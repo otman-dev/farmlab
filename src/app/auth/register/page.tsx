@@ -3,9 +3,11 @@
 
 "use client";
 
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function Register() {
   const router = useRouter();
@@ -49,8 +51,21 @@ export default function Register() {
         return;
       }
 
-      // Redirect to sign in page
-      router.push("/auth/signin");
+      // Automatically sign in after registration
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (signInResult?.error) {
+        setError(signInResult.error === "CredentialsSignin" ? "Invalid email or password" : signInResult.error);
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to dashboard
+      router.push("/dashboard");
     } catch (error) {
       setError("An unexpected error occurred. Please try again.");
       setLoading(false);

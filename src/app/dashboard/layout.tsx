@@ -18,8 +18,10 @@ export default function DashboardLayout({
     async function fetchUser() {
       try {
         const res = await fetch('/api/auth/me');
+        console.log('DashboardLayout: /api/auth/me response', res);
         if (res.ok) {
           const data = await res.json();
+          console.log('DashboardLayout: user data', data);
           setUser(data.user || {});
           // Store user role in localStorage for sidebar
           if (typeof window !== 'undefined' && data.user?.role) {
@@ -27,12 +29,15 @@ export default function DashboardLayout({
           }
           // If not admin, redirect to coming soon
           if (data.user?.role !== 'admin') {
-            router.replace('/dashboard/comingsoon');
+            console.log('DashboardLayout: user is not admin, redirecting to /comingsoon');
+            router.replace('/comingsoon');
           }
         } else {
+          console.log('DashboardLayout: /api/auth/me not ok, redirecting to /auth/signin');
           router.replace('/auth/signin');
         }
-      } catch {
+      } catch (err) {
+        console.log('DashboardLayout: error fetching user', err);
         router.replace('/auth/signin');
       } finally {
         setLoading(false);

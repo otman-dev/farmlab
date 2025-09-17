@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// Temporarily disable the rule for this file to allow the build to proceed.
-
-
 
 "use client";
 export const dynamic = "force-dynamic";
@@ -66,4 +62,3 @@ export default function AuthError() {
   );
 }
 
-// This file is no longer needed and will be removed as part of the cleanup process.

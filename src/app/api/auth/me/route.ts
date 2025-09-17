@@ -1,16 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  try {
-    const token = req.cookies.get('auth_token')?.value;
-    if (!token) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    }
-    const secret = process.env.JWT_SECRET || 'vercel_secret';
-    const user = jwt.verify(token, secret);
-    return NextResponse.json({ user });
-  } catch {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../authOptions';
+
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ user: null }, { status: 401 });
   }
+  return NextResponse.json({ user: session.user });
 }

@@ -3,9 +3,11 @@
 
 "use client";
 
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function SignIn() {
   const router = useRouter();
@@ -19,27 +21,38 @@ export default function SignIn() {
     setLoading(true);
     setError("");
 
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (result?.error) {
+      setError(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch user info and redirect based on role
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Sign-in failed");
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) {
+        setError("Could not fetch user info after sign-in.");
         setLoading(false);
         return;
       }
-
-      // Redirect to dashboard
-      router.push("/dashboard");
-    } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
+      const data = await res.json();
+      const role = data.user?.role;
+      if (role === "admin") {
+        router.push("/dashboard");
+      } else if (role === "visitor") {
+        router.push("/comingsoon");
+      } else {
+        setError("Unknown user role. Please contact support.");
+      }
+    } catch (err) {
+      setError("Unexpected error after sign-in.");
+    } finally {
       setLoading(false);
     }
   };
