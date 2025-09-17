@@ -64,8 +64,17 @@ export default function Register() {
         return;
       }
 
-      // Redirect to dashboard
-      router.push("/dashboard");
+      // Redirect based on role
+      if (signInResult && signInResult.ok) {
+        // Fetch session to get user role
+        const res = await fetch("/api/auth/me");
+        const userData = await res.json();
+        if (userData?.user?.role === "admin") {
+          router.push("/dashboard");
+        } else {
+          router.push("/thankyou");
+        }
+      }
     } catch (error) {
       setError("An unexpected error occurred. Please try again.");
       setLoading(false);

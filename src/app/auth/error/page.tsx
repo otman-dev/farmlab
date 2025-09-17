@@ -2,14 +2,13 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 
 import { Suspense } from "react";
 
 function AuthErrorContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
