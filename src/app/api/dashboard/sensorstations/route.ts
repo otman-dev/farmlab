@@ -5,9 +5,9 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db('farmLab');
-  // List all collections for sensor stations only (e.g., sensorstation01_logs)
-  const collections = await db.listCollections().toArray();
-  const logCollections = collections.filter(c => c.name.startsWith('sensorstation') && c.name.endsWith('_logs'));
+    // List all collections for sensor stations only (e.g., sensorstation01_logs)
+    const collections = await db.listCollections().toArray();
+    const logCollections = collections.filter(c => c.name.startsWith('sensorstation') && c.name.endsWith('_logs'));
 
     // For each log collection, get the latest document
     const latestLogs = await Promise.all(

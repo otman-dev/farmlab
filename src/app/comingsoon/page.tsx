@@ -1,6 +1,6 @@
-export const dynamic = "force-dynamic";
-import ComingSoonClientWrapper from "./ComingSoonClientWrapper";
+"use client";
+import ComingSoonClient from "./ComingSoonClient";
 
 export default function ComingSoonPage() {
-  return <ComingSoonClientWrapper />;
+  return <ComingSoonClient />;
 }

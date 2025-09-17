@@ -1,8 +1,8 @@
-// Minimal global loading component for Next.js app directory
-export default function Loading() {
+// Minimal custom not-found page for Next.js app
+export default function NotFound() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <span>Loading...</span>
+      <span>Page not found.</span>
     </div>
   );
 }

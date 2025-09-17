@@ -9,11 +9,14 @@ type User = {
   image?: string | null;
 };
 
+
 type HeaderProps = {
   user: User;
+  onOpenSidebar?: () => void;
 };
 
-export default function SimpleHeader({ user }: HeaderProps) {
+
+export default function SimpleHeader({ user, onOpenSidebar }: HeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleSignOut = () => {
@@ -25,10 +28,19 @@ export default function SimpleHeader({ user }: HeaderProps) {
     <header className="bg-white border-b border-gray-200">
       <div className="px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="text-lg font-medium text-green-600">
-            FarmLab Platform
+          <div className="flex items-center">
+            {/* Hamburger for mobile */}
+            <button
+              className="md:hidden mr-3 p-2 rounded bg-white border border-gray-200 shadow focus:outline-none"
+              onClick={onOpenSidebar}
+              aria-label="Open sidebar"
+            >
+              <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <span className="text-lg font-medium text-green-600">FarmLab Platform</span>
           </div>
-          
           <div className="flex items-center">
             {/* Profile dropdown */}
             <div className="relative">
@@ -49,7 +61,6 @@ export default function SimpleHeader({ user }: HeaderProps) {
                   </span>
                 </button>
               </div>
-              
               {isProfileOpen && (
                 <div
                   className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
