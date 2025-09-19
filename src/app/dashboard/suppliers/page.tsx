@@ -16,12 +16,22 @@ interface Supplier {
 }
 
 export default function SuppliersPage() {
+
+
+
+  // ...existing code...
+
+
+  // ...existing code...
+
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState<Partial<Supplier>>({ phones: [""] });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchSuppliers = async () => {
     setLoading(true);
@@ -62,12 +72,12 @@ export default function SuppliersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-  if (!form.name) return setError("Contact name is required");
-  if (!form.entrepriseName) return setError("Entreprise name is required");
-  if (!form.address) return setError("Address is required");
-  if (!form.phones || form.phones.length === 0 || form.phones.some(p => !p)) return setError("At least one phone number is required");
+    if (!form.name) return setError("Contact name is required");
+    if (!form.entrepriseName) return setError("Entreprise name is required");
+    if (!form.address) return setError("Address is required");
+    if (!form.phones || form.phones.length === 0 || form.phones.some(p => !p)) return setError("At least one phone number is required");
     try {
-  let res: Response, data: { supplier?: Supplier; error?: string };
+      let res: Response, data: { supplier?: Supplier; error?: string };
       if (editingId) {
         res = await fetch("/api/dashboard/suppliers", {
           method: "PUT",
@@ -78,7 +88,8 @@ export default function SuppliersPage() {
         if (res.ok && data.supplier) {
           setSuppliers(suppliers.map(s => s._id === editingId ? data.supplier! : s));
           setEditingId(null);
-          setForm({});
+          setForm({ phones: [""] });
+          setShowForm(false);
         } else setError(data.error || "Failed to update supplier");
       } else {
         res = await fetch("/api/dashboard/suppliers", {
@@ -89,7 +100,8 @@ export default function SuppliersPage() {
         data = await res.json();
         if (res.ok && data.supplier) {
           setSuppliers([data.supplier, ...suppliers]);
-          setForm({});
+          setForm({ phones: [""] });
+          setShowForm(false);
         } else setError(data.error || "Failed to add supplier");
       }
     } catch (err) {
@@ -99,7 +111,8 @@ export default function SuppliersPage() {
 
   const handleEdit = (supplier: Supplier) => {
     setEditingId(supplier._id);
-  setForm({ ...supplier, phones: supplier.phones && supplier.phones.length > 0 ? supplier.phones : [""] });
+    setForm({ ...supplier, phones: supplier.phones && supplier.phones.length > 0 ? supplier.phones : [""] });
+    setShowForm(true);
   };
 
   const handleDelete = async (supplier: Supplier) => {
@@ -124,16 +137,34 @@ export default function SuppliersPage() {
     }
   };
 
+
+  // Dynamic search filter (matches any field, partial, case-insensitive)
+  const filteredSuppliers: Supplier[] = suppliers.filter((supplier: Supplier) => {
+    if (!search.trim()) return true;
+    const q = search.trim().toLowerCase();
+    return (
+      supplier.entrepriseName.toLowerCase().includes(q) ||
+      supplier.name.toLowerCase().includes(q) ||
+      (supplier.address && supplier.address.toLowerCase().includes(q)) ||
+      (supplier.city && supplier.city.toLowerCase().includes(q)) ||
+      (supplier.category && supplier.category.toLowerCase().includes(q)) ||
+      (supplier.email && supplier.email.toLowerCase().includes(q)) ||
+      (supplier.description && supplier.description.toLowerCase().includes(q)) ||
+      (supplier.notes && supplier.notes.toLowerCase().includes(q)) ||
+      (supplier.phones && supplier.phones.some((phone: string) => phone.toLowerCase().includes(q)))
+    );
+  });
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
         <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-green-400 to-green-700 shadow-lg">
           <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M3 7v13h18V7H3zm16 11H5v-9h14v9zM9 9h2v6H9zm4 0h2v6h-2z"/></svg>
         </span>
         <h1 className="text-3xl font-extrabold text-green-800 tracking-tight">Suppliers Database</h1>
       </div>
-      <p className="text-gray-500 mb-8 text-lg">Manage all your supplier contacts, categories, and details in one place.</p>
-      <form onSubmit={handleSubmit} className="bg-gradient-to-tr from-green-50 to-green-100 rounded-2xl shadow-lg p-8 mb-10 grid grid-cols-1 md:grid-cols-2 gap-6 border border-green-200">
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-gradient-to-tr from-green-50 to-green-100 rounded-2xl shadow-lg p-8 mb-10 grid grid-cols-1 md:grid-cols-2 gap-6 border border-green-200">
   <input name="entrepriseName" placeholder="Entreprise Name*" value={form.entrepriseName || ""} onChange={handleChange} className="border rounded px-3 py-2 text-gray-900" required />
   <input name="name" placeholder="Contact Name*" value={form.name || ""} onChange={handleChange} className="border rounded px-3 py-2 text-gray-900" required />
   <input name="address" placeholder="Address*" value={form.address || ""} onChange={handleChange} className="border rounded px-3 py-2 md:col-span-2 text-gray-900" required />
@@ -167,23 +198,22 @@ export default function SuppliersPage() {
           <button type="submit" className="bg-gradient-to-tr from-green-500 to-green-700 text-white font-bold rounded-lg px-6 py-2 shadow hover:scale-105 hover:from-green-600 hover:to-green-800 transition-all duration-150">
             {editingId ? "Update" : "Add Supplier"}
           </button>
-          {editingId && (
-            <button type="button" className="text-gray-500 px-2" onClick={() => { setEditingId(null); setForm({ phones: [""] }); }}>Cancel</button>
-          )}
+          <button type="button" className="text-gray-500 px-2" onClick={() => { setEditingId(null); setForm({ phones: [""] }); setShowForm(false); }}>Cancel</button>
         </div>
         {error && <div className="text-red-600 md:col-span-2 font-semibold">{error}</div>}
       </form>
+      )}
       {loading ? (
         <div className="text-green-600 font-semibold">Loading suppliers...</div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {suppliers.length === 0 && (
+          {filteredSuppliers.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 bg-gradient-to-tr from-green-50 to-green-100 rounded-xl shadow-inner border border-green-100">
               <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path fill="#a7f3d0" d="M3 7v13h18V7H3zm16 11H5v-9h14v9zM9 9h2v6H9zm4 0h2v6h-2z"/></svg>
-              <span className="text-gray-400 mt-2 text-lg">No suppliers yet. Add your first supplier!</span>
+              <span className="text-gray-400 mt-2 text-lg">No suppliers found.</span>
             </div>
           )}
-          {suppliers.map(supplier => (
+          {filteredSuppliers.map(supplier => (
             <div key={supplier._id} className="bg-white rounded-2xl shadow-lg border-2 border-green-100 hover:border-green-400 transition-all p-6 flex flex-col gap-2">
               <div className="flex items-center gap-3 mb-2">
                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
