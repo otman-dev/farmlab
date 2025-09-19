@@ -4,7 +4,7 @@ import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb-users-client";
-import UserModel from "@/models/User";
+import { getCloudUserModel } from "@/lib/mongodb-cloud";
 import bcrypt from "bcryptjs";
 
 
@@ -19,6 +19,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+        const UserModel = await getCloudUserModel();
         const user = await UserModel.findOne({ email: credentials.email }).select("+password +role");
         if (!user) return null;
         const isValid = await bcrypt.compare(credentials.password, user.password);
