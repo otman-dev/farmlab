@@ -1,10 +1,10 @@
+
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
-import UserModel from '@/models/User';
+import { getCloudUserModel } from '@/lib/mongodb-cloud';
 
 export async function GET() {
   try {
-    await dbConnect();
+    const UserModel = await getCloudUserModel();
     const users = await UserModel.find({}, '-password').lean();
     return NextResponse.json({ users });
   } catch {
@@ -12,10 +12,9 @@ export async function GET() {
   }
 }
 
-// Create a new user
 export async function POST(request: Request) {
   try {
-    await dbConnect();
+    const UserModel = await getCloudUserModel();
     const body = await request.json();
     const { name, email, password, role } = body;
     if (!name || !email || !password || !role) {
@@ -33,10 +32,9 @@ export async function POST(request: Request) {
   }
 }
 
-// Update a user (expects _id in body)
 export async function PUT(request: Request) {
   try {
-    await dbConnect();
+    const UserModel = await getCloudUserModel();
     const body = await request.json();
     const { _id, name, email, role, password } = body;
     if (!_id) {
@@ -54,10 +52,9 @@ export async function PUT(request: Request) {
   }
 }
 
-// Delete a user (expects _id in body)
 export async function DELETE(request: Request) {
   try {
-    await dbConnect();
+    const UserModel = await getCloudUserModel();
     const body = await request.json();
     const { _id } = body;
     if (!_id) {

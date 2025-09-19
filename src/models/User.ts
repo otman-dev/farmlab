@@ -77,7 +77,7 @@ UserSchema.set('toJSON', {
 });
 
 // Explicitly type the UserModel export
-interface User {
+export interface User {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;

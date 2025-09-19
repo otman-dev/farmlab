@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+
+import mongoose, { Connection, Model } from 'mongoose';
+import UserSchema, { User } from '@/models/User';
 
 const MONGODB_CLOUD_CLUSTER_URI = process.env.MONGODB_CLOUD_CLUSTER_URI;
 
@@ -6,40 +8,41 @@ if (!MONGODB_CLOUD_CLUSTER_URI) {
   throw new Error('Please define the MONGODB_CLOUD_CLUSTER_URI environment variable inside .env.local');
 }
 
-let cached: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } = (global as { mongooseCloud?: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } }).mongooseCloud as { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null };
-
-if (!cached) {
-  cached = ((global as { mongooseCloud?: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } }).mongooseCloud = { conn: null, promise: null });
+type CloudCache = { conn: Connection | null; promise: Promise<Connection> | null; userModel?: Model<User> };
+let cachedCloud: CloudCache = (global as unknown as { mongooseCloud?: CloudCache }).mongooseCloud as CloudCache;
+if (!cachedCloud) {
+  cachedCloud = ((global as unknown as { mongooseCloud?: CloudCache }).mongooseCloud = { conn: null, promise: null });
 }
 
-async function dbCloudConnect() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
+export async function getCloudConnection() {
+  if (cachedCloud.conn) return cachedCloud.conn;
+  if (!cachedCloud.promise) {
+  cachedCloud.promise = mongoose.createConnection(MONGODB_CLOUD_CLUSTER_URI as string, {
       bufferCommands: false,
       autoCreate: true,
       autoIndex: true,
       connectTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-    };
-  cached.promise = mongoose.connect(MONGODB_CLOUD_CLUSTER_URI as string, opts)
-      .then((mongoose) => {
+    })
+      .asPromise()
+      .then((conn) => {
         console.log('Connected to MongoDB Cloud Cluster successfully');
-        if (mongoose.connection.db) {
-          console.log('Connected to cloud database:', mongoose.connection.db.databaseName);
-        }
-        return mongoose;
+        return conn;
       })
       .catch((error) => {
         console.error('Error connecting to MongoDB Cloud Cluster:', error);
         throw error;
       });
   }
-  cached.conn = await cached.promise;
-  return cached.conn;
+
+  cachedCloud.conn = await cachedCloud.promise;
+  return cachedCloud.conn;
 }
 
-export default dbCloudConnect;
+export async function getCloudUserModel(): Promise<Model<User>> {
+  const conn = await getCloudConnection();
+  if (!cachedCloud.userModel) {
+    cachedCloud.userModel = conn.models.User || conn.model<User>('User', UserSchema.schema || UserSchema);
+  }
+  return cachedCloud.userModel;
+}

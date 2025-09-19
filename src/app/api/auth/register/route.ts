@@ -1,19 +1,16 @@
 
 
 import { NextRequest, NextResponse } from "next/server";
-import dbCloudConnect from "@/lib/mongodb-cloud";
-import UserModel from "@/models/User";
-
-export async function POST(req: NextRequest) {
+import { getCloudUserModel } from "@/lib/mongodb-cloud";
+export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-  await dbCloudConnect();
-
+    const UserModel = await getCloudUserModel();
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
