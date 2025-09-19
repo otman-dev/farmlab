@@ -75,7 +75,7 @@ export default function Register() {
           router.push("/auth/signin");
         }
       }, 500);
-    } catch (error) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
       setLoading(false);
     }

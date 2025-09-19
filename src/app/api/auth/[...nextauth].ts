@@ -3,7 +3,7 @@ import NextAuth, { type NextAuthOptions, type Session, type User, SessionStrateg
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb-client";
+import clientPromise from "@/lib/mongodb-users-client";
 import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
 

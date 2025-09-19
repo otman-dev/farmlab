@@ -24,6 +24,10 @@ export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }:
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: FiHome },
+  { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
+  { path: '/dashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
+  { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
+  { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
     { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
     { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
     { path: '/dashboard/securitysystem', label: 'Security System', icon: FiLock },
