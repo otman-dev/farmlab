@@ -14,7 +14,7 @@ export async function GET() {
     const Todo = await getCloudTodoModel();
     const todos = await Todo.find({}).sort({ createdAt: -1 }).lean();
     return NextResponse.json({ todos });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch todos' }, { status: 500 });
   }
 }

@@ -31,7 +31,7 @@ export default function SuppliersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search] = useState("");
 
   const fetchSuppliers = async () => {
     setLoading(true);

@@ -8,7 +8,7 @@ export async function GET() {
     await dbConnect();
     const cards = await RFIDCardModel.find({}).populate('user').sort({ detectedAt: -1 }).lean();
     return NextResponse.json({ cards });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch RFID cards' }, { status: 500 });
   }
 }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
     const card = await RFIDCardModel.create({ cardId, status, user, notes });
     return NextResponse.json({ card }, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to add RFID card' }, { status: 500 });
   }
 }
