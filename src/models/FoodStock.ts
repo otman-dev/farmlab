@@ -6,8 +6,9 @@ export interface FoodStockUnit {
 
 export interface FoodStock {
   _id?: string;
-  product: mongoose.Types.ObjectId;
-  units: FoodStockUnit[];
+  productId: string;
+  productName: string;
+  quantity: number;
   createdAt?: string;
 }
 
@@ -15,9 +16,11 @@ const FoodStockUnitSchema = new Schema<FoodStockUnit>({
   openedAt: { type: String },
 });
 
+
 const FoodStockSchema = new Schema<FoodStock>({
-  product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
-  units: { type: [FoodStockUnitSchema], default: [] },
+  productId: { type: String, required: true },
+  productName: { type: String, required: true },
+  quantity: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 

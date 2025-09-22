@@ -1,24 +1,17 @@
+
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-export interface MedicineUnit {
-  openedAt?: Date;
-  expiresAt: Date;
-}
-
 export interface MedicalStock extends Document {
-  product: mongoose.Types.ObjectId; // Reference to Product
-  units: MedicineUnit[];
+  productId: string;
+  productName: string;
+  quantity: number;
   createdAt: Date;
 }
 
-const MedicineUnitSchema: Schema = new Schema<MedicineUnit>({
-  openedAt: { type: Date },
-  expiresAt: { type: Date, required: true },
-});
-
 const MedicalStockSchema: Schema = new Schema<MedicalStock>({
-  product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-  units: { type: [MedicineUnitSchema], required: true },
+  productId: { type: String, required: true, unique: true },
+  productName: { type: String, required: true },
+  quantity: { type: Number, required: true, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 
