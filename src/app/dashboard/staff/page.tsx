@@ -22,13 +22,13 @@ export default function StaffPage() {
   useEffect(() => {
     fetch('/api/dashboard/staff')
       .then(res => res.json())
-      .then(data => setStaff(data))
+      .then(data => setStaff(Array.isArray(data) ? data : data.staff || []))
       .catch(() => setError('Failed to load staff'))
       .finally(() => setLoading(false));
   }, []);
 
   return (
-    <div className="p-6">
+  <div className="p-6 text-black">
       <h1 className="text-2xl font-bold mb-4">Staff Management & Attendance</h1>
       <div className="mb-6">
         <p className="mb-2">Add, view, and manage staff. Track attendance visually on a calendar.</p>
@@ -37,7 +37,7 @@ export default function StaffPage() {
           <Link href="/dashboard/staff/calendar" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">View Attendance Calendar</Link>
         </div>
       </div>
-      <div className="bg-white rounded shadow p-4">
+  <div className="bg-white rounded shadow p-4 text-black">
         <h2 className="text-lg font-semibold mb-2">Staff List</h2>
         {loading ? (
           <p>Loading...</p>
@@ -47,12 +47,12 @@ export default function StaffPage() {
           <p>No staff found.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full border">
+            <table className="min-w-full border text-black">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Role</th>
-                  <th className="px-4 py-2 text-left">Contact</th>
+                <tr className="bg-gray-100 text-black">
+                  <th className="px-4 py-2 text-left text-black">Name</th>
+                  <th className="px-4 py-2 text-left text-black">Role</th>
+                  <th className="px-4 py-2 text-left text-black">Contact</th>
                 </tr>
               </thead>
               <tbody>

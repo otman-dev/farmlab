@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
         // Get product name for denormalization
         const product = await Product.findById(productId);
         if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
-        stock = await FoodStock.create({ productId, productName: product.name, quantity: 1 });
+  stock = await FoodStock.create({ productId, quantity: 1 });
         return NextResponse.json({ success: true, quantity: stock.quantity });
       } else {
         return NextResponse.json({ error: "Stock not found" }, { status: 404 });
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Get product name for denormalization
     const prod = await Product.findById(product);
     if (!prod) return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    const newStock = await FoodStock.create({ productId: product, productName: prod.name, quantity: quantity ?? 0 });
+  const newStock = await FoodStock.create({ productId: product, quantity: quantity ?? 0 });
     return NextResponse.json({ stock: newStock });
   } catch {
     return NextResponse.json({ error: "Failed to create food stock" }, { status: 500 });

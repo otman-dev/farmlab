@@ -32,7 +32,7 @@ export async function PATCH(req: NextRequest) {
         // Get product name for denormalization
         const product = await Product.findById(productId);
         if (!product || product.category !== 'animal_medicine') return NextResponse.json({ error: "Product not found" }, { status: 404 });
-        stock = await MedicalStock.create({ productId, productName: product.name, quantity: 1 });
+  stock = await MedicalStock.create({ productId, quantity: 1 });
         return NextResponse.json({ success: true, quantity: stock.quantity });
       } else {
         return NextResponse.json({ error: "Stock not found" }, { status: 404 });
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     // Get product name for denormalization
     const prod = await Product.findById(productId);
     if (!prod || prod.category !== 'animal_medicine') return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    const newStock = await MedicalStock.create({ productId, productName: prod.name, quantity: quantity ?? 0 });
+  const newStock = await MedicalStock.create({ productId, quantity: quantity ?? 0 });
     return NextResponse.json({ stock: newStock });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });

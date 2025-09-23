@@ -164,7 +164,7 @@ export default function StaffAttendanceCalendar() {
                     <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-200 text-blue-800 font-bold text-base shadow-sm">
                       {s.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                     </span>
-                    {s.name}
+                    <span className="text-black">{s.name}</span>
                   </span>
                   <button
                     className={`ml-2 px-4 py-2 rounded font-bold flex items-center gap-2 ${present ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700 border border-gray-400"}`}
@@ -230,7 +230,7 @@ export default function StaffAttendanceCalendar() {
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-200 text-blue-800 font-bold text-base shadow-sm">
                     {s.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                   </span>
-                  <span>{s.name}</span>
+                  <span className="text-black">{s.name}</span>
                 </td>
                 <td className="px-2 py-1">
                   <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${s.role === "Helping Hand" ? "bg-green-200 text-green-800" : s.role === "Cleaner" ? "bg-yellow-200 text-yellow-800" : "bg-blue-200 text-blue-800"}`}>
