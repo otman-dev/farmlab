@@ -151,7 +151,7 @@ export default function StaffAttendanceCalendar() {
           <button className="text-2xl px-2 py-1" onClick={() => setSelectedDay((d) => Math.min(daysInMonth, d + 1))} disabled={selectedDay === daysInMonth}>&#8594;</button>
         </div>
         {filteredStaff.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">No staff found.</div>
+          <div className="text-center text-black py-8">No staff found.</div>
         ) : (
           <div className="flex flex-col gap-3">
             {filteredStaff.map((s) => {
@@ -175,7 +175,7 @@ export default function StaffAttendanceCalendar() {
                       <span className="w-4 h-4 border-2 border-t-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
                     ) : present ? "Mark Absent" : "Mark Present"}
                   </button>
-                  {state === 'absent' && <span className="ml-2 text-xs text-gray-500">Absent (default)</span>}
+                  {state === 'absent' && <span className="ml-2 text-xs text-black">Absent (default)</span>}
                 </div>
               );
             })}
@@ -189,36 +189,36 @@ export default function StaffAttendanceCalendar() {
   // Desktop: full month grid
   return (
     <div className="max-w-full overflow-x-auto">
-      <div className="mb-4 flex flex-wrap gap-2 items-center">
+      <div className="mb-4 flex flex-wrap gap-2 items-center text-black">
         <span className="font-bold text-lg mr-4">Attendance Management</span>
         <label className="font-semibold">Filter by role:</label>
-        <select className="border rounded px-2 py-1" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
+        <select className="border rounded px-2 py-1 text-black" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
           <option value="all">All</option>
           {roles.map((r) => (
             <option key={r} value={r}>{r}</option>
           ))}
         </select>
         <span className="ml-4">Month:</span>
-        <select className="border rounded px-2 py-1" value={month} onChange={e => setMonth(Number(e.target.value))}>
+        <select className="border rounded px-2 py-1 text-black" value={month} onChange={e => setMonth(Number(e.target.value))}>
           {monthNames.map((m, i) => <option key={m} value={i}>{m}</option>)}
         </select>
         <span>Year:</span>
-        <select className="border rounded px-2 py-1" value={year} onChange={e => setYear(Number(e.target.value))}>
+        <select className="border rounded px-2 py-1 text-black" value={year} onChange={e => setYear(Number(e.target.value))}>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
       </div>
       {filteredStaff.length === 0 ? (
-        <div className="text-center text-gray-500 py-8">No staff found.</div>
+  <div className="text-center text-black py-8">No staff found.</div>
       ) : (
         <table className="min-w-max w-full border-collapse bg-white rounded-lg shadow overflow-hidden">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-2 py-1 text-left sticky left-0 z-20 bg-gray-100" style={{ minWidth: "160px" }}>Staff</th>
-              <th className="px-2 py-1 text-left">Role</th>
+            <tr className="bg-gray-100 text-black">
+              <th className="px-2 py-1 text-left sticky left-0 z-20 bg-gray-100 text-black" style={{ minWidth: "160px" }}>Staff</th>
+              <th className="px-2 py-1 text-left text-black">Role</th>
               {Array.from({ length: daysInMonth }, (_, i) => {
                 const isToday = year === today.getFullYear() && month === today.getMonth() && i + 1 === today.getDate();
                 return (
-                  <th key={i} className={`px-1 py-1 text-center text-xs font-semibold ${isToday ? "bg-blue-200 text-blue-900" : ""}`}>{i + 1}</th>
+                  <th key={i} className={`px-1 py-1 text-center text-xs font-semibold text-black ${isToday ? "bg-blue-200 text-blue-900" : ""}`}>{i + 1}</th>
                 );
               })}
             </tr>
@@ -255,7 +255,7 @@ export default function StaffAttendanceCalendar() {
                           <span className="w-3 h-3 border-2 border-t-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
                         ) : present ? "✔" : ""}
                       </button>
-                      {state === 'absent' && <div className="text-[10px] text-gray-400">-</div>}
+                      {state === 'absent' && <div className="text-[10px] text-black">-</div>}
                     </td>
                   );
                 })}
