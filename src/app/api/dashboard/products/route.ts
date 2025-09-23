@@ -31,8 +31,6 @@ export async function POST(request: NextRequest) {
       unit,
       unitAmount,
       goodFor,
-      expirationDate,
-      firstUsageDate,
       usageDescription
     } = body;
     if (!name || !category) {

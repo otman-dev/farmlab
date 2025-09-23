@@ -29,6 +29,7 @@ export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }:
     { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
     { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
     { path: '/dashboard/products', label: 'Products', icon: FiServer },
+    { path: '/dashboard/staff', label: 'Staff', icon: FiServer },
     { path: '/dashboard/suppliers', label: 'Suppliers', icon: FiServer },
     { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
     { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },

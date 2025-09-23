@@ -12,11 +12,6 @@ export interface FoodStock {
   createdAt?: string;
 }
 
-const FoodStockUnitSchema = new Schema<FoodStockUnit>({
-  openedAt: { type: String },
-});
-
-
 const FoodStockSchema = new Schema<FoodStock>({
   productId: { type: String, required: true },
   productName: { type: String, required: true },
