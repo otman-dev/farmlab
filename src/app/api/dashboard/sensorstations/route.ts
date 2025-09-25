@@ -14,7 +14,7 @@ export async function GET() {
       logCollections.map(async (col) => {
         const doc = await db.collection(col.name)
           .find({})
-          .sort({ timestamp: -1 })
+          .sort({ _id: -1 })
           .limit(1)
           .toArray();
         return doc[0] ? { ...doc[0], collection: col.name } : null;
