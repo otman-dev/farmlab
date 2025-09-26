@@ -12,7 +12,7 @@ async function getCloudTodoModel() {
 export async function GET() {
   try {
     const Todo = await getCloudTodoModel();
-    const todos = await Todo.find({}).sort({ createdAt: -1 }).lean();
+    const todos = await Todo.find({}).populate('user', 'name email').sort({ createdAt: -1 }).lean();
     return NextResponse.json({ todos });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch todos' }, { status: 500 });
@@ -22,13 +22,20 @@ export async function GET() {
 // Add a new todo
 export async function POST(request: Request) {
   try {
-    const { title, user } = await request.json();
+    const { title, user, priority, category, dueDate } = await request.json();
     if (!title) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
     }
     const Todo = await getCloudTodoModel();
-    const todo = await Todo.create({ title, user });
-    return NextResponse.json({ todo }, { status: 201 });
+    const todo = await Todo.create({
+      title,
+      user,
+      priority: priority || 'medium',
+      category: category || 'general',
+      dueDate: dueDate ? new Date(dueDate) : undefined
+    });
+    const populatedTodo = await Todo.findById(todo._id).populate('user', 'name email');
+    return NextResponse.json({ todo: populatedTodo }, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Failed to add todo' }, { status: 500 });
   }
@@ -38,15 +45,25 @@ export async function POST(request: Request) {
 // Update a todo (mark complete/incomplete or edit title)
 export async function PUT(request: Request) {
   try {
-    const { _id, title, completed } = await request.json();
+    const { _id, title, completed, priority, category, dueDate } = await request.json();
     if (!_id) {
       return NextResponse.json({ error: 'Todo ID is required' }, { status: 400 });
     }
     const Todo = await getCloudTodoModel();
-    const update: Partial<{ title?: string; completed?: boolean }> = {};
+    const update: Partial<{
+      title?: string;
+      completed?: boolean;
+      priority?: string;
+      category?: string;
+      dueDate?: Date
+    }> = {};
     if (title !== undefined) update.title = title;
     if (completed !== undefined) update.completed = completed;
-    const updated = await Todo.findByIdAndUpdate(_id, update, { new: true });
+    if (priority !== undefined) update.priority = priority;
+    if (category !== undefined) update.category = category;
+    if (dueDate !== undefined) update.dueDate = dueDate ? new Date(dueDate) : undefined;
+
+    const updated = await Todo.findByIdAndUpdate(_id, update, { new: true }).populate('user', 'name email');
     if (!updated) {
       return NextResponse.json({ error: 'Todo not found' }, { status: 404 });
     }
