@@ -32,18 +32,8 @@ export default function SignIn() {
       return;
     }
 
-    // Wait for session to be updated
-    setTimeout(async () => {
-      const session = await getSession();
-  const role = (session?.user as { role?: string })?.role;
-      if (role === "admin") {
-        router.push("/dashboard");
-      } else if (role === "visitor") {
-        router.push("/comingsoon");
-      } else {
-        router.push("/auth/signin");
-      }
-    }, 500);
+    // Redirect to dashboard - middleware will handle role-based routing
+    router.push("/dashboard");
   };
 
   return (

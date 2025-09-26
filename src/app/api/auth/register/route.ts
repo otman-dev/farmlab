@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCloudUserModel } from "@/lib/mongodb-cloud";
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, userType, farmSize, techExperience, interests, expectations, location, organization } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
@@ -24,6 +24,13 @@ export async function POST(request: NextRequest) {
       email,
       password,
       role: "visitor",
+      userType,
+      farmSize,
+      techExperience,
+      interests,
+      expectations,
+      location,
+      organization,
     });
 
     const userWithoutPassword = {
@@ -31,6 +38,13 @@ export async function POST(request: NextRequest) {
       name: user.name,
       email: user.email,
       role: user.role,
+      userType: user.userType,
+      farmSize: user.farmSize,
+      techExperience: user.techExperience,
+      interests: user.interests,
+      expectations: user.expectations,
+      location: user.location,
+      organization: user.organization,
     };
 
     return NextResponse.json(

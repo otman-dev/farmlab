@@ -28,10 +28,13 @@ export async function middleware(request: NextRequest) {
 
   // Check user role from NextAuth token
   if (token.role === 'admin') {
-    // Allow admin
+    // Allow admin full access
     return NextResponse.next();
   } else if (token.role === 'visitor') {
-    // Redirect visitor to /comingsoon
+    // Allow visitor to access dashboard (they get a presentation dashboard)
+    return NextResponse.next();
+  } else if (token.role === 'waiting_list') {
+    // Redirect waiting list users to coming soon page
     const url = new URL('/comingsoon', request.url);
     return NextResponse.redirect(url);
   } else {

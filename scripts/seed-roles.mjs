@@ -1,4 +1,4 @@
-import Role from '../src/models/Role.js';
+import Role from '../src/models/Role.cloud.js';
 import clientPromise from '../src/lib/mongodb-client.js';
 
 async function seedRoles() {
@@ -8,7 +8,8 @@ async function seedRoles() {
 
     const roles = [
       { name: 'admin', description: 'Administrator with full access', permissions: ['read', 'write', 'delete', 'manage_users'] },
-      { name: 'visitor', description: 'Basic user with limited access', permissions: ['read'] },
+      { name: 'visitor', description: 'Basic user with limited access to presentation dashboard', permissions: ['read'] },
+      { name: 'waiting_list', description: 'Users on waiting list, access coming soon page', permissions: [] },
     ];
 
     for (const roleData of roles) {

@@ -24,8 +24,8 @@ export const authOptions: NextAuthOptions = {
         if (!user) return null;
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) return null;
-        // Only allow admin or visitor
-        if (!['admin', 'visitor'].includes(user.role)) return null;
+        // Only allow admin, visitor, or waiting_list
+        if (!['admin', 'visitor', 'waiting_list'].includes(user.role)) return null;
         return {
           id: user._id.toString(),
           name: user.name,
@@ -50,6 +50,16 @@ export const authOptions: NextAuthOptions = {
         (session.user as User & { role?: string }).role = token.role as string;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      // If the URL is relative, prepend the base URL
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      
+      // If the URL is already absolute and on the same domain, allow it
+      if (new URL(url).origin === baseUrl) return url;
+      
+      // Default to dashboard for authenticated users
+      return `${baseUrl}/dashboard`;
     },
   },
   pages: {

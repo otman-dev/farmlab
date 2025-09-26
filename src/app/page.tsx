@@ -1,81 +1,253 @@
 import Link from "next/link";
+import { FiArrowRight, FiUsers, FiTrendingUp, FiTarget, FiZap, FiHeart, FiBookOpen, FiCode, FiSearch } from "react-icons/fi";
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-green-50 to-lime-100">
-      <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-0 md:gap-8 p-0 md:p-8 animate-fade-in">
-        {/* Left: SVG Illustration & Logo */}
-        <div className="hidden md:flex flex-1 items-center justify-center bg-gradient-to-br from-green-100 to-lime-200 rounded-l-3xl shadow-2xl overflow-hidden">
-          <div className="flex flex-col items-center justify-center w-full h-full p-8">
-            {/* FarmLab Logo - Distinctive, geometric, eco-tech */}
-            <div className="mb-8">
-              <svg width="260" height="64" viewBox="0 0 260 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Icon: flask with leaf, circuit nodes */}
-                <g>
-                  {/* Flask body */}
-                  <rect x="12" y="20" width="32" height="32" rx="16" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2.5" />
-                  {/* Flask neck */}
-                  <rect x="22" y="8" width="12" height="20" rx="6" fill="#bbf7d0" stroke="#22c55e" strokeWidth="2" />
-                  {/* Leaf */}
-                  <path d="M28 36c6-6 14-10 14-18-8 0-14 6-16 12 1 4 2 6 2 6z" fill="#a3e635" stroke="#22c55e" strokeWidth="1.5" />
-                  {/* Circuit nodes */}
-                  <circle cx="20" cy="52" r="2.5" fill="#65a30d" />
-                  <circle cx="36" cy="52" r="2.5" fill="#65a30d" />
-                  <circle cx="28" cy="60" r="2.5" fill="#22c55e" />
-                  <path d="M28 52v6" stroke="#22c55e" strokeWidth="1.5" />
-                  <path d="M20 52h16" stroke="#22c55e" strokeWidth="1.5" />
-                </g>
-                {/* Brand name - improved alignment and spacing */}
-                <text x="60" y="48" fontFamily="'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif" fontWeight="800" fontSize="36" fill="#166534" letterSpacing="3">
-                  Farm
-                </text>
-                <text x="155" y="48" fontFamily="'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif" fontWeight="800" fontSize="36" fill="#65a30d" letterSpacing="3">
-                  Lab
-                </text>
-              </svg>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg mb-8">
+              <FiTarget className="w-10 h-10 text-white" />
             </div>
-            {/* Modern SVG Illustration */}
-            <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="160" cy="260" rx="120" ry="30" fill="#bbf7d0" />
-              <rect x="80" y="180" width="160" height="60" rx="20" fill="#f0fdf4" stroke="#22c55e" strokeWidth="3" />
-              <rect x="120" y="120" width="80" height="80" rx="16" fill="#a3e635" stroke="#22c55e" strokeWidth="3" />
-              <rect x="140" y="80" width="40" height="40" rx="12" fill="#22c55e" stroke="#166534" strokeWidth="2" />
-              <circle cx="160" cy="100" r="8" fill="#fef9c3" stroke="#a3e635" strokeWidth="2" />
-              <path d="M160 180v-40" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
-              <path d="M160 120l-20 20" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
-              <path d="M160 120l20 20" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
-              <ellipse cx="160" cy="200" rx="32" ry="8" fill="#bbf7d0" />
-              <rect x="90" y="200" width="20" height="30" rx="6" fill="#fef9c3" stroke="#a3e635" strokeWidth="2" />
-              <rect x="210" y="200" width="20" height="30" rx="6" fill="#fef9c3" stroke="#a3e635" strokeWidth="2" />
-              <rect x="110" y="220" width="100" height="10" rx="5" fill="#bbf7d0" />
-              <circle cx="160" cy="260" r="6" fill="#22c55e" />
-            </svg>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Welcome to
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">
+                FarmLab
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+              We&apos;re pioneering the future of smart agriculture by digitalizing our own working farm.
+              Join us on this transparent journey from one greenhouse to a connected agricultural network.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Link
+                href="/comingsoon"
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                <FiZap className="w-5 h-5 mr-2" />
+                Explore FarmLab
+                <FiArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-green-500 hover:text-green-600 transition-all duration-200"
+              >
+                <FiUsers className="w-5 h-5 mr-2" />
+                Join Our Community
+              </Link>
+            </div>
           </div>
         </div>
-        {/* Right: Text and CTA */}
-        <div className="flex-1 flex flex-col justify-center items-center md:items-start bg-white/90 backdrop-blur-lg rounded-3xl md:rounded-l-none md:rounded-r-3xl shadow-2xl border-2 border-green-200 px-6 py-12 md:py-16 gap-6">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-green-800 text-center md:text-left leading-tight drop-shadow-lg">
-            Experience the Digital Farm Revolution
-          </h1>
-          <h2 className="text-lg sm:text-xl md:text-2xl text-gray-700 font-medium text-center md:text-left max-w-xl">
-            FarmLab is a real-world initiative: we’re digitalizing our own farm, pioneering smart agriculture, and sharing every step as we scale from one field to a network of greenhouses.
+      </div>
+
+      {/* What is FarmLab */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">What is FarmLab?</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              FarmLab is more than just a platform—it&apos;s a real-world agricultural innovation initiative.
+              We&apos;re digitalizing our own operational farm to pioneer smart agriculture solutions.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg mb-6">
+                <FiTarget className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Real-World Testing</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Every feature is developed and tested on our actual working farm, ensuring practical,
+                reliable solutions that work in real agricultural environments.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg mb-6">
+                <FiTrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Transparent Journey</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Follow our complete transformation from traditional farming to a fully automated,
+                data-driven agricultural operation. Every step is documented and shared.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl shadow-lg mb-6">
+                <FiUsers className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Community Driven</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Join a community of farmers, technologists, and innovators working together
+                to shape the future of sustainable agriculture.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Who Should Join */}
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Who Should Join FarmLab?</h2>
+            <p className="text-lg text-gray-600">FarmLab welcomes everyone interested in the future of agriculture</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg mb-6">
+                <FiTarget className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Farmers & Growers</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Modernize your operations with IoT sensors, automated controls, and data-driven insights
+                that increase yields and reduce costs.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Real-time monitoring</li>
+                <li>• Automated irrigation</li>
+                <li>• Yield optimization</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg mb-6">
+                <FiCode className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Technology Innovators</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Work with cutting-edge IoT, AI, and automation technologies in real agricultural
+                applications and environments.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• IoT integration</li>
+                <li>• API development</li>
+                <li>• Data analytics</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg mb-6">
+                <FiSearch className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Researchers & Academics</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Access real agricultural data and participate in research initiatives that advance
+                sustainable farming practices.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Research partnerships</li>
+                <li>• Data access</li>
+                <li>• Field studies</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg mb-6">
+                <FiBookOpen className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Students & Educators</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Learn about modern agriculture through hands-on examples and educational resources
+                that bridge farming and technology.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Educational content</li>
+                <li>• Case studies</li>
+                <li>• Learning resources</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl shadow-lg mb-6">
+                <FiHeart className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Enthusiasts & Curious Minds</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Follow our journey and learn how technology is transforming traditional agriculture
+                into a sustainable, efficient industry.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Behind-the-scenes access</li>
+                <li>• Educational insights</li>
+                <li>• Community discussions</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl shadow-lg mb-6">
+                <FiUsers className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Industry Partners</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Collaborate with us to integrate your agricultural technologies, research partnerships,
+                or business opportunities.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Partnership opportunities</li>
+                <li>• Integration support</li>
+                <li>• Business development</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Our Journey */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Journey So Far</h2>
+            <p className="text-lg text-gray-600">From concept to real-world implementation</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">2023</div>
+              <div className="text-lg font-semibold text-gray-900 mb-2">Founded</div>
+              <div className="text-gray-600">FarmLab was established with a vision to revolutionize agriculture through technology.</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">2024</div>
+              <div className="text-lg font-semibold text-gray-900 mb-2">First Deployment</div>
+              <div className="text-gray-600">Successfully deployed our IoT system on our pilot farm with real-time monitoring.</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">2025</div>
+              <div className="text-lg font-semibold text-gray-900 mb-2">Platform Launch</div>
+              <div className="text-gray-600">Full platform release with comprehensive farm management features and community access.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Final CTA */}
+      <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 py-16">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to Join the Agricultural Revolution?
           </h2>
-          <ul className="text-base sm:text-lg text-gray-600 mb-2 list-disc list-inside text-left max-w-md mx-auto md:mx-0 space-y-1">
-            <li>🔎 Transparent, hands-on digital transformation</li>
-            <li>� Real data, real automation, real impact</li>
-            <li>🌍 From one farm to a connected community</li>
-            <li>🤝 Join, learn, and shape the future with us</li>
-          </ul>
-          <p className="text-base sm:text-lg text-gray-700 text-center md:text-left mb-2 max-w-lg">
-            Be part of a movement that’s redefining agriculture for the digital age. Get exclusive updates, behind-the-scenes insights, and early access to our platform.
+          <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+            Be part of the movement that&apos;s bringing modern technology to traditional farming.
+            Join our community and help shape the future of sustainable agriculture.
           </p>
-          <Link
-            href="/auth/register"
-            className="inline-block px-10 py-4 bg-gradient-to-r from-green-600 via-green-500 to-lime-400 text-white font-extrabold text-lg rounded-2xl shadow-xl hover:scale-105 hover:from-green-700 hover:to-lime-500 transition-all duration-200 animate-fade-in ring-2 ring-green-300/40 ring-inset tracking-wide"
-            style={{ boxShadow: '0 0 24px 2px #a3e63555, 0 2px 12px 0 #0001' }}
-          >
-            Join the Waitlist & Follow the Journey
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/comingsoon"
+              className="inline-flex items-center px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg"
+            >
+              <FiZap className="w-5 h-5 mr-2" />
+              Learn More About FarmLab
+            </Link>
+            <Link
+              href="/comingsoon"
+              className="inline-flex items-center px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-green-600 transition-all duration-200"
+            >
+              <FiUsers className="w-5 h-5 mr-2" />
+              Join the Waitlist
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -26,6 +26,38 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: 'visitor',
   },
+  // Additional categorization fields
+  userType: {
+    type: String,
+    enum: ['farmer', 'tech', 'rnd', 'student', 'teacher', 'curious'],
+    required: false,
+  },
+  farmSize: {
+    type: String,
+    enum: ['small', 'medium', 'large', 'greenhouse', 'none'],
+    required: false,
+  },
+  techExperience: {
+    type: String,
+    enum: ['beginner', 'intermediate', 'advanced', 'expert'],
+    required: false,
+  },
+  interests: [{
+    type: String,
+    enum: ['monitoring', 'automation', 'analytics', 'mobile', 'collaboration', 'sustainability', 'integration', 'education'],
+  }],
+  expectations: [{
+    type: String,
+    enum: ['increase_yield', 'save_resources', 'reduce_costs', 'improve_quality', 'scale_operations', 'stay_competitive', 'learn_tech', 'network'],
+  }],
+  location: {
+    type: String,
+    required: false,
+  },
+  organization: {
+    type: String,
+    required: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -58,6 +90,13 @@ interface SerializedUser {
   name: string;
   email: string;
   role: string;
+  userType?: string;
+  farmSize?: string;
+  techExperience?: string;
+  interests?: string[];
+  expectations?: string[];
+  location?: string;
+  organization?: string;
   createdAt: Date;
 }
 
@@ -65,11 +104,19 @@ interface SerializedUser {
 UserSchema.set('toJSON', {
   virtuals: true,
   transform: function (doc, ret): SerializedUser {
+    // Convert nulls to undefined for optional string fields to satisfy TS types
     return {
       id: ret._id.toString(),
       name: ret.name,
       email: ret.email,
       role: ret.role,
+      userType: ret.userType === null ? undefined : ret.userType,
+      farmSize: ret.farmSize === null ? undefined : ret.farmSize,
+      techExperience: ret.techExperience === null ? undefined : ret.techExperience,
+      interests: ret.interests,
+      expectations: ret.expectations,
+      location: ret.location === null ? undefined : ret.location,
+      organization: ret.organization === null ? undefined : ret.organization,
       createdAt: ret.createdAt,
     };
   },
@@ -82,6 +129,13 @@ export interface User {
   email: string;
   password: string;
   role: string;
+  userType?: string;
+  farmSize?: string;
+  techExperience?: string;
+  interests?: string[];
+  expectations?: string[];
+  location?: string;
+  organization?: string;
   createdAt: Date;
   matchPassword: (enteredPassword: string) => Promise<boolean>;
 }
