@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FiThermometer, FiDroplet, FiCloud, FiCpu, FiWind, FiZap } from "react-icons/fi";
+import Link from "next/link";
 
 type SensorStation = {
   _id: string;
@@ -61,7 +62,7 @@ export default function SensorStationsPage() {
       {error && <div className="text-red-600">{error}</div>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {stations.map((station: SensorStation) => (
-          <div key={station._id} className="bg-white rounded-xl shadow-lg p-6 border border-green-100 hover:shadow-xl transition">
+          <Link key={station._id} href={`/dashboard/sensorstations/${station.device_id}`} className="bg-white rounded-xl shadow-lg p-6 border border-green-100 hover:shadow-xl transition cursor-pointer">
             <div className="flex items-center justify-between mb-2">
               <div className="font-bold text-lg text-green-700 flex items-center gap-2">
                 <FiZap className="text-green-400" />
@@ -85,7 +86,7 @@ export default function SensorStationsPage() {
               ))}
             </div>
             <div className="mt-4 text-xs text-gray-400 text-right">Timestamp: <span className="font-mono">{station.timestamp}</span></div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
