@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       name,
       email,
       password,
-      role: "visitor",
+      role: "waiting_list",
       userType,
       farmSize,
       techExperience,

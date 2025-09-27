@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { FiArrowRight, FiArrowLeft, FiCheck, FiUser, FiTrendingUp, FiTarget, FiMail, FiMapPin, FiBriefcase, FiCode, FiBookOpen, FiSearch, FiZap, FiHeart, FiStar } from "react-icons/fi";
+import { useState } from "react";
+import { FiArrowRight, FiArrowLeft, FiCheck, FiTarget, FiCode, FiSearch, FiBookOpen, FiZap, FiHeart } from "react-icons/fi";
 
 interface WaitingListData {
   userType: string;

@@ -1,6 +1,8 @@
 
+
 import { NextResponse } from 'next/server';
 import { getCloudUserModel } from '@/lib/mongodb-cloud';
+import bcrypt from 'bcryptjs';
 
 export async function GET() {
   try {
@@ -25,7 +27,10 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 });
     }
-    const newUser = await UserModel.create({ name, email, password, role });
+  // Hash password before saving (mimic registration flow)
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const newUser = await UserModel.create({ name, email, password: hashedPassword, role });
     return NextResponse.json({ user: { ...newUser.toObject(), password: undefined } }, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
@@ -41,7 +46,10 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Missing user ID' }, { status: 400 });
     }
     const update: Partial<{ name: string; email: string; role: string; password?: string }> = { name, email, role };
-    if (password) update.password = password;
+    if (password) {
+  const salt = await bcrypt.genSalt(10);
+  update.password = await bcrypt.hash(password, salt);
+    }
     const updated = await UserModel.findByIdAndUpdate(_id, update, { new: true, runValidators: true });
     if (!updated) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

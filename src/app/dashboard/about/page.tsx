@@ -1,6 +1,6 @@
 "use client";
 
-import { FiHeart, FiTarget, FiUsers, FiAward, FiTrendingUp } from 'react-icons/fi';
+import { FiHeart, FiTarget, FiUsers, FiAward } from 'react-icons/fi';
 
 export default function AboutPage() {
   const values = [

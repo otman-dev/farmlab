@@ -26,14 +26,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Check user role from NextAuth token
-  if (token.role === 'admin') {
-    // Allow admin full access
+  // Allow access for valid roles
+  const role = String(token.role);
+  if (["admin", "manager", "sponsor", "visitor"].includes(role)) {
     return NextResponse.next();
-  } else if (token.role === 'visitor') {
-    // Allow visitor to access dashboard (they get a presentation dashboard)
-    return NextResponse.next();
-  } else if (token.role === 'waiting_list') {
+  } else if (role === "waiting_list") {
     // Redirect waiting list users to coming soon page
     const url = new URL('/comingsoon', request.url);
     return NextResponse.redirect(url);

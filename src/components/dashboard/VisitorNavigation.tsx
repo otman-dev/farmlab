@@ -13,7 +13,7 @@ export default function VisitorNavigation({ mobileOpen, setMobileOpen }: Visitor
   const pathname = usePathname();
 
   const navItems = [
-    { path: '/dashboard', label: 'Home', icon: FiHome },
+    { path: '/visitorDashboard', label: 'Home', icon: FiHome },
     { path: '/dashboard/features', label: 'Features', icon: FiStar },
     { path: '/dashboard/about', label: 'About', icon: FiInfo },
     { path: '/dashboard/contact', label: 'Contact', icon: FiMail },

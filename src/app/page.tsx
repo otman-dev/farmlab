@@ -247,6 +247,14 @@ export default function Home() {
               <FiUsers className="w-5 h-5 mr-2" />
               Join the Waitlist
             </Link>
+            <Link
+              href="/auth/signin"
+              className="inline-flex items-center px-6 py-3 border border-white text-white font-medium rounded-lg hover:bg-white hover:text-green-600 transition-all duration-200 opacity-80 hover:opacity-100"
+              style={{ minWidth: 'fit-content' }}
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12H3m0 0l4-4m-4 4l4 4m13-8v8a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h6"></path></svg>
+              Sign In
+            </Link>
           </div>
         </div>
       </div>

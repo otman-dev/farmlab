@@ -49,7 +49,7 @@ export async function PATCH(req: NextRequest) {
     }
     await stock.save();
     return NextResponse.json({ success: true, quantity: stock.quantity });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Failed to update stock" }, { status: 500 });
   }
 }

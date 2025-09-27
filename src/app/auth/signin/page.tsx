@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn, getSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 export default function SignIn() {
   const router = useRouter();

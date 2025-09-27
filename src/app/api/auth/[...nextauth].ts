@@ -21,11 +21,22 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
         const UserModel = await getCloudUserModel();
         const user = await UserModel.findOne({ email: credentials.email }).select("+password +role");
-        if (!user) return null;
+        console.log('AUTH DEBUG: user found:', user ? { email: user.email, role: user.role, password: user.password } : null);
+        if (!user) {
+          console.log('AUTH DEBUG: No user found for email', credentials.email);
+          return null;
+        }
         const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
-        // Only allow admin, visitor, or waiting_list
-        if (!['admin', 'visitor', 'waiting_list'].includes(user.role)) return null;
+        console.log('AUTH DEBUG: password valid?', isValid);
+        if (!isValid) {
+          console.log('AUTH DEBUG: Invalid password for', credentials.email);
+          return null;
+        }
+        // Only allow admin, sponsor, manager, visitor, or waiting_list
+        if (!['admin', 'sponsor', 'manager', 'visitor', 'waiting_list'].includes(user.role)) {
+          console.log('AUTH DEBUG: Role not allowed:', user.role);
+          return null;
+        }
         return {
           id: user._id.toString(),
           name: user.name,

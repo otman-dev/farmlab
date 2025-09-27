@@ -1,60 +1,25 @@
-
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiServer, FiActivity, FiLock, FiSettings } from 'react-icons/fi';
-import { useEffect, useState } from 'react';
+import { FiActivity, FiServer, FiSettings } from 'react-icons/fi';
 
-interface SidebarProps {
+interface SponsorSidebarProps {
   mobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
 }
 
-export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }: SidebarProps) {
+const sponsorNavItems = [
+  { path: '/sponsorDashboard', label: 'Sponsor Dashboard', icon: FiServer },
+  { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
+  { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
+  { path: '/dashboard/securitysystem', label: 'Security System', icon: FiServer },
+  { path: '/dashboard/settings', label: 'Settings', icon: FiSettings },
+];
+
+export default function SponsorNavigation({ mobileOpen, setMobileOpen }: SponsorSidebarProps) {
   const pathname = usePathname();
-  const [role, setRole] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Try to get user role from localStorage (set by layout)
-    if (typeof window !== 'undefined') {
-      setRole(localStorage.getItem('user_role'));
-    }
-  }, []);
-
-
-  // Restricted nav for farm manager
-  const managerNavItems = [
-    { path: '/dashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
-    { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
-    { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
-    { path: '/dashboard/products', label: 'Products', icon: FiServer },
-    { path: '/dashboard/staff', label: 'Staff', icon: FiServer },
-    { path: '/dashboard/suppliers', label: 'Suppliers', icon: FiServer },
-  ];
-
-  const defaultNavItems = [
-    { path: '/adminDashboard', label: 'Dashboard', icon: FiHome },
-    { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
-    { path: '/dashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
-    { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
-    { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
-    { path: '/dashboard/products', label: 'Products', icon: FiServer },
-    { path: '/dashboard/staff', label: 'Staff', icon: FiServer },
-    { path: '/dashboard/suppliers', label: 'Suppliers', icon: FiServer },
-    { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
-    { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
-    { path: '/dashboard/securitysystem', label: 'Security System', icon: FiLock },
-    { path: '/dashboard/services', label: 'Services Status', icon: FiServer },
-    ...(role === 'admin' ? [
-      { path: '/dashboard/users', label: 'User Management', icon: FiLock }
-    ] : []),
-    { path: '/dashboard/settings', label: 'Settings', icon: FiSettings },
-  ];
-
-  const navItems = role === 'manager' ? managerNavItems : defaultNavItems;
-
-  // Sidebar content as a component for reuse
   const SidebarContent = (
     <div className="flex flex-col h-full w-full px-4 pt-8 pb-4 overflow-y-auto">
       {/* Logo/Header */}
@@ -63,7 +28,7 @@ export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }:
       </div>
       {/* Nav links */}
       <nav className="flex flex-col gap-2 w-full">
-        {navItems.map((item) => {
+        {sponsorNavItems.map((item) => {
           const isActive = pathname === item.path || 
             (item.path !== '/dashboard' && pathname.startsWith(`${item.path}/`));
           const Icon = item.icon;

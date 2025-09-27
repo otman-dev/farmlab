@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { FiArrowRight, FiArrowLeft, FiCheck, FiUser, FiTrendingUp, FiTarget, FiMail, FiMapPin, FiBriefcase, FiCode, FiBookOpen, FiSearch, FiZap, FiHeart, FiStar } from "react-icons/fi";
+import { FiArrowRight, FiArrowLeft, FiCheck, FiTarget, FiCode, FiSearch, FiBookOpen, FiZap, FiHeart } from "react-icons/fi";
 
 interface RegistrationData {
   name: string;
