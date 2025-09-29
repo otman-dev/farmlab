@@ -14,9 +14,9 @@ export default function VisitorNavigation({ mobileOpen, setMobileOpen }: Visitor
 
   const navItems = [
     { path: '/visitorDashboard', label: 'Home', icon: FiHome },
-    { path: '/dashboard/features', label: 'Features', icon: FiStar },
-    { path: '/dashboard/about', label: 'About', icon: FiInfo },
-    { path: '/dashboard/contact', label: 'Contact', icon: FiMail },
+    { path: '/visitorDashboard/features', label: 'Features', icon: FiStar },
+    { path: '/visitorDashboard/about', label: 'About', icon: FiInfo },
+    { path: '/visitorDashboard/contact', label: 'Contact', icon: FiMail },
   ];
 
   // Sidebar content as a component for reuse

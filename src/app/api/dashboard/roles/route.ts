@@ -1,44 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Mock API route for build purposes
-
-// Define the role interface
-interface Role {
-  _id: string;
-  name: string;
-  description: string;
-  permissions: string[];
-  createdAt: string;
-}
-
-// Mock data
-const mockRoles: Role[] = [
-  {
-    _id: 'role1',
-    name: 'Administrator',
-    description: 'Full access to all system features',
-    permissions: ['manage_users', 'manage_animals', 'view_reports', 'edit_settings'],
-    createdAt: '2025-09-15T00:00:00Z'
-  },
-  {
-    _id: 'role2',
-    name: 'Farm Manager',
-    description: 'Day-to-day farm operations management',
-    permissions: ['manage_animals', 'view_reports'],
-    createdAt: '2025-09-16T00:00:00Z'
-  },
-  {
-    _id: 'role3',
-    name: 'Veterinarian',
-    description: 'Access to animal health records',
-    permissions: ['view_animals', 'edit_health_records'],
-    createdAt: '2025-09-17T00:00:00Z'
-  }
-];
+import { getCloudConnection } from '@/lib/mongodb-cloud';
+import { ObjectId } from 'mongodb';
 
 export async function GET() {
   try {
-    return NextResponse.json({ roles: mockRoles });
+    const conn = await getCloudConnection();
+    const rolesCollection = conn.db.collection('roles');
+    const roles = await rolesCollection.find({}).toArray();
+    
+    console.log('Fetched roles from cloud database:', roles.length);
+    
+    // Serialize roles
+    const serializedRoles = roles.map(role => ({
+      _id: role._id.toString(),
+      name: role.name,
+      description: role.description,
+      permissions: role.permissions || [],
+      createdAt: role.createdAt || new Date().toISOString()
+    }));
+    
+    return NextResponse.json({ roles: serializedRoles });
   } catch (error) {
     console.error('Error fetching roles:', error);
     return NextResponse.json({ error: 'Failed to fetch roles' }, { status: 500 });
@@ -53,25 +34,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and description are required' }, { status: 400 });
     }
 
+    const conn = await getCloudConnection();
+    const rolesCollection = conn.db.collection('roles');
+
     // Check for existing role with same name
-    const existingRole = mockRoles.find(role => role.name === name);
+    const existingRole = await rolesCollection.findOne({ name });
     if (existingRole) {
       return NextResponse.json({ error: 'Role with this name already exists' }, { status: 400 });
     }
 
     // Create new role
-    const newRole: Role = {
-      _id: `role_${Date.now()}`,
+    const newRole = {
       name,
       description,
       permissions: permissions || [],
       createdAt: new Date().toISOString()
     };
     
-    // Add to mock data
-    mockRoles.push(newRole);
+    const result = await rolesCollection.insertOne(newRole);
+    const createdRole = await rolesCollection.findOne({ _id: result.insertedId });
+    
+    const serializedRole = {
+      _id: createdRole!._id.toString(),
+      name: createdRole!.name,
+      description: createdRole!.description,
+      permissions: createdRole!.permissions,
+      createdAt: createdRole!.createdAt
+    };
 
-    return NextResponse.json({ role: newRole }, { status: 201 });
+    return NextResponse.json({ role: serializedRole }, { status: 201 });
   } catch (error) {
     console.error('Error creating role:', error);
     return NextResponse.json({ error: 'Failed to create role' }, { status: 500 });
@@ -86,21 +77,39 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID, name and description are required' }, { status: 400 });
     }
 
-    // Find role to update
-    const roleIndex = mockRoles.findIndex(role => role._id === _id);
-    if (roleIndex === -1) {
+    const conn = await getCloudConnection();
+    const rolesCollection = conn.db.collection('roles');
+
+    // Update role using string ID
+    const result = await rolesCollection.updateOne(
+      { _id: _id },
+      { 
+        $set: { 
+          name, 
+          description, 
+          permissions: permissions || [] 
+        } 
+      }
+    );
+
+    if (result.matchedCount === 0) {
       return NextResponse.json({ error: 'Role not found' }, { status: 404 });
     }
 
-    // Update role
-    mockRoles[roleIndex] = {
-      ...mockRoles[roleIndex],
-      name,
-      description,
-      permissions: permissions || []
+    const updatedRole = await rolesCollection.findOne({ _id: _id });
+    if (!updatedRole) {
+      return NextResponse.json({ error: 'Role not found after update' }, { status: 404 });
+    }
+
+    const serializedRole = {
+      _id: updatedRole._id.toString(),
+      name: updatedRole.name,
+      description: updatedRole.description,
+      permissions: updatedRole.permissions || [],
+      createdAt: updatedRole.createdAt || new Date().toISOString()
     };
 
-    return NextResponse.json({ role: mockRoles[roleIndex] });
+    return NextResponse.json({ role: serializedRole });
   } catch (error) {
     console.error('Error updating role:', error);
     return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
@@ -115,14 +124,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Role ID is required' }, { status: 400 });
     }
 
-    // Find role to delete
-    const roleIndex = mockRoles.findIndex(role => role._id === _id);
-    if (roleIndex === -1) {
+    const conn = await getCloudConnection();
+    const rolesCollection = conn.db.collection('roles');
+
+    // Delete role using string ID
+    const result = await rolesCollection.deleteOne({ _id: _id });
+
+    if (result.deletedCount === 0) {
       return NextResponse.json({ error: 'Role not found' }, { status: 404 });
     }
-
-    // Remove role from mock data
-    mockRoles.splice(roleIndex, 1);
 
     return NextResponse.json({ message: 'Role deleted successfully' });
   } catch (error) {

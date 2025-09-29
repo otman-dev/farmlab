@@ -50,27 +50,60 @@ export default function UserManagementPage() {
 
   const fetchRoles = async () => {
     try {
-      const res = await fetch("/api/dashboard/roles");
+      console.log('Fetching roles...');
+      // Add cache-busting parameter to prevent caching
+      const res = await fetch(`/api/dashboard/roles?t=${Date.now()}`, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      console.log('Roles response status:', res.status);
       const data = await res.json();
+      console.log('Roles data:', data);
       if (res.ok) {
-        setRoles(data.roles);
+        setRoles(data.roles || []);
+        console.log('Roles set successfully:', data.roles);
+      } else {
+        console.error('Failed to fetch roles:', data.error);
+        setError(data.error || "Failed to fetch roles");
       }
     } catch (err) {
       console.error("Failed to fetch roles:", err);
+      setError("Failed to fetch roles");
     }
   };
 
   useEffect(() => { 
     fetchUsers(); 
     fetchRoles();
-  }, []);
+    
+    // Also try to fetch roles again after a short delay in case of timing issues
+    const timeoutId = setTimeout(() => {
+      if (roles.length === 0) {
+        console.log('Retrying roles fetch after delay...');
+        fetchRoles();
+      }
+    }, 1000);
+    
+    return () => clearTimeout(timeoutId);
+  }, [roles.length]);
 
   // Modal open helpers
-  const openAddModal = () => {
+  const openAddModal = async () => {
+    // Ensure roles are loaded before opening modal
+    if (roles.length === 0) {
+      await fetchRoles();
+    }
     setForm({ name: '', email: '', password: '', role: roles.length > 0 ? roles[0].name : '' });
     setModalOpen('add');
   };
-  const openEditModal = (user: User) => {
+  const openEditModal = async (user: User) => {
+    // Ensure roles are loaded before opening modal
+    if (roles.length === 0) {
+      await fetchRoles();
+    }
     setForm({ name: user.name, email: user.email, password: '', role: user.role });
     setModalOpen({ user });
   };
@@ -251,6 +284,13 @@ export default function UserManagementPage() {
       {/* Roles Section */}
       <h2 className="text-xl font-bold mt-8 mb-4 text-green-700 flex items-center gap-2">
         <FiShield className="text-green-500" /> Role Management
+        <button
+          onClick={fetchRoles}
+          className="ml-2 text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-lg transition-colors"
+          title="Refresh roles"
+        >
+          Refresh
+        </button>
       </h2>
       <div className="flex items-center mb-4">
         <button
@@ -259,6 +299,9 @@ export default function UserManagementPage() {
         >
           <FiPlus /> Add Role
         </button>
+        <div className="ml-4 text-sm text-gray-600">
+          {roles.length} roles loaded from database
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {roles.map((role) => (
@@ -352,10 +395,19 @@ export default function UserManagementPage() {
                   onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
                   required
                 >
-                  {roles.map(role => (
-                    <option key={role._id} value={role.name}>{role.name}</option>
-                  ))}
+                  {roles.length === 0 ? (
+                    <option value="">Loading roles...</option>
+                  ) : (
+                    roles.map(role => (
+                      <option key={role._id} value={role.name}>{role.name}</option>
+                    ))
+                  )}
                 </select>
+                {roles.length === 0 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    If roles don&apos;t load, please refresh the page or contact support.
+                  </p>
+                )}
               </div>
               <div className="flex gap-3 pt-4">
                 <button
