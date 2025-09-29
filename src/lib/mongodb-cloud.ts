@@ -1,6 +1,13 @@
+import RegistrationResponseModel from '@/models/RegistrationResponse';
+
+export async function getCloudRegistrationResponseModel() {
+  const conn = await getCloudConnection();
+  // Use the model from the connection if available, else fallback
+  return conn.models.RegistrationResponse || conn.model('RegistrationResponse', RegistrationResponseModel.schema);
+}
 
 import mongoose, { Connection, Model } from 'mongoose';
-import UserSchema, { User } from '@/models/User';
+import UserModel, { User } from '@/models/User';
 
 const MONGODB_CLOUD_CLUSTER_URI = process.env.MONGODB_CLOUD_CLUSTER_URI;
 
@@ -42,7 +49,8 @@ export async function getCloudConnection() {
 export async function getCloudUserModel(): Promise<Model<User>> {
   const conn = await getCloudConnection();
   if (!cachedCloud.userModel) {
-    cachedCloud.userModel = conn.models.User || conn.model<User>('User', UserSchema.schema || UserSchema);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cachedCloud.userModel = (conn.models.User || conn.model<User>('User', UserModel.schema)) as any;
   }
   return cachedCloud.userModel;
 }

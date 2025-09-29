@@ -9,7 +9,7 @@ export interface FoodStock {
   productId: string;
   // productName removed; use productId reference only
   quantity: number;
-  createdAt?: string;
+  createdAt?: Date;
 }
 
 const FoodStockSchema = new Schema<FoodStock>({

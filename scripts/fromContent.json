@@ -1,0 +1,244 @@
+{
+  "form": {
+    "title": "FarmLab Registration & Market Intelligence Form",
+    "description": "Adaptive multi-branch questionnaire to understand user profile, challenges, goals, and collaboration opportunities with FarmLab.",
+    "steps": [
+      {
+        "id": "basic_info",
+        "title": "Basic Information",
+        "questions": [
+          { "id": "full_name", "label": "Full Name", "type": "text", "required": true },
+          { "id": "email", "label": "Email Address", "type": "email", "required": true },
+          { "id": "country", "label": "Country / Region", "type": "text", "required": true },
+          { "id": "organization", "label": "Organization / Farm / Company Name", "type": "text", "required": false }
+        ]
+      },
+      {
+        "id": "user_type",
+        "title": "Your Role & Interest",
+        "description": "This determines which question paths you’ll see next.",
+        "questions": [
+          {
+            "id": "roles",
+            "label": "Which of the following describe you? (You can select more than one)",
+            "type": "multi-select",
+            "options": [
+              "Farmer / Grower",
+              "Technologist / Developer / Engineer",
+              "Researcher / Academic",
+              "Industry Professional (Agri-related, food, energy, logistics, etc.)",
+              "Investor / Business Developer",
+              "Student / Educator",
+              "Enthusiast / Curious Observer"
+            ],
+            "required": true
+          }
+        ],
+        "branch_logic": {
+          "Farmer / Grower": "branch_farmer",
+          "Technologist / Developer / Engineer": "branch_technologist",
+          "Farmer / Grower + Technologist / Developer / Engineer": "branch_hybrid",
+          "Industry Professional (Agri-related, food, energy, logistics, etc.)": "branch_industry"
+        }
+      }
+    ]
+  },
+  "branches": {
+    "branch_farmer": {
+      "title": "Farmer Path",
+      "questions": [
+        {
+          "id": "farm_size",
+          "label": "Farm size",
+          "type": "single-select",
+          "options": ["< 1 ha", "1–5 ha", "5–20 ha", "20+ ha"]
+        },
+        {
+          "id": "production_type",
+          "label": "Type of production (select all that apply)",
+          "type": "multi-select",
+          "options": [
+            "Vegetables",
+            "Grains / Cereals",
+            "Fruits / Orchards",
+            "Livestock / Dairy",
+            "Greenhouse",
+            "Hydroponics / Vertical Farming",
+            "Mixed / Other"
+          ]
+        },
+        {
+          "id": "current_tech_usage",
+          "label": "What technologies do you already use?",
+          "type": "multi-select",
+          "options": [
+            "None — mostly manual",
+            "Drip or timed irrigation",
+            "Basic sensors (e.g., soil moisture)",
+            "Farm management apps or software",
+            "IoT / automated control systems",
+            "Drones / imaging / AI",
+            "Renewable energy solutions"
+          ]
+        },
+        {
+          "id": "challenges",
+          "label": "What are your biggest challenges? (Select up to 3)",
+          "type": "multi-select",
+          "options": [
+            "Water usage / irrigation optimization",
+            "Pest / disease detection",
+            "Labor shortages",
+            "Climate unpredictability",
+            "Low yield / inefficiency",
+            "Feed / livestock cost",
+            "Lack of technical support",
+            "Sustainability / soil health"
+          ]
+        },
+        {
+          "id": "priorities",
+          "label": "What are your top priorities in the next 2 years?",
+          "type": "multi-select",
+          "options": [
+            "Automate key operations",
+            "Reduce costs",
+            "Increase yield",
+            "Transition to sustainable practices",
+            "Adopt smart farming solutions",
+            "Collaborate with tech partners"
+          ]
+        }
+      ]
+    },
+    "branch_technologist": {
+      "title": "Technologist Path",
+      "questions": [
+        {
+          "id": "expertise_area",
+          "label": "What is your primary area of expertise?",
+          "type": "single-select",
+          "options": [
+            "IoT / Embedded Systems",
+            "Backend / API Development",
+            "Data Science / AI / ML",
+            "Automation / Robotics",
+            "Hardware / Electronics Design",
+            "Cloud / Infrastructure",
+            "Full-stack Development",
+            "Other"
+          ]
+        },
+        {
+          "id": "collaboration_interest",
+          "label": "What type of collaboration interests you?",
+          "type": "multi-select",
+          "options": [
+            "Build and integrate IoT devices",
+            "Develop APIs or dashboards",
+            "Work with real-time sensor data",
+            "Contribute to open-source software",
+            "Pilot-test solutions on real farms",
+            "Research and analytics projects"
+          ]
+        },
+        {
+          "id": "data_interest",
+          "label": "What kind of agricultural data would be most valuable to you?",
+          "type": "multi-select",
+          "options": [
+            "Sensor telemetry (soil, climate, etc.)",
+            "Plant growth / yield metrics",
+            "Livestock data",
+            "Automation / control logs",
+            "Market and pricing trends",
+            "Other"
+          ]
+        }
+      ]
+    },
+    "branch_hybrid": {
+      "title": "Farmer + Technologist (Hybrid) Path",
+      "questions": [
+        {
+          "id": "hybrid_focus",
+          "label": "Are you more focused on:",
+          "type": "single-select",
+          "options": [
+            "Applying my tech skills to my own farm",
+            "Building solutions for others",
+            "Both"
+          ]
+        },
+        {
+          "id": "pilot_interest",
+          "label": "Would you be interested in becoming an early pilot site for FarmLab technologies?",
+          "type": "single-select",
+          "options": ["Yes", "Maybe — need more info", "Not right now"]
+        }
+      ]
+    },
+    "branch_industry": {
+      "title": "Industry / Related Sector Path",
+      "questions": [
+        {
+          "id": "sector",
+          "label": "What sector are you in?",
+          "type": "single-select",
+          "options": [
+            "Agri-inputs (fertilizers, seeds, etc.)",
+            "Logistics / cold chain",
+            "Food processing / packaging",
+            "Renewable energy",
+            "Agritech / SaaS",
+            "Government / policy",
+            "Investment / VC",
+            "Other"
+          ]
+        },
+        {
+          "id": "industry_interest",
+          "label": "What are you most interested in exploring with FarmLab?",
+          "type": "multi-select",
+          "options": [
+            "Commercial partnerships",
+            "Product integration",
+            "Research collaboration",
+            "Market intelligence",
+            "Pilot deployment",
+            "Sponsorship or investment"
+          ]
+        }
+      ]
+    }
+  },
+  "final_section": {
+    "title": "Engagement & Monetization (All Users)",
+    "questions": [
+      {
+        "id": "participation_mode",
+        "label": "How would you like to participate in FarmLab?",
+        "type": "multi-select",
+        "options": [
+          "Join the community / follow updates",
+          "Access data and dashboards",
+          "Join beta / pilot programs",
+          "Partner commercially",
+          "Contribute to research"
+        ]
+      },
+      {
+        "id": "pricing_model",
+        "label": "What pricing model would you find most appealing?",
+        "type": "single-select",
+        "options": [
+          "Monthly subscription",
+          "One-time purchase",
+          "Pay-as-you-grow (based on farm size)",
+          "Revenue-sharing model",
+          "Not sure yet"
+        ]
+      }
+    ]
+  }
+}

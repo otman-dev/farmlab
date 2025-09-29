@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getCloudConnection } from '@/lib/mongodb-cloud';
-import SupplierSchema, { Supplier } from '@/models/Supplier';
+import SupplierModel from '@/models/Supplier';
 
-import type { Model } from 'mongoose';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CloudSupplierModel = any;
 
-let cachedSupplierModel: Model<Supplier> | null = null;
-async function getCloudSupplierModel() {
+let cachedSupplierModel: CloudSupplierModel | null = null;
+async function getCloudSupplierModel(): Promise<CloudSupplierModel> {
   if (cachedSupplierModel) return cachedSupplierModel;
   const conn = await getCloudConnection();
-  cachedSupplierModel = conn.models.Supplier || conn.model<Supplier>('Supplier', SupplierSchema.schema || SupplierSchema);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cachedSupplierModel = (conn.models.Supplier || conn.model('Supplier', SupplierModel.schema)) as any;
   return cachedSupplierModel;
 }
 
 // GET: List all suppliers
 export async function GET() {
   const SupplierModel = await getCloudSupplierModel();
-  const suppliers = await SupplierModel.find().sort({ createdAt: -1 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const suppliers = await (SupplierModel as any).find().sort({ createdAt: -1 });
   return NextResponse.json({ suppliers });
 }
 

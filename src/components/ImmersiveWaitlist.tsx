@@ -122,7 +122,7 @@ export default function ImmersiveWaitlist() {
     }
   };
 
-  const submitForm = async () => {
+    const submitForm = async () => {
     try {
       const response = await fetch('/api/waitlist', {
         method: 'POST',
@@ -135,12 +135,10 @@ export default function ImmersiveWaitlist() {
       } else {
         alert('Something went wrong. Please try again.');
       }
-    } catch (error) {
+    } catch {      
       alert('Network error. Please check your connection and try again.');
     }
-  };
-
-  const renderStepContent = () => {
+  };  const renderStepContent = () => {
     switch (currentStep) {
       case 0: // Welcome
         return (

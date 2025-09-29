@@ -1,4 +1,4 @@
-import { Schema, Document, Connection } from 'mongoose';
+import { Schema, Document, Connection, Model } from 'mongoose';
 
 export type StaffRole = 'helping_hand' | 'cleaner';
 
@@ -16,6 +16,6 @@ const StaffSchema = new Schema<IStaff>({
   createdAt: { type: Date, default: Date.now },
 });
 
-export function getStaffModel(conn: Connection) {
+export function getStaffModel(conn: Connection): Model<IStaff> {
   return conn.models.Staff || conn.model<IStaff>('Staff', StaffSchema);
 }

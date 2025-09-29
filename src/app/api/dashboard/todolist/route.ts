@@ -12,7 +12,8 @@ async function getCloudTodoModel() {
 export async function GET() {
   try {
     const Todo = await getCloudTodoModel();
-    const todos = await Todo.find({}).populate('user', 'name email').sort({ createdAt: -1 }).lean();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const todos = await (Todo as any).find({}).populate('user', 'name email').sort({ createdAt: -1 }).lean();
     return NextResponse.json({ todos });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch todos' }, { status: 500 });
@@ -27,14 +28,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
     }
     const Todo = await getCloudTodoModel();
-    const todo = await Todo.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const todo = await (Todo as any).create({
       title,
       user,
       priority: priority || 'medium',
       category: category || 'general',
       dueDate: dueDate ? new Date(dueDate) : undefined
     });
-    const populatedTodo = await Todo.findById(todo._id).populate('user', 'name email');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const populatedTodo = await (Todo as any).findById(todo._id).populate('user', 'name email');
     return NextResponse.json({ todo: populatedTodo }, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Failed to add todo' }, { status: 500 });
@@ -63,7 +66,8 @@ export async function PUT(request: Request) {
     if (category !== undefined) update.category = category;
     if (dueDate !== undefined) update.dueDate = dueDate ? new Date(dueDate) : undefined;
 
-    const updated = await Todo.findByIdAndUpdate(_id, update, { new: true }).populate('user', 'name email');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updated = await (Todo as any).findByIdAndUpdate(_id, update, { new: true }).populate('user', 'name email');
     if (!updated) {
       return NextResponse.json({ error: 'Todo not found' }, { status: 404 });
     }
@@ -81,7 +85,8 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Todo ID is required' }, { status: 400 });
     }
     const Todo = await getCloudTodoModel();
-    const deleted = await Todo.findByIdAndDelete(_id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deleted = await (Todo as any).findByIdAndDelete(_id);
     if (!deleted) {
       return NextResponse.json({ error: 'Todo not found' }, { status: 404 });
     }
