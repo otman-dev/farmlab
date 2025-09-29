@@ -801,16 +801,6 @@ export default function Home() {
               </details>
             </div>
           </div>
-          
-          {/* Enhanced CTA for more FAQs */}
-          <div className="text-center mt-8">
-            <Link href="/comingsoon" className="inline-flex items-center justify-center px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-all duration-200">
-              View all FAQs
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </Link>
-          </div>
         </div>
       </section>
 

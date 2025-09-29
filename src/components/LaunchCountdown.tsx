@@ -59,44 +59,46 @@ export default function LaunchCountdown({ targetDate, title = "Launching Soon", 
   const formatNumber = (num: number): string => num.toString().padStart(2, '0');
 
   return (
-    <div className={`bg-white rounded-2xl shadow-lg p-6 ${className}`}>
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <FiClock className="text-green-600 w-5 h-5" />
-        <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+    <div className={`bg-white rounded-3xl shadow-xl p-6 sm:p-8 border border-gray-100 ${className}`}>
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-md">
+          <FiClock className="text-white w-5 h-5" />
+        </div>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{title}</h2>
       </div>
       
-      <p className="text-gray-600 mb-6 text-center">{subtitle}</p>
+      <p className="text-gray-600 mb-8 text-center text-base sm:text-lg leading-relaxed">{subtitle}</p>
       
-      <div className="grid grid-cols-4 gap-2 md:gap-4">
-        <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-xl p-3 text-center">
-          <div className="text-3xl md:text-4xl font-bold text-green-800">{formatNumber(timeLeft.days)}</div>
-          <div className="text-xs md:text-sm text-green-700">Days</div>
+      <div className="grid grid-cols-4 gap-3 md:gap-4">
+        <div className="bg-gradient-to-br from-green-50 via-green-100 to-emerald-100 rounded-2xl p-4 text-center border border-green-200 shadow-sm">
+          <div className="text-2xl md:text-3xl font-bold text-green-800 mb-1">{formatNumber(timeLeft.days)}</div>
+          <div className="text-xs md:text-sm text-green-700 font-medium">Days</div>
         </div>
-        <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-xl p-3 text-center">
-          <div className="text-3xl md:text-4xl font-bold text-green-800">{formatNumber(timeLeft.hours)}</div>
-          <div className="text-xs md:text-sm text-green-700">Hours</div>
+        <div className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-green-100 rounded-2xl p-4 text-center border border-emerald-200 shadow-sm">
+          <div className="text-2xl md:text-3xl font-bold text-emerald-800 mb-1">{formatNumber(timeLeft.hours)}</div>
+          <div className="text-xs md:text-sm text-emerald-700 font-medium">Hours</div>
         </div>
-        <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-xl p-3 text-center">
-          <div className="text-3xl md:text-4xl font-bold text-green-800">{formatNumber(timeLeft.minutes)}</div>
-          <div className="text-xs md:text-sm text-green-700">Mins</div>
+        <div className="bg-gradient-to-br from-teal-50 via-teal-100 to-emerald-100 rounded-2xl p-4 text-center border border-teal-200 shadow-sm">
+          <div className="text-2xl md:text-3xl font-bold text-teal-800 mb-1">{formatNumber(timeLeft.minutes)}</div>
+          <div className="text-xs md:text-sm text-teal-700 font-medium">Mins</div>
         </div>
-        <div className="bg-gradient-to-b from-green-50 to-green-100 rounded-xl p-3 text-center">
-          <div className="text-3xl md:text-4xl font-bold text-green-800 countdown-seconds">
+        <div className="bg-gradient-to-br from-green-50 via-emerald-100 to-teal-100 rounded-2xl p-4 text-center border border-green-200 shadow-sm">
+          <div className="text-2xl md:text-3xl font-bold text-green-800 countdown-seconds mb-1">
             {formatNumber(timeLeft.seconds)}
           </div>
-          <div className="text-xs md:text-sm text-green-700">Secs</div>
+          <div className="text-xs md:text-sm text-green-700 font-medium">Secs</div>
         </div>
       </div>
       
       {/* Add subtle animation to seconds counter */}
       <style jsx>{`
-        @keyframes pulse {
+        @keyframes pulse-gentle {
           0% { transform: scale(1); }
           50% { transform: scale(1.05); }
           100% { transform: scale(1); }
         }
         .countdown-seconds {
-          animation: pulse 1s infinite;
+          animation: pulse-gentle 1s ease-in-out infinite;
         }
       `}</style>
     </div>

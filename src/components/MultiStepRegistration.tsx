@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { FiArrowRight, FiArrowLeft, FiCheckCircle, FiSmile, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import Link from "next/link";
+import { FiArrowRight, FiArrowLeft, FiCheckCircle, FiTarget, FiChevronDown, FiChevronUp, FiUsers } from "react-icons/fi";
 
 // Inline the JSON structure (in a real app, import or fetch it)
 
@@ -136,14 +137,14 @@ const branchLogic: { [key: string]: string } = {
 	"Enthusiast / Curious Observer": "branch_enthusiast"
 };
 
-	// Fun Discord-like color palette for chat bubbles
-	const funColors = [
-		"from-indigo-200 via-purple-200 to-pink-200",
-		"from-green-200 via-teal-200 to-cyan-200",
-		"from-yellow-200 via-orange-200 to-pink-200",
-		"from-pink-200 via-red-200 to-yellow-200",
-		"from-blue-200 via-indigo-200 to-purple-200",
-		"from-emerald-200 via-lime-200 to-yellow-200"
+	// FarmLab brand color palette for progress bubbles
+	const farmLabColors = [
+		"from-green-200 via-emerald-200 to-teal-200",
+		"from-emerald-200 via-green-200 to-lime-200",
+		"from-teal-200 via-cyan-200 to-blue-200",
+		"from-green-300 via-emerald-300 to-teal-300",
+		"from-lime-200 via-green-200 to-emerald-200",
+		"from-cyan-200 via-teal-200 to-green-200"
 	];
 
 	export default function MultiStepRegistration() {
@@ -341,74 +342,128 @@ const branchLogic: { [key: string]: string } = {
 		function renderQuestion(q: Question) {
 			   if (q.type === "text" || q.type === "email" || q.type === "password") {
 				   return (
-					   <div className="mb-6" key={q.id}>
-						   <label className="block font-semibold mb-2 text-gray-800">{q.label}{q.required && <span className="text-red-500">*</span>}</label>
+					   <div className="mb-4 sm:mb-6" key={q.id}>
+						   <label className="block font-semibold mb-2 text-gray-800">
+							   {q.label}
+							   {q.required && <span className="text-red-500 ml-1">*</span>}
+						   </label>
 						   <input
 							   type={q.type}
-						   className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white text-lg transition-all`}
-						   value={formData[q.id] ? String(formData[q.id]) : ""}
+							   className={`w-full px-4 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg ${
+								   errors[q.id] 
+									   ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
+									   : 'border-gray-200 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-300'
+							   } focus:outline-none focus:ring-4`}
+							   value={formData[q.id] ? String(formData[q.id]) : ""}
 							   onChange={e => handleChange(q.id, e.target.value)}
 							   placeholder={q.label}
 							   minLength={q.minLength || undefined}
 						   />
-						   {errors[q.id] && <div className="text-red-500 text-sm mt-1">{errors[q.id]}</div>}
+						   {errors[q.id] && (
+							   <div className="flex items-center mt-2 text-red-600 text-sm">
+								   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								   </svg>
+								   {errors[q.id]}
+							   </div>
+						   )}
 					   </div>
 				   );
 			   }
 			if (q.type === "multi-select") {
 				return (
-					<div className="mb-6" key={q.id}>
-						<label className="block font-semibold mb-2 text-gray-800">{q.label}{q.required && <span className="text-red-500">*</span>}</label>
-						<div className="flex flex-wrap gap-2">
-							{q.options?.map((option: string) => (
-								<button
-									type="button"
-									key={option}
-									className={`px-4 py-2 rounded-full border-2 text-base font-medium transition-all flex items-center gap-2
-										${Array.isArray(formData[q.id]) && (formData[q.id] as string[]).includes(option)
-											? `border-indigo-500 bg-indigo-50 text-indigo-700 scale-105 shadow`
-											: `border-gray-200 bg-white text-gray-700 hover:border-indigo-400 hover:bg-indigo-50`}
-									`}
-									onClick={() => handleMultiSelect(q.id, option)}
-								>
-									{Array.isArray(formData[q.id]) && (formData[q.id] as string[]).includes(option) && <FiCheckCircle className="text-indigo-500" />}
-									{option}
-								</button>
-							))}
+					<div className="mb-4 sm:mb-6" key={q.id}>
+						<label className="block font-semibold mb-3 text-gray-800">
+							{q.label}
+							{q.required && <span className="text-red-500 ml-1">*</span>}
+						</label>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+							{q.options?.map((option: string) => {
+								const isSelected = Array.isArray(formData[q.id]) && (formData[q.id] as string[]).includes(option);
+								return (
+									<button
+										type="button"
+										key={option}
+										className={`p-3 sm:p-4 rounded-xl border-2 text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-3 text-left ${
+											isSelected
+												? 'border-green-500 bg-green-50 text-green-700 shadow-md transform scale-105'
+												: 'border-gray-200 bg-white text-gray-700 hover:border-green-400 hover:bg-green-50 hover:shadow-sm'
+										}`}
+										onClick={() => handleMultiSelect(q.id, option)}
+									>
+										<div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+											isSelected 
+												? 'border-green-500 bg-green-500' 
+												: 'border-gray-300'
+										}`}>
+											{isSelected && <FiCheckCircle className="text-white w-3 h-3" />}
+										</div>
+										<span className="flex-1">{option}</span>
+									</button>
+								);
+							})}
 						</div>
-						{errors[q.id] && <div className="text-red-500 text-sm mt-1">{errors[q.id]}</div>}
+						{errors[q.id] && (
+							<div className="flex items-center mt-2 text-red-600 text-sm">
+								<svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
+								{errors[q.id]}
+							</div>
+						)}
 					</div>
 				);
 			}
 			if (q.type === "single-select") {
 				return (
-					<div className="mb-6" key={q.id}>
-						<label className="block font-semibold mb-2 text-gray-800">{q.label}{q.required && <span className="text-red-500">*</span>}</label>
-						<div className="flex flex-wrap gap-2">
-							{q.options?.map((option: string) => (
-								<button
-									type="button"
-									key={option}
-									className={`px-4 py-2 rounded-full border-2 text-base font-medium transition-all flex items-center gap-2
-										${formData[q.id] === option
-											? `border-green-500 bg-green-50 text-green-700 scale-105 shadow`
-											: `border-gray-200 bg-white text-gray-700 hover:border-green-400 hover:bg-green-50`}
-									`}
-									onClick={() => handleChange(q.id, option)}
-								>
-									{formData[q.id] === option && <FiCheckCircle className="text-green-500" />}
-									{option}
-								</button>
-							))}
+					<div className="mb-4 sm:mb-6" key={q.id}>
+						<label className="block font-semibold mb-3 text-gray-800">
+							{q.label}
+							{q.required && <span className="text-red-500 ml-1">*</span>}
+						</label>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+							{q.options?.map((option: string) => {
+								const isSelected = formData[q.id] === option;
+								return (
+									<button
+										type="button"
+										key={option}
+										className={`p-3 sm:p-4 rounded-xl border-2 text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-3 text-left ${
+											isSelected
+												? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md transform scale-105'
+												: 'border-gray-200 bg-white text-gray-700 hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-sm'
+										}`}
+										onClick={() => handleChange(q.id, option)}
+									>
+										<div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+											isSelected 
+												? 'border-emerald-500 bg-emerald-500' 
+												: 'border-gray-300'
+										}`}>
+											{isSelected && (
+												<div className="w-2 h-2 bg-white rounded-full"></div>
+											)}
+										</div>
+										<span className="flex-1">{option}</span>
+									</button>
+								);
+							})}
 						</div>
-						{errors[q.id] && <div className="text-red-500 text-sm mt-1">{errors[q.id]}</div>}
+						{errors[q.id] && (
+							<div className="flex items-center mt-2 text-red-600 text-sm">
+								<svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
+								{errors[q.id]}
+							</div>
+						)}
 					</div>
 				);
 			}
 			return null;
 		}
 
-		// Fun Discord-like chat bubble style
+		// FarmLab brand-consistent chat bubble style
 		type BubbleProps = {
 			children: React.ReactNode;
 			colorIdx: number;
@@ -417,17 +472,19 @@ const branchLogic: { [key: string]: string } = {
 			title: string;
 		};
 		function Bubble({ children, colorIdx, expanded, onToggle, title }: BubbleProps) {
-			const color = funColors[colorIdx % funColors.length];
+			const color = farmLabColors[colorIdx % farmLabColors.length];
 			return (
-				<div className={`mb-8 w-full`}>
+				<div className="mb-4 sm:mb-6 lg:mb-8 w-full">
 					<div className={`rounded-2xl shadow-lg bg-gradient-to-r ${color} p-1`}>
-						<div className="bg-white rounded-2xl p-6 flex flex-col">
+						<div className="bg-white rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col overflow-hidden">
 							<div className="flex items-center justify-between cursor-pointer" onClick={onToggle}>
-								<div className="font-bold text-lg text-gray-900 flex items-center gap-2">
-									<FiSmile className="text-2xl text-indigo-400" />
+								<div className="font-bold text-lg sm:text-xl text-gray-900 flex items-center gap-2">
+									<FiTarget className="text-xl sm:text-2xl text-green-600" />
 									{title}
 								</div>
-								<div>{expanded ? <FiChevronUp /> : <FiChevronDown />}</div>
+								<div className="text-green-600">
+									{expanded ? <FiChevronUp /> : <FiChevronDown />}
+								</div>
 							</div>
 							{expanded && <div className="mt-4">{children}</div>}
 						</div>
@@ -439,69 +496,171 @@ const branchLogic: { [key: string]: string } = {
 		// Render
 		if (submitted) {
 			return (
-				<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-green-50 to-pink-50">
-					<div className="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-10 text-center">
-						<FiCheckCircle className="text-green-500 text-5xl mx-auto mb-4 animate-bounce" />
-						<h2 className="text-3xl font-bold mb-2">Thank you for joining FarmLab!</h2>
-						<p className="text-lg text-gray-700 mb-6">We received your info and will be in touch soon. 🚀</p>
+				<div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 overflow-x-hidden">
+					{/* Enhanced background with pattern and animation */}
+					<div className="absolute inset-0 overflow-hidden">
+						<div className="absolute -bottom-32 -left-32 w-80 h-80 bg-gradient-to-r from-green-200 to-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+						<div className="absolute -top-32 -right-32 w-80 h-80 bg-gradient-to-r from-emerald-200 to-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+					</div>
+					<div className="relative flex items-center justify-center min-h-screen px-4 py-6 lg:py-8">
+						<div className="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-8 sm:p-10 text-center border border-gray-100">
+							{/* Success icon with FarmLab branding */}
+							<div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-lg mb-6 mx-auto">
+								<FiCheckCircle className="text-white text-4xl animate-bounce" />
+							</div>
+							{/* FarmLab branded success message */}
+							<div className="flex items-center justify-center mb-4">
+								<div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-md mr-3">
+									<FiTarget className="w-6 h-6 text-white" />
+								</div>
+								<span className="text-xl font-bold text-gray-900">FarmLab</span>
+							</div>
+							<h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">
+								Welcome to the Future of Agriculture!
+							</h2>
+							<p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
+								Thank you for joining our community. We&apos;ve received your information and will be in touch soon with updates about our platform launch.
+							</p>
+							<div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-6">
+								<p className="text-sm text-green-800 font-medium">
+									🚀 You&apos;re now part of our exclusive community of agricultural innovators
+								</p>
+							</div>
+							<Link 
+								href="/"
+								className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg"
+							>
+								<FiTarget className="w-5 h-5 mr-2" />
+								Return to Home
+							</Link>
+						</div>
 					</div>
 				</div>
 			);
 		}
 
 		return (
-			<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-green-50 to-pink-50 py-8">
-				<form className="max-w-2xl w-full mx-4">
-					<div className="mb-8 text-center">
-						<h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">{formJson.form.title}</h1>
-						<p className="text-lg text-gray-600">{formJson.form.description}</p>
-					</div>
-					<div className="mb-6 flex items-center justify-center gap-2">
-						{steps.map((s, idx) => (
-							s ? <div key={s.id} className={`w-3 h-3 rounded-full transition-all duration-300 ${idx === stepIndex ? 'bg-indigo-500 scale-125' : 'bg-gray-300'}`}></div> : null
-						))}
-					</div>
-					{submitError && (
-						<div className="mb-4 text-red-600 text-center font-semibold">{submitError}</div>
-					)}
-					{currentStep && (
-						<Bubble
-							colorIdx={stepIndex}
-							expanded={expanded[stepIndex] ?? true}
-							onToggle={() => setExpanded(e => ({ ...e, [stepIndex]: !(e[stepIndex] ?? true) }))}
-							title={currentStep.title}
-						>
-							{currentStep.questions.map((q) => renderQuestion(q))}
-						</Bubble>
-					)}
-					<div className="flex justify-between mt-4">
-						<button
-							type="button"
-							onClick={handleBack}
-							disabled={stepIndex === 0}
-							className={`px-6 py-2 rounded-xl font-medium flex items-center gap-2 transition-all ${stepIndex === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}`}
-						>
-							<FiArrowLeft /> Back
-						</button>
-						{stepIndex < steps.length - 2 ? (
+			<div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 overflow-x-hidden">
+				{/* Enhanced background with pattern and animation - matching landing page */}
+				<div className="absolute inset-0 overflow-hidden">
+					<div className="absolute -bottom-32 -left-32 w-80 h-80 bg-gradient-to-r from-green-200 to-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+					<div className="absolute -top-32 -right-32 w-80 h-80 bg-gradient-to-r from-emerald-200 to-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+				</div>
+				
+				<div className="relative flex items-center justify-center min-h-screen px-4 py-6 lg:py-6 lg:py-8">
+					<div className="w-full max-w-2xl mx-auto">
+						{/* FarmLab Header - matching landing page branding */}
+						<div className="mb-4 sm:mb-6 lg:mb-8 text-center">
+							{/* Logo and brand identity */}
+							<div className="flex items-center justify-center mb-4 sm:mb-6">
+								<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg">
+									<FiTarget className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+								</div>
+								<span className="ml-3 text-xl sm:text-2xl font-bold text-gray-900">FarmLab</span>
+							</div>
+							<h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-2 sm:mb-4 tracking-tight">
+								Join the Agricultural
+								<span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 animate-gradient-x">
+									Revolution
+								</span>
+							</h1>
+							<p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+								Help us build the future of smart farming. Your insights will shape our platform.
+							</p>
+						</div>
+						
+						{/* Progress indicators */}
+						<div className="mb-4 sm:mb-6 flex items-center justify-center gap-2 overflow-hidden">
+							{steps.map((s, idx) => (
+								s ? (
+									<div 
+										key={s.id} 
+										className={`transition-all duration-300 flex-shrink-0 ${
+											idx === stepIndex 
+												? 'w-6 h-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full scale-110' 
+												: idx < stepIndex
+													? 'w-3 h-3 bg-green-400 rounded-full'
+													: 'w-3 h-3 bg-gray-300 rounded-full'
+										}`}
+									>
+									</div>
+								) : null
+							))}
+						</div>
+						
+						{/* Error display */}
+						{submitError && (
+							<div className="mb-4 sm:mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+								<div className="flex items-center">
+									<div className="flex-shrink-0 w-5 h-5 text-red-500 mr-3">
+										<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+										</svg>
+									</div>
+									<p className="text-red-800 font-medium">{submitError}</p>
+								</div>
+							</div>
+						)}
+						
+						{/* Current step content */}
+						{currentStep && (
+							<Bubble
+								colorIdx={stepIndex}
+								expanded={expanded[stepIndex] ?? true}
+								onToggle={() => setExpanded(e => ({ ...e, [stepIndex]: !(e[stepIndex] ?? true) }))}
+								title={currentStep.title}
+							>
+								{currentStep.questions.map((q) => renderQuestion(q))}
+							</Bubble>
+						)}
+						
+						{/* Navigation buttons */}
+						<div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
 							<button
 								type="button"
-								onClick={handleNext}
-								className="px-6 py-2 rounded-xl font-medium flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-lg"
+								onClick={handleBack}
+								disabled={stepIndex === 0}
+								className={`order-2 sm:order-1 px-4 sm:px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all w-full sm:w-auto ${
+									stepIndex === 0 
+										? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+										: 'bg-white border-2 border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 shadow-sm hover:shadow-md'
+								}`}
 							>
-								Next <FiArrowRight />
+								<FiArrowLeft className="w-4 h-4" /> Back
 							</button>
-						) : (
-							<button
-								type="submit"
-								onClick={handleSubmit}
-								className="px-6 py-2 rounded-xl font-medium flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-lg"
-							>
-								Submit <FiCheckCircle />
-							</button>
-						)}
+							{stepIndex < steps.length - 2 ? (
+								<button
+									type="button"
+									onClick={handleNext}
+									disabled={validationInProgress}
+									className={`order-1 sm:order-2 px-4 sm:px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto ${
+										validationInProgress
+											? 'bg-gray-400 text-white cursor-not-allowed'
+											: 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 hover:shadow-xl'
+									}`}
+								>
+									{validationInProgress ? 'Validating...' : 'Next'} <FiArrowRight className="w-4 h-4" />
+								</button>
+							) : (
+								<button
+									type="submit"
+									onClick={handleSubmit}
+									className="order-1 sm:order-2 px-4 sm:px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+								>
+									<FiUsers className="w-4 h-4" />
+									Join FarmLab
+								</button>
+							)}
+						</div>
+						
+						{/* Additional info footer */}
+						<div className="mt-4 sm:mt-6 text-center">
+							<p className="text-sm text-gray-500 px-4">
+								By joining, you agree to be part of our agricultural innovation community
+							</p>
+						</div>
 					</div>
-				</form>
+				</div>
 			</div>
 		);
 		}
