@@ -25,23 +25,23 @@ export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }:
 
   // Restricted nav for farm manager
   const managerNavItems = [
-    { path: '/dashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
-    { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
-    { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
-    { path: '/dashboard/products', label: 'Products', icon: FiServer },
-    { path: '/dashboard/staff', label: 'Staff', icon: FiServer },
-    { path: '/dashboard/suppliers', label: 'Suppliers', icon: FiServer },
+    { path: '/managerDashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
+    { path: '/managerDashboard/food-stock', label: 'Food Stock', icon: FiActivity },
+    { path: '/managerDashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
+    { path: '/managerDashboard/products', label: 'Products', icon: FiServer },
+    { path: '/managerDashboard/staff', label: 'Staff', icon: FiServer },
+    { path: '/managerDashboard/suppliers', label: 'Suppliers', icon: FiServer },
   ];
 
   const defaultNavItems = [
     { path: '/adminDashboard', label: 'Dashboard', icon: FiHome },
     { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
-    { path: '/dashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
-    { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
-    { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
-    { path: '/dashboard/products', label: 'Products', icon: FiServer },
-    { path: '/dashboard/staff', label: 'Staff', icon: FiServer },
-    { path: '/dashboard/suppliers', label: 'Suppliers', icon: FiServer },
+    { path: '/managerDashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
+    { path: '/managerDashboard/food-stock', label: 'Food Stock', icon: FiActivity },
+    { path: '/managerDashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
+    { path: '/managerDashboard/products', label: 'Products', icon: FiServer },
+    { path: '/managerDashboard/staff', label: 'Staff', icon: FiServer },
+    { path: '/managerDashboard/suppliers', label: 'Suppliers', icon: FiServer },
     { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
     { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
     { path: '/dashboard/securitysystem', label: 'Security System', icon: FiLock },

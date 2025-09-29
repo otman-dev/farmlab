@@ -72,8 +72,8 @@ export default function StaffAttendanceCalendar() {
     setLoading(true);
     setError("");
     Promise.all([
-      fetch("/api/dashboard/staff").then((res) => res.json()),
-      fetch(`/api/dashboard/attendance?date=${year}-${String(month + 1).padStart(2, "0")}`).then((res) => res.json()),
+      fetch("/api/staff").then((res) => res.json()),
+      fetch(`/api/attendance?date=${year}-${String(month + 1).padStart(2, "0")}`).then((res) => res.json()),
     ])
       .then(([staffData, attendanceData]) => {
         setStaff(staffData.staff || []);
@@ -108,15 +108,15 @@ export default function StaffAttendanceCalendar() {
     try {
       const payload = { staff: staff._id, date: dateStr, state: newState };
       if (typeof window !== 'undefined') {
-    console.log('POST /api/dashboard/attendance', payload);
+    console.log('POST /api/attendance', payload);
       }
-      await fetch("/api/dashboard/attendance", {
+      await fetch("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       // Refresh attendance for the month
-      fetch(`/api/dashboard/attendance?date=${year}-${String(month + 1).padStart(2, "0")}`)
+      fetch(`/api/attendance?date=${year}-${String(month + 1).padStart(2, "0")}`)
         .then((res) => res.json())
         .then((data) => setAttendance(data))
         .catch(() => setError("Failed to load data"));

@@ -17,7 +17,7 @@ export default function ProductsPage() {
     // Will fetch products from invoices API endpoint
     const fetchProducts = async () => {
       setLoading(true);
-      const res = await fetch("/api/dashboard/products");
+      const res = await fetch("/api/products");
       const data = await res.json();
       // Deduplicate by name and category
       const unique: Record<string, Product> = {};

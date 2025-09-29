@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiActivity, FiServer, FiSettings } from 'react-icons/fi';
+import { FiActivity, FiServer } from 'react-icons/fi';
 
 interface ManagerSidebarProps {
   mobileOpen: boolean;
@@ -11,13 +11,12 @@ interface ManagerSidebarProps {
 
 const managerNavItems = [
   { path: '/managerDashboard', label: 'Dashboard', icon: FiServer },
-  { path: '/dashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
-  { path: '/dashboard/food-stock', label: 'Food Stock', icon: FiActivity },
-  { path: '/dashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
-  { path: '/dashboard/products', label: 'Products', icon: FiServer },
-  { path: '/dashboard/staff', label: 'Staff', icon: FiServer },
-  { path: '/dashboard/suppliers', label: 'Suppliers', icon: FiServer },
-  { path: '/dashboard/settings', label: 'Settings', icon: FiSettings },
+  { path: '/managerDashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
+  { path: '/managerDashboard/food-stock', label: 'Food Stock', icon: FiActivity },
+  { path: '/managerDashboard/staff', label: 'Staff Management', icon: FiServer },
+  { path: '/managerDashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
+  { path: '/managerDashboard/products', label: 'Products', icon: FiServer },
+  { path: '/managerDashboard/suppliers', label: 'Suppliers', icon: FiServer },
 ];
 
 export default function ManagerNavigation({ mobileOpen, setMobileOpen }: ManagerSidebarProps) {

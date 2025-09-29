@@ -42,7 +42,7 @@ export default function FoodStockPage() {
         );
         if (missing.length > 0) {
           await Promise.all(missing.map(product =>
-            fetch("/api/dashboard/food-stock", {
+            fetch("/api/food-stock", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ product: product._id, quantity: 0 })
@@ -61,8 +61,8 @@ export default function FoodStockPage() {
     setError("");
     try {
       const [productsRes, stocksRes] = await Promise.all([
-        fetch("/api/dashboard/products"),
-        fetch("/api/dashboard/food-stock")
+        fetch("/api/products"),
+        fetch("/api/food-stock")
       ]);
       const productsData = await productsRes.json();
       const stocksData = await stocksRes.json();
@@ -120,7 +120,7 @@ export default function FoodStockPage() {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("/api/dashboard/food-stock", {
+      const res = await fetch("/api/food-stock", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId, action })

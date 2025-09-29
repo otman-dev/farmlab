@@ -15,13 +15,13 @@ export default function AddStaffPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/dashboard/staff', {
+      const res = await fetch('/api/staff', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, role, contact }),
       });
       if (!res.ok) throw new Error('Failed to add staff');
-      router.push('/dashboard/staff');
+      router.push('/managerDashboard/staff');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

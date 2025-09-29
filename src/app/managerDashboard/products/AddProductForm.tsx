@@ -26,7 +26,7 @@ export default function AddProductForm() {
     if (!form.name.trim()) return setError("Product name is required");
     if (!form.description.trim()) return setError("Description is required");
     setLoading(true);
-    const res = await fetch("/api/dashboard/products", {
+    const res = await fetch("/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...form }),

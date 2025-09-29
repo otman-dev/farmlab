@@ -39,8 +39,8 @@ export default function MedicalStockPage() {
     try {
       // Fetch products and stocks
       const [productsRes, stocksRes] = await Promise.all([
-        fetch("/api/dashboard/products"),
-        fetch("/api/dashboard/medical-stock")
+        fetch("/api/products"),
+        fetch("/api/medical-stock")
       ]);
       const productsData = await productsRes.json();
       const stocksData = await stocksRes.json();
@@ -54,14 +54,14 @@ export default function MedicalStockPage() {
         );
         if (missing.length > 0) {
           await Promise.all(missing.map((product: Product) =>
-            fetch("/api/dashboard/medical-stock", {
+            fetch("/api/medical-stock", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ productId: product._id, quantity: 0 })
             })
           ));
           // Re-fetch stocks after creating missing entries
-          const stocksRes2 = await fetch("/api/dashboard/medical-stock");
+          const stocksRes2 = await fetch("/api/medical-stock");
           const stocksData2 = await stocksRes2.json();
           setMedicalStocks(stocksData2.stocks || []);
         }
@@ -108,7 +108,7 @@ export default function MedicalStockPage() {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("/api/dashboard/medical-stock", {
+      const res = await fetch("/api/medical-stock", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId, action })

@@ -20,7 +20,7 @@ export default function StaffPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/dashboard/staff')
+    fetch('/api/staff')
       .then(res => res.json())
       .then(data => setStaff(Array.isArray(data) ? data : data.staff || []))
       .catch(() => setError('Failed to load staff'))
@@ -33,8 +33,8 @@ export default function StaffPage() {
       <div className="mb-6">
         <p className="mb-2">Add, view, and manage staff. Track attendance visually on a calendar.</p>
         <div className="flex gap-4 mb-4">
-          <Link href="/dashboard/staff/add" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add Staff</Link>
-          <Link href="/dashboard/staff/calendar" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">View Attendance Calendar</Link>
+          <Link href="/managerDashboard/staff/add" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add Staff</Link>
+          <Link href="/managerDashboard/staff/calendar" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">View Attendance Calendar</Link>
         </div>
       </div>
   <div className="bg-white rounded shadow p-4 text-black">

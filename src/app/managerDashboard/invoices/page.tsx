@@ -73,18 +73,18 @@ export default function InvoicesPage() {
 
   // Fetch suppliers and invoices on mount
   useEffect(() => {
-    fetch("/api/dashboard/suppliers")
+    fetch("/api/suppliers")
       .then(res => res.json())
       .then(data => setSuppliers(data.suppliers || []));
     fetchInvoices();
-    fetch("/api/dashboard/products")
+    fetch("/api/products")
       .then(res => res.json())
       .then(data => setAllProducts(data.products || []));
   }, []);
 
   const fetchInvoices = async () => {
     setLoadingInvoices(true);
-    const res = await fetch("/api/dashboard/invoices");
+    const res = await fetch("/api/invoices");
     const data = await res.json();
     setInvoices(data.invoices || []);
     setLoadingInvoices(false);
@@ -150,7 +150,7 @@ export default function InvoicesPage() {
             usageDescription: p.usageDescription,
           };
         }
-        const resp = await fetch("/api/dashboard/products", {
+        const resp = await fetch("/api/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(productPayload),
@@ -163,7 +163,7 @@ export default function InvoicesPage() {
       }
     }
     // Now submit invoice
-    const res = await fetch("/api/dashboard/invoices", {
+    const res = await fetch("/api/invoices", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ invoiceNumber, supplierId, products: products.map(p => ({ ...p, category })), date: invoiceDate }),

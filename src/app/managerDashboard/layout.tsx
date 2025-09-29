@@ -20,7 +20,7 @@ export default function ManagerDashboardLayout({ children }: { children: React.R
   useEffect(() => {
     if (status === "loading") return;
     const user = session?.user as SessionUser | undefined;
-    if (!user || user.role !== "manager") {
+    if (!user || !["admin", "manager"].includes(user.role || "")) {
       router.replace("/auth/signin");
     }
   }, [session, status, router]);

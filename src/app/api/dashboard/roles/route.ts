@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCloudConnection } from '@/lib/mongodb-cloud';
-import { ObjectId } from 'mongodb';
 
 export async function GET() {
   try {

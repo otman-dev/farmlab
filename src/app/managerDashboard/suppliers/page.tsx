@@ -36,7 +36,7 @@ export default function SuppliersPage() {
   const fetchSuppliers = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/dashboard/suppliers");
+      const res = await fetch("/api/suppliers");
       const data = await res.json();
       if (res.ok) setSuppliers(data.suppliers);
       else setError(data.error || "Failed to fetch suppliers");
@@ -79,7 +79,7 @@ export default function SuppliersPage() {
     try {
       let res: Response, data: { supplier?: Supplier; error?: string };
       if (editingId) {
-        res = await fetch("/api/dashboard/suppliers", {
+        res = await fetch("/api/suppliers", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ _id: editingId, ...form }),
@@ -92,7 +92,7 @@ export default function SuppliersPage() {
           setShowForm(false);
         } else setError(data.error || "Failed to update supplier");
       } else {
-        res = await fetch("/api/dashboard/suppliers", {
+        res = await fetch("/api/suppliers", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
@@ -119,7 +119,7 @@ export default function SuppliersPage() {
     setDeletingId(supplier._id);
     setError("");
     try {
-      const res = await fetch("/api/dashboard/suppliers", {
+      const res = await fetch("/api/suppliers", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ _id: supplier._id }),

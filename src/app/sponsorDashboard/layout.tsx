@@ -20,7 +20,7 @@ export default function SecureSponsorDashboardLayout({ children }: { children: R
   useEffect(() => {
     if (status === "loading") return;
     const user = session?.user as SessionUser | undefined;
-    if (!user || user.role !== "sponsor") {
+    if (!user || !["admin", "sponsor"].includes(user.role || "")) {
       router.replace("/auth/signin");
     }
   }, [session, status, router]);
