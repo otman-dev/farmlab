@@ -38,6 +38,12 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Background grid pattern */
+.bg-grid-pattern {
+  background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 /* Animations */
 @keyframes blob {
   0% { transform: scale(1); }
@@ -52,6 +58,12 @@ body {
   100% { background-position: 0% 50%; }
 }
 
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
 .animate-blob {
   animation: blob 7s infinite;
 }
@@ -60,7 +72,19 @@ body {
   animation-delay: 2s;
 }
 
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
 .animate-gradient-x {
   background-size: 200% 200%;
   animation: gradient-x 5s ease infinite;
+}
+
+.animate-loading-bar {
+  animation: loading-bar 2s ease-in-out infinite;
 }

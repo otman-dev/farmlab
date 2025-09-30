@@ -869,25 +869,46 @@ export default function MultiStepRegistration() {
         <div className="absolute -top-32 -right-32 w-80 h-80 bg-gradient-to-r from-emerald-200 to-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
       </div>
       
-      <div className="relative flex items-center justify-center min-h-screen px-4 py-6">
+      <div className="relative min-h-screen px-4 py-6 sm:py-8">
         <div className="w-full max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 text-center">
-            <div className="flex items-center justify-center mb-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg">
-                <FiTarget className="w-8 h-8 text-white" />
-              </div>
-              <span className="ml-3 text-2xl font-bold text-gray-900">FarmLab</span>
+          {/* Mobile-First Header with Navigation */}
+          <div className="mb-8 sm:mb-10">
+            {/* Top row - Logo and Back button */}
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <Link 
+                href="/"
+                className="flex items-center group"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-200 flex items-center justify-center">
+                  <FiTarget className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+                <span className="ml-2 sm:ml-3 text-lg sm:text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors duration-200">FarmLab</span>
+              </Link>
+              
+              <Link 
+                href="/"
+                className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-sm text-gray-700 font-medium rounded-lg border border-gray-200/80 hover:bg-white hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+              >
+                <svg className="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                <span className="hidden sm:inline">Back to Home</span>
+                <span className="sm:hidden">Home</span>
+              </Link>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-              Join the Agricultural
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500">
-                Revolution
-              </span>
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Help us build the future of smart farming. Your insights will shape our platform.
-            </p>
+            
+            {/* Title Section - Mobile Optimized */}
+            <div className="text-center">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4 tracking-tight leading-tight">
+                Join the Agricultural
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 mt-1">
+                  Revolution
+                </span>
+              </h1>
+              <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto leading-relaxed px-2">
+                Help us build the future of smart farming. Your insights will shape our platform.
+              </p>
+            </div>
           </div>
 
           {/* Progress indicators */}
