@@ -2,23 +2,27 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { FiTarget, FiUser, FiLock, FiCheckCircle } from "react-icons/fi";
+import { FiTarget, FiUser, FiLock, FiCheckCircle, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function SignIn() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const email = emailRef.current?.value || "";
+    const password = passwordRef.current?.value || "";
 
     const result = await signIn("credentials", {
       redirect: false,
@@ -92,14 +96,13 @@ export default function SignIn() {
                     <FiUser className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
+                    ref={emailRef}
                     id="email"
                     name="email"
                     type="email"
                     autoComplete="email"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg border-gray-200 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-300 focus:outline-none focus:ring-4"
+                    className="w-full pl-10 pr-4 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg text-gray-900 placeholder:text-gray-400 border-gray-200 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-300 focus:outline-none focus:ring-4"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -116,16 +119,27 @@ export default function SignIn() {
                     <FiLock className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
+                    ref={passwordRef}
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg border-gray-200 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-300 focus:outline-none focus:ring-4"
+                    className="w-full pl-10 pr-12 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg text-gray-900 placeholder:text-gray-400 border-gray-200 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-300 focus:outline-none focus:ring-4"
                     placeholder="Enter your password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <FiEyeOff className="h-5 w-5" />
+                    ) : (
+                      <FiEye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
               </div>
 
