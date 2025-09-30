@@ -764,19 +764,75 @@ export default function MultiStepRegistration() {
 
   const handleSubmit = async () => {
     try {
+      // Debug: Check what's in formData.roles
+      console.log('Raw formData.roles:', formData.roles);
+      console.log('Is formData.roles an array?', Array.isArray(formData.roles));
+      console.log('formData.roles length:', Array.isArray(formData.roles) ? formData.roles.length : 'N/A');
+
+      // Get the primary role (first selected role)
+      const primaryRole = Array.isArray(formData.roles) && formData.roles.length > 0 
+        ? (formData.roles as string[])[0] 
+        : 'waiting_list';
+
+      console.log('Calculated primaryRole:', primaryRole);
+
+      // Transform form data to match API expectations
+      const registrationData = {
+        // Required fields first
+        email: formData.email,
+        password: formData.password,
+        full_name: formData.full_name,
+        role: primaryRole, // Primary role for user account
+        
+        // Optional basic fields
+        organization: formData.organization,
+        country: formData.country,
+        
+        // All the detailed form responses
+        roles: formData.roles, // Full roles array for registration response
+        experience_level: formData.experience_level,
+        farm_size: formData.farm_size,
+        production_type: formData.production_type,
+        current_tech_usage: formData.current_tech_usage,
+        challenges: formData.challenges,
+        priorities: formData.priorities,
+        expertise_area: formData.expertise_area,
+        collaboration_interest: formData.collaboration_interest,
+        data_interest: formData.data_interest,
+        research_field: formData.research_field,
+        collab_interest: formData.collab_interest,
+        sector: formData.sector,
+        industry_interest: formData.industry_interest,
+        investment_focus: formData.investment_focus,
+        ticket_size: formData.ticket_size,
+        study_level: formData.study_level,
+        interest_area: formData.interest_area,
+        follow_topics: formData.follow_topics,
+        interest_reason: formData.interest_reason,
+        participation_mode: formData.participation_mode,
+        pricing_model: formData.pricing_model
+      };
+
+      // Debug: Log form data being sent
+      console.log('Primary role selected:', primaryRole);
+      console.log('Final registrationData role field:', registrationData.role);
+      console.log('Form data being sent:', { ...registrationData, password: '[REDACTED]' });
+      
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(registrationData),
       });
       
       if (res.ok) {
         setSubmitted(true);
       } else {
         const data = await res.json();
+        console.log('Registration error response:', data);
         setErrors({ general: data.error || 'Registration failed' });
       }
-    } catch {
+    } catch (error) {
+      console.log('Registration catch error:', error);
       setErrors({ general: 'Registration failed' });
     }
   };

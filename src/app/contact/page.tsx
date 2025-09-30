@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { FiTarget, FiMail, FiPhone, FiMapPin, FiUser, FiFileText, FiSend, FiArrowLeft } from "react-icons/fi";
+import { FiTarget, FiMail, FiPhone, FiMapPin, FiFileText, FiSend, FiArrowLeft } from "react-icons/fi";
 import Footer from "@/components/Footer";
 
 export default function ContactPage() {

@@ -597,15 +597,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            
-            {/* Scroll indicators for mobile */}
-            <div className="flex justify-center mt-4 sm:hidden">
-              <div className="flex space-x-1">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -820,7 +811,7 @@ export default function Home() {
                 </summary>
                 <div className="px-5 pb-5 pt-0 text-gray-600 bg-gray-50 border-t border-gray-100">
                   <p className="leading-relaxed mb-3">
-                    Our customers report significant improvements across multiple metrics:
+                    While we&apos;re still gathering comprehensive data from our pilot deployments, early indicators suggest exciting potential across key farming metrics. Join us on this journey of discovery as we unlock the true potential of smart farming together:
                   </p>
                   <div className="flex flex-wrap -mx-2">
                     <div className="w-1/2 px-2 mb-3">
@@ -831,8 +822,8 @@ export default function Home() {
                           </svg>
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900">15-30%</div>
-                          <div className="text-xs text-gray-500">Water savings</div>
+                          <div className="font-bold text-gray-900 text-green-600">Coming Soon</div>
+                          <div className="text-xs text-gray-500">Water optimization data</div>
                         </div>
                       </div>
                     </div>
@@ -844,8 +835,8 @@ export default function Home() {
                           </svg>
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900">20-25%</div>
-                          <div className="text-xs text-gray-500">Fertilizer reduction</div>
+                          <div className="font-bold text-gray-900 text-blue-600">Discovering...</div>
+                          <div className="text-xs text-gray-500">Fertilizer efficiency insights</div>
                         </div>
                       </div>
                     </div>
@@ -857,8 +848,8 @@ export default function Home() {
                           </svg>
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900">8-12%</div>
-                          <div className="text-xs text-gray-500">Yield increase</div>
+                          <div className="font-bold text-gray-900 text-purple-600">Measuring...</div>
+                          <div className="text-xs text-gray-500">Yield improvement potential</div>
                         </div>
                       </div>
                     </div>
@@ -870,10 +861,20 @@ export default function Home() {
                           </svg>
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900">15-40%</div>
-                          <div className="text-xs text-gray-500">Labor time saved</div>
+                          <div className="font-bold text-gray-900 text-orange-600">Unlocking...</div>
+                          <div className="text-xs text-gray-500">Labor time optimization</div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <p className="text-sm text-blue-800 font-medium">
+                        Be part of the research! Early adopters help us validate these projections and discover even greater possibilities.
+                      </p>
                     </div>
                   </div>
                 </div>

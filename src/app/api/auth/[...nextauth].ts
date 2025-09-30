@@ -4,7 +4,6 @@ import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb-users-client";
-import { getCloudUserModel } from "@/lib/mongodb-cloud";
 import bcrypt from "bcryptjs";
 
 
@@ -19,30 +18,53 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        const UserModel = await getCloudUserModel();
-        const user = await UserModel.findOne({ email: credentials.email }).select("+password +role");
-        console.log('AUTH DEBUG: user found:', user ? { email: user.email, role: user.role, password: user.password } : null);
-        if (!user) {
-          console.log('AUTH DEBUG: No user found for email', credentials.email);
+        
+        try {
+          // Use direct database connection to match registration approach
+          const { getCloudConnection } = await import("@/lib/mongodb-cloud");
+          const conn = await getCloudConnection();
+          
+          // Find user directly in database
+          const user = await conn.db.collection('users').findOne({ 
+            email: credentials.email.toLowerCase() 
+          });
+          
+          console.log('AUTH DEBUG: user found:', user ? { 
+            email: user.email, 
+            role: user.role, 
+            hasPassword: !!user.password 
+          } : null);
+          
+          if (!user) {
+            console.log('AUTH DEBUG: No user found for email', credentials.email);
+            return null;
+          }
+          
+          // Check password
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          console.log('AUTH DEBUG: password valid?', isValid);
+          
+          if (!isValid) {
+            console.log('AUTH DEBUG: Invalid password for', credentials.email);
+            return null;
+          }
+          
+          // Only allow admin, sponsor, manager, visitor, or waiting_list
+          if (!['admin', 'sponsor', 'manager', 'visitor', 'waiting_list'].includes(user.role)) {
+            console.log('AUTH DEBUG: Role not allowed:', user.role);
+            return null;
+          }
+          
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error('AUTH ERROR:', error);
           return null;
         }
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        console.log('AUTH DEBUG: password valid?', isValid);
-        if (!isValid) {
-          console.log('AUTH DEBUG: Invalid password for', credentials.email);
-          return null;
-        }
-        // Only allow admin, sponsor, manager, visitor, or waiting_list
-        if (!['admin', 'sponsor', 'manager', 'visitor', 'waiting_list'].includes(user.role)) {
-          console.log('AUTH DEBUG: Role not allowed:', user.role);
-          return null;
-        }
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
       },
     }),
   ],

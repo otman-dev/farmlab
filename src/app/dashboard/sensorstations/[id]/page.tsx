@@ -181,7 +181,7 @@ export default function SensorStationDetailPage() {
         ...reading.sensors,
       };
     });
-  }, [readings, selectedTimeRange.hours, customDateRange.start, customDateRange.end]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [readings, selectedTimeRange.hours, customDateRange.start, customDateRange.end]);
 
   const sensorKeys = useMemo(() => {
     return readings.length > 0 ? Object.keys(readings[0].sensors) : [];
