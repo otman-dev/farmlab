@@ -17,7 +17,7 @@ interface TimeLeft {
   seconds: number;
 }
 
-export default function LaunchCountdown({ targetDate, title = "Launching Soon", subtitle = "Get ready for the launch of our platform!", className = "" }: CountdownProps) {
+export default function LaunchCountdown({ targetDate, title = "Launching Soon", subtitle, className = "" }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isClient, setIsClient] = useState(false);
 
@@ -57,6 +57,9 @@ export default function LaunchCountdown({ targetDate, title = "Launching Soon", 
   }
 
   const formatNumber = (num: number): string => num.toString().padStart(2, '0');
+  
+  // Generate dynamic subtitle if not provided
+  const dynamicSubtitle = subtitle || `Our platform arrives in just ${timeLeft.days} day${timeLeft.days !== 1 ? 's' : ''}!`;
 
   return (
     <div className={`bg-white rounded-3xl shadow-xl p-6 sm:p-8 border border-gray-100 ${className}`}>
@@ -67,7 +70,7 @@ export default function LaunchCountdown({ targetDate, title = "Launching Soon", 
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{title}</h2>
       </div>
       
-      <p className="text-gray-600 mb-8 text-center text-base sm:text-lg leading-relaxed">{subtitle}</p>
+      <p className="text-gray-600 mb-8 text-center text-base sm:text-lg leading-relaxed">{dynamicSubtitle}</p>
       
       <div className="grid grid-cols-4 gap-3 md:gap-4">
         <div className="bg-gradient-to-br from-green-50 via-green-100 to-emerald-100 rounded-2xl p-4 text-center border border-green-200 shadow-sm">

@@ -73,7 +73,6 @@ export default function Home() {
                   <LaunchCountdown 
                     targetDate="2025-10-28T12:00:00" 
                     title="Launching Soon" 
-                    subtitle="Our platform arrives in just 30 days!"
                     className="mb-0"
                   />
                 </div>
@@ -236,19 +235,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
-          {/* Mobile-friendly CTA */}
-          <div className="mt-12 text-center">
-            <Link
-              href="/comingsoon"
-              className="inline-flex items-center px-6 py-3 border border-green-600 text-green-600 bg-white font-medium rounded-lg hover:bg-green-600 hover:text-white transition-colors duration-200"
-            >
-              Learn How It Works
-              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-              </svg>
-            </Link>
-          </div>
         </div>
       </div>
 
@@ -266,7 +252,7 @@ export default function Home() {
           {/* Mobile-optimized scrollable testimonials */}
           <div className="relative">
             <div className="-mx-4 sm:mx-0 pb-4 sm:pb-6 overflow-x-auto sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
-              <div className="inline-flex sm:grid sm:grid-cols-1 md:grid-cols-2 sm:gap-6 gap-4 px-4 sm:px-0">
+              <div className="inline-flex sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-6 gap-4 px-4 sm:px-0">
                 
                 {/* Testimonial 1 - Atlantic Dunes CEO */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 w-80 sm:w-auto flex-shrink-0 hover:shadow-lg transition-all duration-300">
@@ -330,15 +316,37 @@ export default function Home() {
                   </div>
                 </div>
 
-              </div>
-            </div>
-            
-            {/* Scroll indicators for mobile */}
-            <div className="flex justify-center mt-4 sm:hidden">
-              <div className="flex space-x-1">
-                {[...Array(2)].map((_, i) => (
-                  <div key={i} className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                ))}
+                {/* Testimonial 3 - Domaine Moutaouafiq */}
+                <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 w-72 sm:w-auto flex-shrink-0 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4 shadow-md">
+                      DM
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg text-gray-900">Domaine Moutaouafiq</h4>
+                      <p className="text-green-600 text-sm font-medium">Agricultural Leader</p>
+                    </div>
+                  </div>
+                  <div className="bg-purple-50 rounded-xl p-4 mb-4 relative">
+                    <svg className="absolute -top-2 left-4 text-purple-50 w-4 h-4" width="16" height="8" viewBox="0 0 16 8" fill="currentColor">
+                      <path d="M0 8 L8 0 L16 8 Z"></path>
+                    </svg>
+                    <p className="text-gray-700 italic">
+                      &ldquo;As a leader in apple production, I&apos;ve been introduced to FarmLab&apos;s innovative solutions and I can confirm there is a real need for this technology in our industry. Their smart farming approach aligns perfectly with our vision for modernizing agriculture. We are very interested in including their solutions in our operations.&rdquo;
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-500">Agricultural Partner</span>
+                  </div>
+                </div>
+
               </div>
             </div>
             
@@ -347,11 +355,11 @@ export default function Home() {
               <p className="text-center text-sm font-medium text-gray-500 uppercase tracking-wider mb-6">
                 Our Key Collaborators
               </p>
-              <div className="grid grid-cols-2 gap-6 md:grid-cols-2 max-w-md mx-auto">
+              <div className="grid grid-cols-3 gap-4 md:grid-cols-3 max-w-2xl mx-auto">
                 {/* These would be actual partner logos */}
-                {['Atlantic Dunes', 'Origon Bio'].map((partner, idx) => (
-                  <div key={idx} className="flex justify-center items-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
-                    <div className="h-8 flex items-center justify-center text-gray-600 font-semibold">
+                {['Atlantic Dunes', 'Origon Bio', 'Domaine Moutaouafiq'].map((partner, idx) => (
+                  <div key={idx} className="flex justify-center items-center p-3 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="h-6 flex items-center justify-center text-gray-600 font-semibold text-sm">
                       {partner}
                     </div>
                   </div>
@@ -601,28 +609,98 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Our Journey */}
-      <div className="bg-white py-10 sm:py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Our Journey - Enhanced Mobile Experience */}
+      <div className="bg-gradient-to-b from-white to-gray-50 py-10 sm:py-12 md:py-16 relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-8 sm:mb-12">
+            <span className="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full mb-2">OUR STORY</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">Our Journey So Far</h2>
             <p className="text-base sm:text-lg text-gray-600">From concept to real-world implementation</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">2023</div>
-              <div className="text-lg font-semibold text-gray-900 mb-2">Founded</div>
-              <div className="text-gray-600">FarmLab was established with a vision to revolutionize agriculture through technology.</div>
+          
+          {/* Mobile-optimized timeline cards */}
+          <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-3 md:gap-6 lg:gap-8">
+            {/* 2023 - Founded */}
+            <div className="relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 transform hover:-translate-y-1">
+              
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl sm:text-5xl font-bold text-green-600 mb-3">2023</div>
+                <div className="text-xl font-bold text-gray-900 mb-3">Founded</div>
+                <div className="text-gray-600 leading-relaxed">FarmLab was established with a vision to revolutionize agriculture through technology.</div>
+              </div>
+              
+              {/* Progress indicator */}
+              <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full w-full"></div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">2024</div>
-              <div className="text-lg font-semibold text-gray-900 mb-2">First Deployment</div>
-              <div className="text-gray-600">Successfully deployed our IoT system on our pilot farm with real-time monitoring.</div>
+            
+            {/* 2024 - First Deployment */}
+            <div className="relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 transform hover:-translate-y-1">
+              
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl sm:text-5xl font-bold text-blue-600 mb-3">2024</div>
+                <div className="text-xl font-bold text-gray-900 mb-3">First Deployment</div>
+                <div className="text-gray-600 leading-relaxed">Successfully deployed our IoT system on our pilot farm with real-time monitoring.</div>
+              </div>
+              
+              {/* Progress indicator */}
+              <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-blue-500 h-2 rounded-full w-full"></div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">2025</div>
-              <div className="text-lg font-semibold text-gray-900 mb-2">Platform Launch</div>
-              <div className="text-gray-600">Full platform release with comprehensive farm management features and community access.</div>
+            
+            {/* 2025 - Platform Launch */}
+            <div className="relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 transform hover:-translate-y-1">
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg animate-pulse">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-4xl sm:text-5xl font-bold text-purple-600 mb-3">2025</div>
+                <div className="text-xl font-bold text-gray-900 mb-3">Platform Launch</div>
+                <div className="text-gray-600 leading-relaxed">Full platform release with comprehensive farm management features and community access.</div>
+              </div>
+              
+              {/* Progress indicator - animated for current year */}
+              <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-purple-500 h-2 rounded-full w-3/4 animate-pulse"></div>
+              </div>
+              
+              {/* "Coming Soon" badge */}
+              <div className="absolute -top-2 -right-2">
+                <div className="bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce">
+                  Live!
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,8 +1,12 @@
 "use client";
 
-import { FiServer, FiTrendingUp, FiUsers, FiBarChart, FiShield, FiSmartphone, FiZap, FiTarget } from 'react-icons/fi';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiServer, FiTrendingUp, FiUsers, FiBarChart, FiShield, FiSmartphone, FiZap, FiChevronRight, FiPlay } from 'react-icons/fi';
 
 export default function FeaturesPage() {
+  const [activeFeature, setActiveFeature] = useState<number | null>(null);
+
   const features = [
     {
       icon: FiServer,
@@ -40,59 +44,206 @@ export default function FeaturesPage() {
       description: "Monitor and control your farm operations from anywhere using our responsive mobile interface and dedicated mobile applications.",
       details: ["iOS & Android apps", "Offline capabilities", "Push notifications", "Voice commands"]
     }
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">FarmLab Features</h1>
-            <p className="text-gray-600 mt-1">Comprehensive suite of tools for modern agriculture</p>
+  ];  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-12">
+        {/* Hero Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center space-y-6"
+        >
+          <div className="relative">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute -top-4 -right-4 w-8 h-8 border-2 border-green-300 border-t-green-600 rounded-full"
+            />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-green-600 via-green-700 to-green-800 bg-clip-text text-transparent">
+              FarmLab Features
+            </h1>
           </div>
-          <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-            <FiZap className="w-6 h-6 text-green-600" />
-          </div>
-        </div>
-      </div>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Discover the comprehensive suite of cutting-edge tools designed to revolutionize modern agriculture
+          </p>
+          
+          {/* Stats Bar */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex justify-center gap-8 mt-8"
+          >
+            {[
+              { label: "Active Farms", value: "150+", icon: "🚜" },
+              { label: "IoT Devices", value: "2.5K+", icon: "📡" },
+              { label: "Countries", value: "12+", icon: "🌍" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white rounded-xl px-6 py-4 shadow-lg border border-green-100"
+              >
+                <div className="text-2xl mb-1">{stat.icon}</div>
+                <div className="text-2xl font-bold text-green-600">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          return (
-            <div key={index} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center mb-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mr-4">
-                  <Icon className="w-6 h-6 text-green-600" />
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          {features.map((feature, index) => {
+            const isActive = activeFeature === index;
+            
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -10, scale: 1.02 }}
+                onHoverStart={() => setActiveFeature(index)}
+                onHoverEnd={() => setActiveFeature(null)}
+                className="relative overflow-hidden bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:shadow-xl cursor-pointer group transition-all duration-300"
+              >
+                {/* Background Pattern */}
+                <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
+                  <div className="w-full h-full bg-green-500 rounded-full transform rotate-45 scale-150" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{feature.title}</h3>
-              </div>
-              <p className="text-gray-600 leading-relaxed mb-4">{feature.description}</p>
-              <div className="space-y-2">
-                {feature.details.map((detail, detailIndex) => (
-                  <div key={detailIndex} className="flex items-center text-sm text-gray-600">
-                    <FiTarget className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                    {detail}
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg shadow p-8 text-white text-center">
-        <h2 className="text-xl font-bold mb-3">Ready to Experience These Features?</h2>
-        <p className="text-green-100 mb-6 max-w-2xl mx-auto text-sm">
-          Join FarmLab today and transform your farming operations with cutting-edge IoT technology.
-        </p>
-        <button className="inline-flex items-center px-6 py-3 bg-white text-green-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-          <FiZap className="w-4 h-4 mr-2" />
-          Request Demo
-        </button>
+                {/* Header */}
+                <div className="relative z-10 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <motion.div
+                      animate={{ rotate: isActive ? 360 : 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center shadow-lg"
+                    >
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </motion.div>
+                    <motion.div
+                      animate={{ x: isActive ? 5 : 0 }}
+                      className="text-gray-400 group-hover:text-gray-600"
+                    >
+                      <FiChevronRight className="w-6 h-6" />
+                    </motion.div>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-green-600 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed text-sm">
+                    {feature.description}
+                  </p>
+                </div>
+
+                {/* Features List */}
+                <AnimatePresence>
+                  <motion.div
+                    initial={{ opacity: 0.7 }}
+                    whileHover={{ opacity: 1 }}
+                    className="relative z-10 space-y-3"
+                  >
+                    {feature.details.map((detail, detailIndex) => (
+                      <motion.div
+                        key={detailIndex}
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: (index * 0.1) + (detailIndex * 0.05) }}
+                        className="flex items-center text-sm text-gray-700 group-hover:text-gray-800"
+                      >
+                        <motion.div
+                          animate={{ scale: isActive ? 1.2 : 1 }}
+                          className="w-2 h-2 rounded-full bg-gradient-to-r from-green-500 to-green-600 mr-3 flex-shrink-0"
+                        />
+                        {detail}
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Hover Overlay */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"
+                />
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Interactive Demo CTA */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8 }}
+          className="relative overflow-hidden bg-gradient-to-r from-green-600 via-green-700 to-green-800 rounded-3xl p-12 text-white text-center shadow-2xl"
+        >
+          {/* Background Animation */}
+          <div className="absolute inset-0">
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                animate={{
+                  y: [0, -100],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 2,
+                }}
+                className="absolute w-2 h-2 bg-white/20 rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: '100%',
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="relative z-10 max-w-4xl mx-auto">
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-6xl mb-6"
+            >
+              🚀
+            </motion.div>
+            
+            <h2 className="text-4xl font-bold mb-4">
+              Ready to Transform Your Farm?
+            </h2>
+            <p className="text-green-100 mb-8 text-lg leading-relaxed max-w-2xl mx-auto">
+              Experience the future of agriculture with our comprehensive IoT platform. 
+              Join thousands of farmers already maximizing their yields with FarmLab.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center px-8 py-4 bg-white text-green-700 font-bold text-lg rounded-xl hover:bg-gray-100 transition-all shadow-lg"
+              >
+                <FiPlay className="w-5 h-5 mr-3" />
+                Watch Demo
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-bold text-lg rounded-xl hover:bg-white hover:text-green-700 transition-all"
+              >
+                <FiZap className="w-5 h-5 mr-3" />
+                Start Free Trial
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
