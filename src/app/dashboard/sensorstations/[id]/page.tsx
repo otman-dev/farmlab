@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush, ReferenceLine } from "recharts";
-import { FiThermometer, FiDroplet, FiCloud, FiCpu, FiWind, FiCalendar, FiDownload, FiFilter, FiEye, FiEyeOff, FiZoomIn, FiZoomOut, FiRefreshCw, FiBarChart } from "react-icons/fi";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush } from "recharts";
+import { FiThermometer, FiDroplet, FiCloud, FiCpu, FiWind, FiCalendar, FiDownload, FiFilter, FiEye, FiEyeOff, FiZoomIn, FiRefreshCw, FiBarChart } from "react-icons/fi";
 
 type Reading = {
   _id: string;
@@ -181,7 +181,7 @@ export default function SensorStationDetailPage() {
         ...reading.sensors,
       };
     });
-  }, [readings, selectedTimeRange.hours, selectedTimeRange.label, customDateRange.start, customDateRange.end]);
+  }, [readings, selectedTimeRange.hours, customDateRange.start, customDateRange.end]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sensorKeys = useMemo(() => {
     return readings.length > 0 ? Object.keys(readings[0].sensors) : [];

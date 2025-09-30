@@ -2,8 +2,8 @@
 
 "use client";
 
-import MultiStepRegistration from "@/components/MultiStepRegistration";
+import SimpleRegistration from "@/components/SimpleRegistration";
 
 export default function Register() {
-  return <MultiStepRegistration />;
+  return <SimpleRegistration />;
 }

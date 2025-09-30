@@ -1,13 +1,25 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { FiArrowRight, FiArrowLeft, FiCheckCircle, FiTarget, FiChevronDown, FiChevronUp, FiUsers } from "react-icons/fi";
+import { UncontrolledInput } from "./UncontrolledInput";
 
-// Inline the JSON structure (in a real app, import or fetch it)
-
+// Define types first
 type FormDataType = Record<string, string | string[] | number | boolean | undefined>;
 type ErrorsType = Record<string, string | undefined>;
 type ExpandedType = Record<number, boolean>;
+
+// Define a more comprehensive Question type
+type Question = {
+	id: string;
+	label: string;
+	type: string;
+	required?: boolean;
+	minLength?: number;
+	options?: string[];
+};
+
+// Move formJson outside component to make it completely stable
 const formJson = {
 	"form": {
 		"title": "FarmLab Registration & Market Intelligence Form",
@@ -154,6 +166,7 @@ const branchLogic: { [key: string]: string } = {
 		const [expanded, setExpanded] = useState<ExpandedType>({});
 		const [submitted, setSubmitted] = useState<boolean>(false);
 		const [validationInProgress, setValidationInProgress] = useState<boolean>(false);
+		const [showPassword, setShowPassword] = useState<boolean>(false);
 
 		// Add effect to log step changes
 		React.useEffect(() => {
@@ -184,7 +197,7 @@ const branchLogic: { [key: string]: string } = {
 				steps: calculatedSteps,
 				currentStep: calculatedSteps[stepIndex] ?? null
 			};
-		}, [formData, stepIndex]);
+		}, [formData["roles"], stepIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
 		// Validation
 		function validateStep(): boolean {
@@ -226,11 +239,12 @@ const branchLogic: { [key: string]: string } = {
 				return isValid;
 			}
 
-		function handleChange(id: string, value: string | string[] | number | boolean | undefined) {
+		const handleChange = useCallback((id: string, value: string | string[] | number | boolean | undefined) => {
 			setFormData((prev: FormDataType) => ({ ...prev, [id]: value }));
 			setErrors((prev: ErrorsType) => ({ ...prev, [id]: undefined }));
-		}
-		function handleMultiSelect(id: string, option: string) {
+		}, []);
+		
+		const handleMultiSelect = useCallback((id: string, option: string) => {
 			setFormData((prev: FormDataType) => {
 				const arr: string[] = Array.isArray(prev[id]) ? prev[id] : [];
 				if (arr.includes(option)) {
@@ -240,7 +254,12 @@ const branchLogic: { [key: string]: string } = {
 				}
 			});
 			setErrors((prev: ErrorsType) => ({ ...prev, [id]: undefined }));
-		}
+		}, []);
+
+		const handleToggleExpanded = useCallback(() => {
+			setExpanded(e => ({ ...e, [stepIndex]: !(e[stepIndex] ?? true) }));
+		}, [stepIndex]);
+		
 		function handleNext() {
 			console.log("Attempting to go to next step...");
 			console.log("Current form data:", { ...formData, password: formData.password ? '[REDACTED]' : undefined });
@@ -328,52 +347,29 @@ const branchLogic: { [key: string]: string } = {
 			}
 		}
 
-		// UI helpers
-		// Define a more comprehensive Question type
-		type Question = {
-			id: string;
-			label: string;
-			type: string;
-			required?: boolean;
-			minLength?: number;
-			options?: string[];
-		};
-
-		function renderQuestion(q: Question) {
-			   if (q.type === "text" || q.type === "email" || q.type === "password") {
-				   return (
-					   <div className="mb-4 sm:mb-6" key={q.id}>
-						   <label className="block font-semibold mb-2 text-gray-800">
-							   {q.label}
-							   {q.required && <span className="text-red-500 ml-1">*</span>}
-						   </label>
-						   <input
-							   type={q.type}
-							   className={`w-full px-4 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg ${
-								   errors[q.id] 
-									   ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-									   : 'border-gray-200 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-300'
-							   } focus:outline-none focus:ring-4`}
-							   value={formData[q.id] ? String(formData[q.id]) : ""}
-							   onChange={e => handleChange(q.id, e.target.value)}
-							   placeholder={q.label}
-							   minLength={q.minLength || undefined}
-						   />
-						   {errors[q.id] && (
-							   <div className="flex items-center mt-2 text-red-600 text-sm">
-								   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-								   </svg>
-								   {errors[q.id]}
-							   </div>
-						   )}
-					   </div>
-				   );
-			   }
+		// Simple render function without useCallback to avoid deps issues
+		const renderQuestion = (q: Question) => {
+			if (q.type === "text" || q.type === "email" || q.type === "password") {
+				return (
+					<UncontrolledInput
+						key={q.id}
+						id={q.id}
+						label={q.label}
+						type={q.type}
+						required={q.required}
+						minLength={q.minLength}
+						value={formData[q.id] ? String(formData[q.id]) : ""}
+						error={errors[q.id]}
+						showPassword={showPassword}
+						onTogglePassword={q.type === "password" ? () => setShowPassword(!showPassword) : undefined}
+						onChange={handleChange}
+					/>
+				);
+			}
 			if (q.type === "multi-select") {
 				return (
 					<div className="mb-4 sm:mb-6" key={q.id}>
-						<label className="block font-semibold mb-3 text-gray-800">
+						<label className="block font-semibold mb-3 text-gray-900">
 							{q.label}
 							{q.required && <span className="text-red-500 ml-1">*</span>}
 						</label>
@@ -384,27 +380,27 @@ const branchLogic: { [key: string]: string } = {
 									<button
 										type="button"
 										key={option}
-										className={`p-3 sm:p-4 rounded-xl border-2 text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-3 text-left ${
+										className={`p-3 sm:p-4 rounded-xl border-2 text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-3 text-left shadow-sm hover:shadow-md ${
 											isSelected
-												? 'border-green-500 bg-green-50 text-green-700 shadow-md transform scale-105'
-												: 'border-gray-200 bg-white text-gray-700 hover:border-green-400 hover:bg-green-50 hover:shadow-sm'
+												? 'border-green-500 bg-green-100 text-green-800 shadow-md transform scale-105 ring-2 ring-green-200'
+												: 'border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-50 hover:text-green-700'
 										}`}
 										onClick={() => handleMultiSelect(q.id, option)}
 									>
-										<div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+										<div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
 											isSelected 
-												? 'border-green-500 bg-green-500' 
-												: 'border-gray-300'
+												? 'border-green-600 bg-green-600' 
+												: 'border-gray-400 bg-white'
 										}`}>
 											{isSelected && <FiCheckCircle className="text-white w-3 h-3" />}
 										</div>
-										<span className="flex-1">{option}</span>
+										<span className="flex-1 font-medium">{option}</span>
 									</button>
 								);
 							})}
 						</div>
 						{errors[q.id] && (
-							<div className="flex items-center mt-2 text-red-600 text-sm">
+							<div className="flex items-center mt-2 text-red-600 text-sm font-medium">
 								<svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 								</svg>
@@ -417,7 +413,7 @@ const branchLogic: { [key: string]: string } = {
 			if (q.type === "single-select") {
 				return (
 					<div className="mb-4 sm:mb-6" key={q.id}>
-						<label className="block font-semibold mb-3 text-gray-800">
+						<label className="block font-semibold mb-3 text-gray-900">
 							{q.label}
 							{q.required && <span className="text-red-500 ml-1">*</span>}
 						</label>
@@ -428,29 +424,29 @@ const branchLogic: { [key: string]: string } = {
 									<button
 										type="button"
 										key={option}
-										className={`p-3 sm:p-4 rounded-xl border-2 text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-3 text-left ${
+										className={`p-3 sm:p-4 rounded-xl border-2 text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-3 text-left shadow-sm hover:shadow-md ${
 											isSelected
-												? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md transform scale-105'
-												: 'border-gray-200 bg-white text-gray-700 hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-sm'
+												? 'border-emerald-500 bg-emerald-100 text-emerald-800 shadow-md transform scale-105 ring-2 ring-emerald-200'
+												: 'border-gray-300 bg-white text-gray-700 hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700'
 										}`}
 										onClick={() => handleChange(q.id, option)}
 									>
 										<div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
 											isSelected 
-												? 'border-emerald-500 bg-emerald-500' 
-												: 'border-gray-300'
+												? 'border-emerald-600 bg-emerald-600' 
+												: 'border-gray-400 bg-white'
 										}`}>
 											{isSelected && (
-												<div className="w-2 h-2 bg-white rounded-full"></div>
+												<div className="w-2.5 h-2.5 bg-white rounded-full"></div>
 											)}
 										</div>
-										<span className="flex-1">{option}</span>
+										<span className="flex-1 font-medium">{option}</span>
 									</button>
 								);
 							})}
 						</div>
 						{errors[q.id] && (
-							<div className="flex items-center mt-2 text-red-600 text-sm">
+							<div className="flex items-center mt-2 text-red-600 text-sm font-medium">
 								<svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 								</svg>
@@ -461,7 +457,7 @@ const branchLogic: { [key: string]: string } = {
 				);
 			}
 			return null;
-		}
+		};
 
 		// FarmLab brand-consistent chat bubble style
 		type BubbleProps = {
@@ -607,7 +603,7 @@ const branchLogic: { [key: string]: string } = {
 							<Bubble
 								colorIdx={stepIndex}
 								expanded={expanded[stepIndex] ?? true}
-								onToggle={() => setExpanded(e => ({ ...e, [stepIndex]: !(e[stepIndex] ?? true) }))}
+								onToggle={handleToggleExpanded}
 								title={currentStep.title}
 							>
 								{currentStep.questions.map((q) => renderQuestion(q))}

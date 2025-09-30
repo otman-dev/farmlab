@@ -294,7 +294,7 @@ interface DataPanelProps {
   timestamp?: number;
 }
 
-function DataPanel({ temperature, humidity, timestamp }: DataPanelProps) {
+function DataPanel({ temperature, humidity }: DataPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
   
   useEffect(() => {
