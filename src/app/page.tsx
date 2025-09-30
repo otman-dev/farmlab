@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FiUsers, FiTrendingUp, FiTarget, FiHeart, FiBookOpen, FiCode, FiSearch } from "react-icons/fi";
 import LaunchCountdown from "@/components/LaunchCountdown";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -1027,6 +1028,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
