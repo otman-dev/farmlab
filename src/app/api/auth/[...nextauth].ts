@@ -2,13 +2,14 @@
 import NextAuth, { type NextAuthOptions, type Session, type User, SessionStrategy } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb-users-client";
+// import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
+// import clientPromise from "@/lib/mongodb-users-client";
 import bcrypt from "bcryptjs";
 
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  // Temporarily disable MongoDB adapter due to Atlas DNS issues
+  // adapter: MongoDBAdapter(clientPromise),
   providers: [
     CredentialsProvider({
       name: "Credentials",
