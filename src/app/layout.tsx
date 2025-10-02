@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SessionProviderWrapper from "./SessionProviderWrapper";
+import "@/lib/error-handlers"; // Global error handling
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

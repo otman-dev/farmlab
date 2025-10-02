@@ -44,8 +44,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Connect to database
-    const conn = await getCloudConnection();
+    // Connect to database with retry logic
+    let conn;
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+      try {
+        conn = await getCloudConnection();
+        break; // Success, exit retry loop
+      } catch (error) {
+        retryCount++;
+        console.error(`MongoDB connection attempt ${retryCount} failed:`, error);
+        
+        if (retryCount >= maxRetries) {
+          console.error('All MongoDB connection attempts failed. Registration cannot proceed.');
+          return NextResponse.json({
+            error: "Service temporarily unavailable. Please try again later."
+          }, { status: 503 });
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+      }
+    }
     
     // Check if user already exists using direct connection
     const existingUser = await conn.db.collection('users').findOne({ 

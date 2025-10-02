@@ -28,8 +28,10 @@ export async function getCloudConnection() {
       bufferCommands: false,
       autoCreate: true,
       autoIndex: true,
-      connectTimeoutMS: 10000,
+      connectTimeoutMS: 30000, // Increased timeout
       socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 30000, // Added server selection timeout
+      family: 4, // Force IPv4 to avoid IPv6 DNS issues
     })
       .asPromise()
       .then((conn) => {
@@ -38,6 +40,16 @@ export async function getCloudConnection() {
       })
       .catch((error) => {
         console.error('Error connecting to MongoDB Cloud Cluster:', error);
+        
+        // Log detailed error information
+        if (error.code === 'ESERVFAIL' || error.code === 'ENOTFOUND') {
+          console.error('DNS resolution failed for MongoDB Atlas cluster. This could be due to:');
+          console.error('1. Network connectivity issues');
+          console.error('2. DNS server problems');
+          console.error('3. Firewall blocking MongoDB Atlas');
+          console.error('4. Temporary MongoDB Atlas service issues');
+        }
+        
         throw error;
       });
   }
