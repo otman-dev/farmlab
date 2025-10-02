@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
     const { 
       email, 
       password, 
-      full_name, 
+      full_name,
+      phone,
       role, 
       organization,
       experience_level,
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase(),
       password: hashedPassword,
       name: full_name,
+      phone: phone || '',
       role: userRole, // Use the derived role (will be 'waiting_list')
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -79,6 +81,7 @@ export async function POST(request: NextRequest) {
       userId: userId,
       email: email.toLowerCase(),
       full_name,
+      phone: phone || '',
       intended_role: roles ? roles[0] : 'waiting_list', // User's primary intended role
       organization: organization || '',
       country: body.country || '',

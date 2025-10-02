@@ -545,6 +545,15 @@ export default function MultiStepRegistration() {
               onChange={handleInputChange}
             />
             <BasicInput
+              id="phone"
+              label="Phone Number"
+              type="tel"
+              required
+              formData={formData}
+              errors={errors}
+              onChange={handleInputChange}
+            />
+            <BasicInput
               id="country"
               label="Country / Region"
               type="text"
@@ -733,6 +742,7 @@ export default function MultiStepRegistration() {
       } else if ((formData.password as string).length < 8) {
         newErrors.password = "Password must be at least 8 characters";
       }
+      if (!formData.phone) newErrors.phone = "Required";
       if (!formData.country) newErrors.country = "Required";
     } else if (currentStep === 1) {
       if (!formData.roles || (Array.isArray(formData.roles) && formData.roles.length === 0)) {
@@ -769,12 +779,10 @@ export default function MultiStepRegistration() {
       console.log('Is formData.roles an array?', Array.isArray(formData.roles));
       console.log('formData.roles length:', Array.isArray(formData.roles) ? formData.roles.length : 'N/A');
 
-      // Get the primary role (first selected role)
-      const primaryRole = Array.isArray(formData.roles) && formData.roles.length > 0 
-        ? (formData.roles as string[])[0] 
-        : 'waiting_list';
+      // All new users get waiting_list role - their selections are just for interest tracking
+      const primaryRole = 'waiting_list';
 
-      console.log('Calculated primaryRole:', primaryRole);
+      console.log('Setting primaryRole to:', primaryRole);
 
       // Transform form data to match API expectations
       const registrationData = {
@@ -782,7 +790,8 @@ export default function MultiStepRegistration() {
         email: formData.email,
         password: formData.password,
         full_name: formData.full_name,
-        role: primaryRole, // Primary role for user account
+        phone: formData.phone,
+        role: primaryRole, // All users start as waiting_list
         
         // Optional basic fields
         organization: formData.organization,

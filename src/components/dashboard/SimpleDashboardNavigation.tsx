@@ -33,6 +33,18 @@ export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }:
     { path: '/managerDashboard/suppliers', label: 'Suppliers', icon: FiServer },
   ];
 
+  // Admin-specific navigation (no manager dashboard items)
+  const adminNavItems = [
+    { path: '/adminDashboard', label: 'Dashboard', icon: FiHome },
+    { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
+    { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
+    { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
+    { path: '/dashboard/securitysystem', label: 'Security System', icon: FiLock },
+    { path: '/dashboard/services', label: 'Services Status', icon: FiServer },
+    { path: '/dashboard/users', label: 'User Management', icon: FiLock },
+    { path: '/dashboard/settings', label: 'Settings', icon: FiSettings },
+  ];
+
   const defaultNavItems = [
     { path: '/adminDashboard', label: 'Dashboard', icon: FiHome },
     { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
@@ -52,7 +64,7 @@ export default function SimpleDashboardNavigation({ mobileOpen, setMobileOpen }:
     { path: '/dashboard/settings', label: 'Settings', icon: FiSettings },
   ];
 
-  const navItems = role === 'manager' ? managerNavItems : defaultNavItems;
+  const navItems = role === 'manager' ? managerNavItems : role === 'admin' ? adminNavItems : defaultNavItems;
 
   // Sidebar content as a component for reuse
   const SidebarContent = (

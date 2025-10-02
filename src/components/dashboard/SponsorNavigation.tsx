@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiActivity, FiServer, FiSettings } from 'react-icons/fi';
+import { FiHome } from 'react-icons/fi';
 
 interface SponsorSidebarProps {
   mobileOpen: boolean;
@@ -10,11 +10,7 @@ interface SponsorSidebarProps {
 }
 
 const sponsorNavItems = [
-  { path: '/sponsorDashboard', label: 'Sponsor Dashboard', icon: FiServer },
-  { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
-  { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
-  { path: '/dashboard/securitysystem', label: 'Security System', icon: FiServer },
-  { path: '/dashboard/settings', label: 'Settings', icon: FiSettings },
+  { path: '/sponsorDashboard', label: 'Sponsor Dashboard', icon: FiHome },
 ];
 
 export default function SponsorNavigation({ mobileOpen, setMobileOpen }: SponsorSidebarProps) {

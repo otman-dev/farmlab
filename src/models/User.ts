@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema({
       'Please provide a valid email',
     ],
   },
+  phone: {
+    type: String,
+    required: false,
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -89,6 +93,7 @@ interface SerializedUser {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   role: string;
   userType?: string;
   farmSize?: string;
@@ -109,6 +114,7 @@ UserSchema.set('toJSON', {
       id: ret._id.toString(),
       name: ret.name,
       email: ret.email,
+      phone: ret.phone === null ? undefined : ret.phone,
       role: ret.role,
       userType: ret.userType === null ? undefined : ret.userType,
       farmSize: ret.farmSize === null ? undefined : ret.farmSize,
@@ -127,6 +133,7 @@ export interface User {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
+  phone?: string;
   password: string;
   role: string;
   userType?: string;
