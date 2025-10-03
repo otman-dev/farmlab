@@ -579,42 +579,138 @@ export default function InvoicesPage() {
         ) : invoices.length === 0 ? (
           <div className="text-gray-400">No invoices found.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border rounded-lg shadow mt-2">
-              <thead className="bg-green-50 sticky top-0 z-10">
-                <tr>
-                  <th className="px-4 py-3 border-b font-bold text-green-900">Invoice #</th>
-                  <th className="px-4 py-3 border-b font-bold text-green-900">Supplier</th>
-                  <th className="px-4 py-3 border-b font-bold text-green-900">Products</th>
-                  <th className="px-4 py-3 border-b font-bold text-green-900">Grand Total (MAD)</th>
-                  <th className="px-4 py-3 border-b font-bold text-green-900">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.map((inv, idx) => (
-                  <tr key={inv._id} className={idx % 2 === 0 ? "bg-white" : "bg-green-50" + " border-b hover:bg-green-100 transition-all"}>
-                    <td className="px-4 py-2 font-semibold text-green-800">{inv.invoiceNumber}</td>
-                    <td className="px-4 py-2">{inv.supplier?.entrepriseName || "-"}</td>
-                    <td className="px-4 py-2">
-                      <ul className="space-y-1">
-                        {inv.products.map((p: InvoiceProduct, i: number) => (
-                          <li key={i} className="flex items-center gap-2">
-                            <span className="inline-block bg-green-100 text-green-800 font-semibold rounded px-2 py-0.5 text-xs">{p.name}</span>
-                            <span className="inline-block bg-green-200 text-green-900 rounded px-2 py-0.5 text-xs">x{p.quantity}</span>
-                            <span className="inline-block bg-green-50 text-green-700 rounded px-2 py-0.5 text-xs">{p.price} MAD</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="px-4 py-2 font-bold text-green-700 text-right">
-                      {typeof inv.grandTotal === 'number' ? inv.grandTotal.toFixed(2) : ''}
-                    </td>
-                    <td className="px-4 py-2 text-xs text-gray-500">{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString() : "-"}</td>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full bg-white border rounded-lg shadow mt-2">
+                <thead className="bg-green-50 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-4 py-3 border-b font-bold text-green-900">Invoice #</th>
+                    <th className="px-4 py-3 border-b font-bold text-green-900">Supplier</th>
+                    <th className="px-4 py-3 border-b font-bold text-green-900">Products</th>
+                    <th className="px-4 py-3 border-b font-bold text-green-900">Grand Total (MAD)</th>
+                    <th className="px-4 py-3 border-b font-bold text-green-900">Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {invoices.map((inv, idx) => (
+                    <tr key={inv._id} className={idx % 2 === 0 ? "bg-white" : "bg-green-50" + " border-b hover:bg-green-100 transition-all"}>
+                      <td className="px-4 py-2 font-semibold text-green-800">{inv.invoiceNumber}</td>
+                      <td className="px-4 py-2">{inv.supplier?.entrepriseName || "-"}</td>
+                      <td className="px-4 py-2">
+                        <ul className="space-y-1">
+                          {inv.products.map((p: InvoiceProduct, i: number) => (
+                            <li key={i} className="flex items-center gap-2">
+                              <span className="inline-block bg-green-100 text-green-800 font-semibold rounded px-2 py-0.5 text-xs">{p.name}</span>
+                              <span className="inline-block bg-green-200 text-green-900 rounded px-2 py-0.5 text-xs">x{p.quantity}</span>
+                              <span className="inline-block bg-green-50 text-green-700 rounded px-2 py-0.5 text-xs">{p.price} MAD</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className="px-4 py-2 font-bold text-green-700 text-right">
+                        {typeof inv.grandTotal === 'number' ? inv.grandTotal.toFixed(2) : ''}
+                      </td>
+                      <td className="px-4 py-2 text-xs text-gray-500">{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString() : "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-6">
+              {invoices.map((inv, idx) => (
+                <div key={inv._id} className="bg-gradient-to-br from-white to-green-50 border-2 border-green-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+                  {/* Header with gradient background */}
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="font-bold text-white text-lg tracking-wide">#{inv.invoiceNumber}</h3>
+                        <p className="text-green-100 text-sm opacity-90">{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString() : "-"}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-extrabold text-white drop-shadow">
+                          {typeof inv.grandTotal === 'number' ? inv.grandTotal.toFixed(2) : ''} 
+                        </div>
+                        <div className="text-green-100 text-sm font-medium">MAD</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Supplier Section */}
+                    <div className="mb-6">
+                      <div className="flex items-center mb-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        <div className="text-sm font-bold text-green-800 uppercase tracking-wider">Supplier</div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 shadow-sm border border-green-100">
+                        <div className="text-gray-900 font-semibold">{inv.supplier?.entrepriseName || "-"}</div>
+                      </div>
+                    </div>
+
+                    {/* Products Section */}
+                    <div>
+                      <div className="flex items-center mb-3">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                        <div className="text-sm font-bold text-green-800 uppercase tracking-wider">Products</div>
+                        <div className="ml-auto bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
+                          {inv.products.length} item{inv.products.length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        {inv.products.map((p: InvoiceProduct, i: number) => (
+                          <div key={i} className="bg-gradient-to-r from-white to-green-25 rounded-xl p-4 border border-green-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="flex items-center mb-2">
+                                  <div className="font-bold text-green-800 text-base mr-3">{p.name}</div>
+                                  <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-semibold">
+                                    x{p.quantity}
+                                  </div>
+                                </div>
+                                {p.description && (
+                                  <div className="text-gray-600 text-sm leading-relaxed">{p.description}</div>
+                                )}
+                                {p.category && (
+                                  <div className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium mt-2">
+                                    {p.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-right ml-4">
+                                <div className="text-lg font-bold text-green-700">{p.price}</div>
+                                <div className="text-xs text-green-600 font-medium">MAD/unit</div>
+                                <div className="text-sm text-gray-500 mt-1">
+                                  Total: {(p.quantity * p.price).toFixed(2)} MAD
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Total Summary at bottom */}
+                    <div className="mt-6 pt-4 border-t border-green-200">
+                      <div className="flex justify-between items-center">
+                        <div className="text-green-800 font-semibold">Invoice Total</div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-green-700">
+                            {typeof inv.grandTotal === 'number' ? inv.grandTotal.toFixed(2) : ''} MAD
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {inv.products.length} product{inv.products.length !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
