@@ -32,7 +32,7 @@ export default function ManagerNavigation({ mobileOpen, setMobileOpen }: Manager
       <nav className="flex flex-col gap-2 w-full">
         {managerNavItems.map((item) => {
           const isActive = pathname === item.path || 
-            (item.path !== '/dashboard' && pathname.startsWith(`${item.path}/`));
+            (item.path !== '/managerDashboard' && pathname.startsWith(`${item.path}/`));
           const Icon = item.icon;
           return (
             <Link

@@ -30,7 +30,7 @@ export default function VisitorNavigation({ mobileOpen, setMobileOpen }: Visitor
       <nav className="flex flex-col gap-2 w-full">
         {navItems.map((item) => {
           const isActive = pathname === item.path ||
-            (item.path !== '/dashboard' && pathname.startsWith(`${item.path}/`));
+            (item.path !== '/visitorDashboard' && pathname.startsWith(`${item.path}/`));
           const Icon = item.icon;
           return (
             <Link
