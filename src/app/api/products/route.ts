@@ -14,6 +14,34 @@ export async function GET() {
   }
 }
 
+export async function DELETE(request: NextRequest) {
+  try {
+    const conn = await cloudConnPromise;
+    const Product = getProductModel(conn);
+    
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('id');
+    
+    if (!productId) {
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+    }
+    
+    const deletedProduct = await Product.findByIdAndDelete(productId);
+    
+    if (!deletedProduct) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    
+    return NextResponse.json({ 
+      message: 'Product deleted successfully',
+      product: deletedProduct 
+    });
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const conn = await cloudConnPromise;
@@ -27,7 +55,8 @@ export async function POST(request: NextRequest) {
       unit,
       unitAmount,
       goodFor,
-      usageDescription
+      usageDescription,
+      kgPerUnit
     } = body;
     
     // Basic validation
@@ -50,13 +79,23 @@ export async function POST(request: NextRequest) {
       amountPerUnit?: number;
       goodFor?: string[];
       usageDescription?: string;
+      kgPerUnit?: number;
     } = {
       name,
       category,
       description
     };
     
-    if (category === 'animal_medicine') {
+    if (category === 'animal_feed') {
+      // Validate and add kgPerUnit for animal feed
+      if (kgPerUnit) {
+        const kgValue = parseFloat(kgPerUnit);
+        if (isNaN(kgValue) || kgValue <= 0) {
+          return NextResponse.json({ error: 'Kilogram per unit must be a positive number' }, { status: 400 });
+        }
+        productData.kgPerUnit = kgValue;
+      }
+    } else if (category === 'animal_medicine') {
       if (unit) productData.unit = unit;
       if (unitAmount) productData.amountPerUnit = unitAmount;
       if (goodFor) {

@@ -3,8 +3,9 @@ import { Schema, Document, Connection, Model } from 'mongoose';
 export interface IProduct extends Document {
   name: string;
   category: 'animal_feed' | 'animal_medicine';
-  price: number;
-  kilogramQuantity?: number; // animal_feed only
+  price?: number;
+  kilogramQuantity?: number; // animal_feed only - DEPRECATED, use kgPerUnit
+  kgPerUnit?: number; // animal_feed only - kilograms per unit/package
   unitPrice?: number; // animal_feed only, auto-calculated
   unitCount?: number; // animal_feed only
   total?: number; // animal_feed only, auto-calculated
@@ -20,7 +21,8 @@ const ProductSchema: Schema = new Schema<IProduct>({
   name: { type: String, required: true },
   category: { type: String, enum: ['animal_feed', 'animal_medicine'], required: true },
   price: { type: Number },
-  kilogramQuantity: { type: Number },
+  kilogramQuantity: { type: Number }, // DEPRECATED - keeping for backward compatibility
+  kgPerUnit: { type: Number }, // animal_feed only - kilograms per unit/package
   unitPrice: { type: Number },
   unitCount: { type: Number },
   total: { type: Number },
@@ -39,7 +41,8 @@ ProductSchema.index({ name: 1, category: 1 }, { unique: true });
 ProductSchema.pre('save', function (next) {
   if (this.category === 'animal_feed') {
     const price = Number(this.price);
-    const kg = Number(this.kilogramQuantity);
+    // Use kgPerUnit (new) or fall back to kilogramQuantity (old) for backward compatibility
+    const kg = Number(this.kgPerUnit || this.kilogramQuantity);
     const unitCount = Number(this.unitCount);
     if (kg && price) {
       this.unitPrice = price / kg;

@@ -171,7 +171,12 @@ export default function InvoicesPage() {
     const data = await res.json();
     setLoading(false);
     if (res.ok) {
-      setSuccess("Invoice added successfully!");
+      // Enhanced success message with stock updates
+      let successMessage = "Invoice added successfully!";
+      if (data.stockUpdates && data.stockUpdates.length > 0) {
+        successMessage += "\n\nStock Updates:\n" + data.stockUpdates.join("\n");
+      }
+      setSuccess(successMessage);
       setInvoiceNumber("");
       setSupplierId("");
   setProducts([{ name: "", quantity: 1, price: 0 }]);
@@ -567,7 +572,19 @@ export default function InvoicesPage() {
             </div>
           </div>
           {error && <div className="text-red-600 font-semibold text-center">{error}</div>}
-          {success && <div className="text-green-600 font-semibold text-center">{success}</div>}
+          {success && (
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-green-800">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div className="flex-1">
+                  <div className="font-bold text-green-800 mb-2">Success!</div>
+                  <div className="whitespace-pre-line text-sm">{success}</div>
+                </div>
+              </div>
+            </div>
+          )}
           <button type="submit" className="bg-gradient-to-tr from-green-500 to-green-700 text-white font-bold rounded-lg px-8 py-3 shadow hover:scale-105 hover:from-green-600 hover:to-green-800 transition-all duration-150 mt-2" disabled={loading}>{loading ? "Saving..." : "Add Invoice"}</button>
         </form>
       </div>

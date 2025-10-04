@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import cloudConnPromise from '@/lib/mongoose-cloud-conn';
 import { getInvoiceModel } from '@/models/Invoice.cloud';
+import { getFoodStockModel } from '@/models/FoodStock.cloud';
+import { getMedicalStockModel } from '@/models/MedicalStock.cloud';
+import { getProductModel } from '@/models/Product.cloud';
 
 export async function POST(req: NextRequest) {
   try {
@@ -82,8 +85,78 @@ export async function POST(req: NextRequest) {
       grandTotal,
       invoiceDate: date ? new Date(date) : new Date()
     });
+
+    // Update food and medical stock automatically
+    const FoodStock = getFoodStockModel(conn);
+    const MedicalStock = getMedicalStockModel(conn);
+    const Product = getProductModel(conn);
     
-    return NextResponse.json({ invoice });
+    const stockUpdates = [];
+    
+    for (const product of productsWithCalcs) {
+      if (product.quantity > 0 && (product.category === 'animal_feed' || product.category === 'animal_medicine')) {
+        try {
+          // Find the product by name to get its ID
+          const productDoc = await Product.findOne({ name: product.name });
+          if (productDoc) {
+            const productId = productDoc._id.toString();
+            
+            if (product.category === 'animal_feed') {
+              // Update food stock
+              let foodStock = await FoodStock.findOne({ productId });
+              
+              if (foodStock) {
+                // Add the new quantity to existing stock
+                const oldQuantity = foodStock.quantity;
+                foodStock.quantity += product.quantity;
+                await foodStock.save();
+                stockUpdates.push(`Food Stock - ${product.name}: ${oldQuantity} + ${product.quantity} = ${foodStock.quantity} units`);
+              } else {
+                // Create new food stock entry
+                foodStock = await FoodStock.create({
+                  productId,
+                  quantity: product.quantity
+                });
+                stockUpdates.push(`Food Stock - ${product.name}: Created with ${product.quantity} units`);
+              }
+            } else if (product.category === 'animal_medicine') {
+              // Update medical stock
+              let medicalStock = await MedicalStock.findOne({ productId });
+              
+              if (medicalStock) {
+                // Add the new quantity to existing stock
+                const oldQuantity = medicalStock.quantity;
+                medicalStock.quantity += product.quantity;
+                await medicalStock.save();
+                stockUpdates.push(`Medical Stock - ${product.name}: ${oldQuantity} + ${product.quantity} = ${medicalStock.quantity} units`);
+              } else {
+                // Create new medical stock entry
+                medicalStock = await MedicalStock.create({
+                  productId,
+                  quantity: product.quantity
+                });
+                stockUpdates.push(`Medical Stock - ${product.name}: Created with ${product.quantity} units`);
+              }
+            }
+          } else {
+            console.warn(`Product not found in database: ${product.name}`);
+            stockUpdates.push(`Warning: Product "${product.name}" not found in database`);
+          }
+        } catch (stockError) {
+          console.error(`Failed to update stock for ${product.name}:`, stockError);
+          stockUpdates.push(`Error: Failed to update stock for ${product.name}`);
+          // Don't fail the invoice creation if stock update fails
+        }
+      }
+    }
+    
+    console.log('Stock updates completed:', stockUpdates);
+    
+    return NextResponse.json({ 
+      invoice, 
+      stockUpdates,
+      message: 'Invoice created successfully and stock levels updated automatically' 
+    });
   } catch (err) {
     console.error('Error creating invoice:', err);
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
