@@ -48,6 +48,7 @@ export default function ProductsPage() {
         setError("Failed to fetch products");
       }
     } catch (err) {
+      console.error('Error loading products:', err);
       setError("Error loading products");
     }
     setLoading(false);
@@ -80,6 +81,7 @@ export default function ProductsPage() {
         setError(data.error || 'Failed to delete product');
       }
     } catch (err) {
+      console.error('Error deleting product:', err);
       setError('Error deleting product');
     } finally {
       setDeleting(null);
@@ -131,30 +133,6 @@ export default function ProductsPage() {
         </div>
       )}
       
-      {error && (
-        <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-800 mb-4">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span className="font-semibold">{error}</span>
-          </div>
-        </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-green-800 mb-4">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span className="font-semibold">{success}</span>
-          </div>
-        </div>
-      )}
-      
-      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
-      </div>
       {loading ? (
         <div className="text-green-600 font-semibold">Loading products...</div>
       ) : (
@@ -166,9 +144,26 @@ export default function ProductsPage() {
           )}
           {filteredProducts.map((product, idx) => (
             <div key={idx} className="bg-white rounded-2xl shadow-lg border-2 border-green-100 hover:border-green-400 transition-all p-6 flex flex-col gap-3">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-lg font-bold text-green-800">{product.name}</span>
-                <span className="ml-auto text-xs text-green-700 bg-green-50 rounded px-2 py-1">{product.category.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex-1">
+                  <span className="text-lg font-bold text-green-800">{product.name}</span>
+                  <span className="ml-3 text-xs text-green-700 bg-green-50 rounded px-2 py-1">{product.category.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
+                </div>
+                <button
+                  onClick={() => handleDelete(product._id, product.name)}
+                  disabled={deleting === product._id}
+                  className="flex items-center gap-1 px-3 py-1 text-xs bg-red-50 text-red-700 rounded-lg hover:bg-red-100 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-red-200"
+                  title={`Delete ${product.name}`}
+                >
+                  {deleting === product._id ? (
+                    <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  )}
+                  <span className="hidden sm:inline">{deleting === product._id ? 'Deleting...' : 'Delete'}</span>
+                </button>
               </div>
               
               {product.description && (

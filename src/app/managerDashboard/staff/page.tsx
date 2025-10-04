@@ -18,14 +18,61 @@ export default function StaffPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [success, setSuccess] = useState('');
+
+  const fetchStaff = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/staff');
+      const data = await res.json();
+      if (res.ok) {
+        setStaff(Array.isArray(data) ? data : data.staff || []);
+      } else {
+        setError('Failed to load staff');
+      }
+    } catch (err) {
+      console.error('Error loading staff:', err);
+      setError('Failed to load staff');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch('/api/staff')
-      .then(res => res.json())
-      .then(data => setStaff(Array.isArray(data) ? data : data.staff || []))
-      .catch(() => setError('Failed to load staff'))
-      .finally(() => setLoading(false));
+    fetchStaff();
   }, []);
+
+  const handleDelete = async (staffId: string, staffName: string) => {
+    if (!confirm(`Are you sure you want to delete "${staffName}"? This action cannot be undone and will also remove all attendance records for this staff member.`)) {
+      return;
+    }
+    
+    setDeleting(staffId);
+    setError('');
+    setSuccess('');
+    
+    try {
+      const res = await fetch(`/api/staff?id=${staffId}`, {
+        method: 'DELETE',
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setSuccess(`Staff member "${staffName}" deleted successfully!`);
+        fetchStaff(); // Refresh the list
+      } else {
+        setError(data.error || 'Failed to delete staff member');
+      }
+    } catch (err) {
+      console.error('Error deleting staff member:', err);
+      setError('Error deleting staff member');
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
@@ -75,6 +122,28 @@ export default function StaffPage() {
           </div>
         </div>
 
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-800 mb-4">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span className="font-semibold">{error}</span>
+            </div>
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-green-800 mb-4">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span className="font-semibold">{success}</span>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-green-600 font-semibold flex items-center">
@@ -119,7 +188,7 @@ export default function StaffPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-green-100">
-                  {staff.map((s, index) => (
+                  {staff.map((s) => (
                     <tr key={s._id} className="hover:bg-green-50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -142,9 +211,26 @@ export default function StaffPage() {
                         {s.contact || <span className="text-gray-400">No contact info</span>}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button className="text-green-600 hover:text-green-800 font-medium">
-                          Edit
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button className="text-green-600 hover:text-green-800 font-medium transition-colors">
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(s._id, s.name)}
+                            disabled={deleting === s._id}
+                            className="text-red-600 hover:text-red-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            title={`Delete ${s.name}`}
+                          >
+                            {deleting === s._id ? (
+                              <div className="w-4 h-4 border border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                              </svg>
+                            )}
+                            {deleting === s._id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -154,10 +240,10 @@ export default function StaffPage() {
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
-              {staff.map((s, index) => (
+              {staff.map((s) => (
                 <div key={s._id} className="bg-gradient-to-r from-white to-green-25 border border-green-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
+                    <div className="flex items-center flex-1">
                       <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold shadow-md mr-3">
                         {s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
@@ -174,11 +260,27 @@ export default function StaffPage() {
                         </div>
                       </div>
                     </div>
-                    <button className="text-green-600 hover:text-green-800 font-medium">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-                      </svg>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button className="p-2 text-green-600 hover:text-green-800 transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(s._id, s.name)}
+                        disabled={deleting === s._id}
+                        className="p-2 text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={`Delete ${s.name}`}
+                      >
+                        {deleting === s._id ? (
+                          <div className="w-5 h-5 border border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
                   {s.contact && (
                     <div className="mt-3 pt-3 border-t border-green-100">

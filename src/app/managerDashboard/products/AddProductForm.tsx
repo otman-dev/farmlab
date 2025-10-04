@@ -41,7 +41,12 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
     setLoading(true);
     
     // Prepare payload
-    const payload: any = {
+    const payload: {
+      category: string;
+      name: string;
+      description: string;
+      kgPerUnit?: number;
+    } = {
       category: form.category,
       name: form.name.trim(),
       description: form.description.trim()

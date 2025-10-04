@@ -613,7 +613,7 @@ export default function InvoicesPage() {
                   {invoices.map((inv, idx) => (
                     <tr key={inv._id} className={idx % 2 === 0 ? "bg-white" : "bg-green-50" + " border-b hover:bg-green-100 transition-all"}>
                       <td className="px-4 py-2 font-semibold text-green-800">{inv.invoiceNumber}</td>
-                      <td className="px-4 py-2">{inv.supplier?.entrepriseName || "-"}</td>
+                      <td className="px-4 py-2 text-gray-900 font-medium">{inv.supplier?.entrepriseName || "-"}</td>
                       <td className="px-4 py-2">
                         <ul className="space-y-1">
                           {inv.products.map((p: InvoiceProduct, i: number) => (
@@ -637,7 +637,7 @@ export default function InvoicesPage() {
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-6">
-              {invoices.map((inv, idx) => (
+              {invoices.map((inv) => (
                 <div key={inv._id} className="bg-gradient-to-br from-white to-green-50 border-2 border-green-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
                   {/* Header with gradient background */}
                   <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">

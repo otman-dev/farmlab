@@ -4,17 +4,26 @@ import { getInvoiceModel } from '@/models/Invoice.cloud';
 import { getFoodStockModel } from '@/models/FoodStock.cloud';
 import { getMedicalStockModel } from '@/models/MedicalStock.cloud';
 import { getProductModel } from '@/models/Product.cloud';
+import { getSupplierModel } from '@/models/Supplier.cloud';
 
 export async function POST(req: NextRequest) {
   try {
     const conn = await cloudConnPromise;
     const Invoice = getInvoiceModel(conn);
     const body = await req.json();
-    const { invoiceNumber, supplierId, products, date, supplierName, supplierEnterprise } = body;
+    const { invoiceNumber, supplierId, products, date } = body;
     
     // Basic validation
     if (!invoiceNumber || !supplierId || !products || !Array.isArray(products) || products.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+    
+    // Fetch supplier details from database
+    const Supplier = getSupplierModel(conn);
+    const supplier = await Supplier.findById(supplierId);
+    
+    if (!supplier) {
+      return NextResponse.json({ error: 'Supplier not found' }, { status: 400 });
     }
     
     // Check for duplicate invoice number
@@ -77,9 +86,9 @@ export async function POST(req: NextRequest) {
     const invoice = await Invoice.create({
       invoiceNumber,
       supplier: {
-        _id: supplierId,
-        name: supplierName || 'Supplier Name',
-        entrepriseName: supplierEnterprise || 'Enterprise Name'
+        _id: supplier._id,
+        name: supplier.name,
+        entrepriseName: supplier.entrepriseName
       },
       products: productsWithCalcs,
       grandTotal,
@@ -167,8 +176,38 @@ export async function GET() {
   try {
     const conn = await cloudConnPromise;
     const Invoice = getInvoiceModel(conn);
+    const Supplier = getSupplierModel(conn);
+    
+    // Fetch all invoices
     const invoices = await Invoice.find().sort({ createdAt: -1 });
-    return NextResponse.json({ invoices });
+    
+    // Populate supplier information for each invoice
+    const populatedInvoices = await Promise.all(
+      invoices.map(async (invoice) => {
+        const invoiceObj = invoice.toObject();
+        
+        // If invoice has a supplier with _id, fetch the actual supplier data
+        if (invoiceObj.supplier && invoiceObj.supplier._id) {
+          try {
+            const supplierData = await Supplier.findById(invoiceObj.supplier._id);
+            if (supplierData) {
+              invoiceObj.supplier = {
+                _id: supplierData._id.toString(),
+                name: supplierData.name,
+                entrepriseName: supplierData.entrepriseName
+              };
+            }
+          } catch (supplierErr) {
+            console.warn(`Failed to fetch supplier ${invoiceObj.supplier._id}:`, supplierErr);
+            // Keep the existing supplier data as fallback
+          }
+        }
+        
+        return invoiceObj;
+      })
+    );
+    
+    return NextResponse.json({ invoices: populatedInvoices });
   } catch (err) {
     console.error('Error fetching invoices:', err);
     return NextResponse.json({ error: 'Failed to fetch invoices' }, { status: 500 });
