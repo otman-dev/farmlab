@@ -3,6 +3,7 @@ import cloudConnPromise from '@/lib/mongoose-cloud-conn';
 import { getInvoiceModel } from '@/models/Invoice.cloud';
 import { getFoodStockModel } from '@/models/FoodStock.cloud';
 import { getMedicalStockModel } from '@/models/MedicalStock.cloud';
+import { getMedicineUnitModel } from '@/models/MedicineUnit.cloud';
 import { getProductModel } from '@/models/Product.cloud';
 import { getSupplierModel } from '@/models/Supplier.cloud';
 
@@ -33,6 +34,13 @@ export async function POST(req: NextRequest) {
     }
     
     // Calculate totals for products
+    interface MedicineUnit {
+      id: string;
+      customId: string;
+      expirationDate: string;
+      firstUsageDate?: string;
+    }
+    
     interface ProductInput {
       name: string;
       quantity: number;
@@ -41,6 +49,9 @@ export async function POST(req: NextRequest) {
       unit?: string;
       kgPerUnit?: number;
       description?: string;
+      units?: MedicineUnit[];
+      usageDescription?: string;
+      goodFor?: string;
     }
     
     const productsWithCalcs = products.map((prod: ProductInput) => {
@@ -52,7 +63,10 @@ export async function POST(req: NextRequest) {
           totalPrice: prod.quantity && prod.price ? prod.quantity * prod.price : undefined,
           unit: prod.unit,
           description: prod.description,
-          category: prod.category
+          category: prod.category,
+          units: prod.units,
+          usageDescription: prod.usageDescription,
+          goodFor: prod.goodFor
         };
       } else if (prod.category === 'animal_feed') {
         return {
@@ -129,22 +143,99 @@ export async function POST(req: NextRequest) {
                 stockUpdates.push(`Food Stock - ${product.name}: Created with ${product.quantity} units`);
               }
             } else if (product.category === 'animal_medicine') {
-              // Update medical stock
-              let medicalStock = await MedicalStock.findOne({ productId });
+              // Create individual medicine units with tracking
+              const MedicineUnit = getMedicineUnitModel(conn);
               
-              if (medicalStock) {
-                // Add the new quantity to existing stock
-                const oldQuantity = medicalStock.quantity;
-                medicalStock.quantity += product.quantity;
-                await medicalStock.save();
-                stockUpdates.push(`Medical Stock - ${product.name}: ${oldQuantity} + ${product.quantity} = ${medicalStock.quantity} units`);
+              // Get medicine-specific data from the product
+              const medicineUnits = product.units || [];
+              
+              // Debug: Log what we received
+              console.log(`Processing medicine: ${product.name}`);
+              console.log(`Product object:`, JSON.stringify(product, null, 2));
+              console.log(`Medicine units received:`, JSON.stringify(medicineUnits, null, 2));
+              console.log(`Units array length: ${medicineUnits.length}`);
+              
+              if (medicineUnits.length > 0) {
+                // Validate units before creating
+                const validUnits = medicineUnits.filter((unit: MedicineUnit) => 
+                  unit.customId && unit.expirationDate
+                );
+                
+                if (validUnits.length === 0) {
+                  console.warn(`No valid units found for ${product.name}`);
+                  stockUpdates.push(`Warning: No valid units found for ${product.name} - missing customId or expirationDate`);
+                } else {
+                  // Create individual medicine units
+                  const unitsToCreate = validUnits.map((unit: MedicineUnit) => ({
+                    productId,
+                    productName: product.name,
+                    customId: unit.customId,
+                    expirationDate: new Date(unit.expirationDate),
+                    firstUsageDate: unit.firstUsageDate ? new Date(unit.firstUsageDate) : undefined,
+                    usageDescription: product.usageDescription,
+                    goodFor: product.goodFor,
+                    isUsed: Boolean(unit.firstUsageDate), // If usage date is set, mark as used
+                    invoiceId: invoice._id.toString()
+                  }));
+                  
+                  console.log(`Creating ${unitsToCreate.length} units for ${product.name}`);
+                
+                  try {
+                    const createdUnits = await MedicineUnit.insertMany(unitsToCreate);
+                    
+                    // Update medical stock total (only count unused units)
+                    const unusedUnitsCount = unitsToCreate.filter(u => !u.isUsed).length;
+                  
+                    let medicalStock = await MedicalStock.findOne({ productId });
+                    if (medicalStock) {
+                      const oldQuantity = medicalStock.quantity;
+                      medicalStock.quantity += unusedUnitsCount;
+                      await medicalStock.save();
+                      stockUpdates.push(`Medical Stock - ${product.name}: ${oldQuantity} + ${unusedUnitsCount} = ${medicalStock.quantity} available units (${createdUnits.length} total units created)`);
+                    } else {
+                      medicalStock = await MedicalStock.create({
+                        productId,
+                        quantity: unusedUnitsCount
+                      });
+                      stockUpdates.push(`Medical Stock - ${product.name}: Created with ${unusedUnitsCount} available units (${createdUnits.length} total units created)`);
+                    }
+                    
+                    stockUpdates.push(`Medicine Units - ${product.name}: Created ${createdUnits.length} individual units with expiration tracking`);
+                  } catch (unitError) {
+                    console.error(`Failed to create medicine units for ${product.name}:`, unitError);
+                    stockUpdates.push(`Error: Failed to create medicine units for ${product.name}: ${(unitError as Error).message}`);
+                    
+                    // Fallback to simple quantity update
+                    let medicalStock = await MedicalStock.findOne({ productId });
+                    if (medicalStock) {
+                      const oldQuantity = medicalStock.quantity;
+                      medicalStock.quantity += product.quantity;
+                      await medicalStock.save();
+                      stockUpdates.push(`Medical Stock - ${product.name}: Fallback update ${oldQuantity} + ${product.quantity} = ${medicalStock.quantity} units`);
+                    } else {
+                      medicalStock = await MedicalStock.create({
+                        productId,
+                        quantity: product.quantity
+                      });
+                      stockUpdates.push(`Medical Stock - ${product.name}: Fallback creation with ${product.quantity} units`);
+                    }
+                  }
+                }
               } else {
-                // Create new medical stock entry
-                medicalStock = await MedicalStock.create({
-                  productId,
-                  quantity: product.quantity
-                });
-                stockUpdates.push(`Medical Stock - ${product.name}: Created with ${product.quantity} units`);
+                // Fallback for medicines without unit tracking
+                let medicalStock = await MedicalStock.findOne({ productId });
+                if (medicalStock) {
+                  const oldQuantity = medicalStock.quantity;
+                  medicalStock.quantity += product.quantity;
+                  await medicalStock.save();
+                  stockUpdates.push(`Medical Stock - ${product.name}: ${oldQuantity} + ${product.quantity} = ${medicalStock.quantity} units (no unit tracking)`);
+                } else {
+                  medicalStock = await MedicalStock.create({
+                    productId,
+                    quantity: product.quantity
+                  });
+                  stockUpdates.push(`Medical Stock - ${product.name}: Created with ${product.quantity} units (no unit tracking)`);
+                }
               }
             }
           } else {

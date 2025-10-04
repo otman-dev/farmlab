@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 
-interface ProductForm {
+interface InvoiceProduct {
   name: string;
   quantity: number;
   price: number;
@@ -18,6 +18,14 @@ interface ProductForm {
   expirationDate?: string;
   firstUsageDate?: string;
   usageDescription?: string;
+  units?: MedicineUnit[]; // Individual unit tracking for medicines
+}
+
+interface MedicineUnit {
+  id: string;
+  expirationDate: string;
+  firstUsageDate?: string;
+  customId: string; // ID to write on the medicine box
 }
 
 interface Product {
@@ -42,19 +50,11 @@ export default function InvoicesPage() {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [products, setProducts] = useState<ProductForm[]>([{ name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
+  const [products, setProducts] = useState<InvoiceProduct[]>([{ name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  interface InvoiceProduct {
-    name: string;
-    quantity: number;
-    price: number;
-    description?: string;
-    category?: string;
-    unit?: string;
-    kgPerUnit?: number;
-  }
+  
   interface Invoice {
     _id: string;
     invoiceNumber: string;
@@ -90,13 +90,113 @@ export default function InvoicesPage() {
     setLoadingInvoices(false);
   };
 
-  const handleProductChange = (idx: number, field: keyof ProductForm, value: string | number | string[]) => {
+  const handleProductChange = (idx: number, field: keyof InvoiceProduct, value: string | number | string[] | MedicineUnit[]) => {
+    console.log(`Product change - index: ${idx}, field: ${field}, value: ${value}, category: ${category}`);
+    
     setProducts(products => {
       const updated = [...products];
       updated[idx] = { ...updated[idx], [field]: value };
+      
+      // If quantity changes for medicine, update units array
+      if (field === 'quantity' && category === 'animal_medicine') {
+        console.log(`Medicine quantity changed to ${value}, current units: ${updated[idx].units?.length || 0}`);
+        
+        const newQuantity = value as number;
+        const currentUnits = updated[idx].units || [];
+        
+        if (newQuantity > currentUnits.length) {
+          // Add new units
+          const newUnits = [...currentUnits];
+          for (let j = currentUnits.length; j < newQuantity; j++) {
+            // Generate custom ID based on medicine name
+            const medicineName = updated[idx].name || 'Medicine';
+            const sanitizedName = medicineName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+            const customId = `${sanitizedName}-${String(j + 1).padStart(3, '0')}`;
+            
+            newUnits.push({
+              id: `${Date.now()}-${j}-${Math.random()}`,
+              customId: customId,
+              expirationDate: '',
+              firstUsageDate: ''
+            });
+          }
+          updated[idx].units = newUnits;
+        } else if (newQuantity < currentUnits.length) {
+          // Remove excess units
+          updated[idx].units = currentUnits.slice(0, newQuantity);
+        } else if (newQuantity > 0 && currentUnits.length === 0) {
+          // Initialize units if none exist
+          const newUnits = [];
+          for (let j = 0; j < newQuantity; j++) {
+            const medicineName = updated[idx].name || 'Medicine';
+            const sanitizedName = medicineName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+            const customId = `${sanitizedName}-${String(j + 1).padStart(3, '0')}`;
+            
+            newUnits.push({
+              id: `${Date.now()}-${j}-${Math.random()}`,
+              customId: customId,
+              expirationDate: '',
+              firstUsageDate: ''
+            });
+          }
+          updated[idx].units = newUnits;
+        }
+      }
+      
+      // If medicine name changes, update all unit custom IDs
+      if (field === 'name' && category === 'animal_medicine' && updated[idx].units) {
+        const medicineName = value as string;
+        const sanitizedName = medicineName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+        updated[idx].units = updated[idx].units.map((unit, unitIdx) => ({
+          ...unit,
+          customId: `${sanitizedName}-${String(unitIdx + 1).padStart(3, '0')}`
+        }));
+      }
+      
       return updated;
     });
   };
+
+  // Handle individual medicine unit changes
+  const handleUnitChange = (productIdx: number, unitIdx: number, field: keyof MedicineUnit, value: string) => {
+    console.log(`Updating unit ${unitIdx} of product ${productIdx}, field: ${field}, value: ${value}`);
+    
+    setProducts(products => {
+      const updated = [...products];
+      
+      // Initialize units array if it doesn't exist
+      if (!updated[productIdx].units) {
+        updated[productIdx].units = [];
+        console.log(`Initialized empty units array for product ${productIdx}`);
+      }
+      
+      // Ensure the units array is long enough
+      while (updated[productIdx].units!.length <= unitIdx) {
+        const medicineName = updated[productIdx].name || 'Medicine';
+        const sanitizedName = medicineName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+        const customId = `${sanitizedName}-${String(updated[productIdx].units!.length + 1).padStart(3, '0')}`;
+        
+        updated[productIdx].units!.push({
+          id: `${Date.now()}-${updated[productIdx].units!.length}`,
+          customId: customId,
+          expirationDate: '',
+          firstUsageDate: ''
+        });
+        console.log(`Added new unit to product ${productIdx}: ${customId}`);
+      }
+      
+      // Update the specific unit field
+      updated[productIdx].units![unitIdx] = { 
+        ...updated[productIdx].units![unitIdx], 
+        [field]: value 
+      };
+      
+      console.log(`Updated product ${productIdx} units:`, updated[productIdx].units);
+      
+      return updated;
+    });
+  };
+
   // Dropdown open/close handlers
   const setDropdown = (idx: number, open: boolean) => {
     setDropdownOpen(arr => {
@@ -112,7 +212,22 @@ export default function InvoicesPage() {
   };
 
   const addProduct = () => {
-    setProducts([...products, { name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
+    const newProduct = category === 'animal_medicine' 
+      ? { 
+          name: "", 
+          quantity: 1, 
+          price: 0, 
+          kgPerUnit: undefined,
+          units: [{
+            id: `${Date.now()}-0`,
+            customId: 'Medicine-001',
+            expirationDate: '',
+            firstUsageDate: ''
+          }]
+        }
+      : { name: "", quantity: 1, price: 0, kgPerUnit: undefined };
+      
+    setProducts([...products, newProduct]);
     setDropdownOpen(arr => [...arr, false]);
   };
   const removeProduct = (idx: number) => {
@@ -123,9 +238,43 @@ export default function InvoicesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); setSuccess("");
+    
+    console.log("=== FORM SUBMISSION ===");
+    console.log("Category:", category);
+    console.log("Products before submission:", products);
+    
+    if (category === 'animal_medicine') {
+      products.forEach((product, idx) => {
+        console.log(`Product ${idx} (${product.name}):`, {
+          quantity: product.quantity,
+          units: product.units,
+          unitsLength: product.units?.length || 0
+        });
+      });
+    }
+    console.log("======================");
+    
     if (!invoiceNumber.trim()) return setError("Invoice number is required");
     if (!supplierId) return setError("Supplier is required");
     if (products.some(p => !p.name || p.quantity <= 0 || p.price < 0)) return setError("All products must have a name, quantity > 0, and price >= 0");
+    
+    // Additional validation for medicine products
+    if (category === 'animal_medicine') {
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        if (product.units && product.units.length > 0) {
+          for (let j = 0; j < product.units.length; j++) {
+            const unit = product.units[j];
+            if (!unit.customId || !unit.customId.trim()) {
+              return setError(`Product "${product.name}": Unit ${j + 1} is missing a Box ID`);
+            }
+            if (!unit.expirationDate) {
+              return setError(`Product "${product.name}": Unit ${j + 1} (${unit.customId}) is missing an expiration date`);
+            }
+          }
+        }
+      }
+    }
     // Check for new products and insert them first
     setLoading(true);
     for (let i = 0; i < products.length; i++) {
@@ -136,14 +285,12 @@ export default function InvoicesPage() {
           return setError(`Please provide a description for new product: ${p.name}`);
         }
         // Only send relevant fields for animal_medicine
-        let productPayload: Partial<ProductForm> = { name: p.name, category, description: p.description };
+        let productPayload: Partial<InvoiceProduct> = { name: p.name, category, description: p.description };
         if (category === 'animal_medicine') {
           productPayload = {
             name: p.name,
             category,
             description: p.description,
-            unit: p.unit,
-            unitAmount: p.unitAmount,
             goodFor: p.goodFor,
             expirationDate: p.expirationDate,
             firstUsageDate: p.firstUsageDate,
@@ -163,10 +310,33 @@ export default function InvoicesPage() {
       }
     }
     // Now submit invoice
+    const invoicePayload = { 
+      invoiceNumber, 
+      supplierId, 
+      products: products.map(p => ({ ...p, category })), 
+      date: invoiceDate 
+    };
+    
+    // Debug: Log the products being sent to see if units are included
+    console.log('Submitting invoice with products:', invoicePayload.products);
+    console.log('Raw products before mapping:', products);
+    
+    // Extra debug for medicine products
+    invoicePayload.products.forEach((product, index) => {
+      if (product.category === 'animal_medicine') {
+        console.log(`Medicine ${index + 1} (${product.name}):`, {
+          quantity: product.quantity,
+          units: product.units,
+          unitsLength: product.units?.length || 0,
+          rawProduct: products[index]
+        });
+      }
+    });
+    
     const res = await fetch("/api/invoices", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ invoiceNumber, supplierId, products: products.map(p => ({ ...p, category })), date: invoiceDate }),
+      body: JSON.stringify(invoicePayload),
     });
     const data = await res.json();
     setLoading(false);
@@ -220,8 +390,26 @@ export default function InvoicesPage() {
           <div>
             <label className="block font-semibold mb-2 text-green-900">Product Category*</label>
             <select value={category} onChange={e => {
-              setCategory(e.target.value);
-              setProducts([{ name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
+              const newCategory = e.target.value;
+              setCategory(newCategory);
+              
+              // Initialize products based on category
+              if (newCategory === 'animal_medicine') {
+                setProducts([{ 
+                  name: "", 
+                  quantity: 1, 
+                  price: 0, 
+                  kgPerUnit: undefined,
+                  units: [{
+                    id: `${Date.now()}-0`,
+                    customId: 'Medicine-001',
+                    expirationDate: '',
+                    firstUsageDate: ''
+                  }]
+                }]);
+              } else {
+                setProducts([{ name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
+              }
             }} className="border-2 border-green-200 rounded-lg px-4 py-2 w-full focus:outline-none focus:border-green-500 text-gray-900" required>
               <option value="">Select category</option>
               <option value="animal_feed">Animal Feed</option>
@@ -246,185 +434,246 @@ export default function InvoicesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 w-full">
                     {/* Medicine fields for animal_medicine */}
                     {category === 'animal_medicine' ? (
-                      <>
-                        <div className="flex-1 relative min-w-[260px] flex flex-col">
-                          <label className="text-xs text-green-800 font-semibold mb-1" htmlFor={`medicine-name-${idx}`}>Medicine Name*</label>
-                          <input
-                            id={`medicine-name-${idx}`}
-                            value={product.name}
-                            onChange={e => handleProductChange(idx, "name", e.target.value)}
-                            className="border border-green-200 rounded px-3 py-2 w-full text-gray-900 focus:ring-2 focus:ring-green-400 text-base"
-                            placeholder="Type or select medicine"
-                            required
-                            autoComplete="off"
-                            onFocus={() => setDropdown(idx, true)}
-                            onClick={() => setDropdown(idx, true)}
-                            onBlur={() => setTimeout(() => setDropdown(idx, false), 150)}
-                          />
-                          <span className="text-xs text-gray-500">Select an existing medicine or type a new name</span>
-                          {/* Custom dropdown suggestions */}
-                          {dropdownOpen[idx] && (category ? allProducts.filter(p => p.category === category).length > 0 : allProducts.length > 0) && (
-                            <div className="absolute left-0 right-0 bg-white border border-green-200 rounded shadow-xl mt-2 max-h-48 overflow-y-auto text-base" style={{ top: '100%', zIndex: 50 }}>
-                              {(category ? allProducts.filter(p => p.category === category) : allProducts).map((p, i) => (
-                                <div
-                                  key={i}
-                                  className="px-4 py-2 cursor-pointer hover:bg-green-100 text-green-900"
-                                  onMouseDown={() => handleProductChange(idx, "name", p.name)}
-                                >
-                                  {p.name}
-                                </div>
-                              ))}
+                      <div className="col-span-full">
+                        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200 rounded-2xl p-4 md:p-6 mt-4 shadow-lg">
+                          {/* Medicine Header */}
+                          <div className="flex items-center mb-6">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg flex items-center justify-center mr-3 md:mr-4">
+                              <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 9.172V5L8 4z"></path>
+                              </svg>
                             </div>
-                          )}
-                        </div>
-                        {/* Description */}
-                        <div className="flex flex-col w-full">
-                          <label className="text-xs text-green-800 font-semibold mb-1" htmlFor={`medicine-desc-${idx}`}>Medicine Description*</label>
-                          <textarea
-                            id={`medicine-desc-${idx}`}
-                            placeholder="Description for medicine"
-                            value={product.description || ""}
-                            onChange={e => handleProductChange(idx, "description", e.target.value)}
-                            className="border border-green-200 rounded px-3 py-2 w-full text-gray-900 min-h-[40px]"
-                            required
-                          />
-                          <span className="text-xs text-gray-500">Describe the medicine in detail</span>
-                        </div>
-                        {/* Good for multi-select */}
-                        <div className="flex flex-col w-48">
-                          <label className="text-xs text-green-800 font-bold mb-1 flex items-center gap-1">
-                            Good for*
-                            <span title="Select all animal types or plants this medicine is suitable for." className="ml-1 text-green-400 cursor-help">&#9432;</span>
-                          </label>
-                          <div className="flex flex-row gap-4 mb-1">
-                            {['sheep', 'chicken', 'plant'].map(option => (
-                              <label key={option} className="flex items-center gap-1 text-green-900 text-xs font-medium cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={Array.isArray(product.goodFor) && product.goodFor.includes(option)}
-                                  onChange={e => {
-                                    const checked = e.target.checked;
-                                    let updated: string[] = Array.isArray(product.goodFor) ? [...product.goodFor] : [];
-                                    if (checked) {
-                                      if (!updated.includes(option)) updated.push(option);
-                                    } else {
-                                      updated = updated.filter(val => val !== option);
-                                    }
-                                    handleProductChange(idx, "goodFor", updated);
-                                  }}
-                                  className="accent-green-600 w-4 h-4 rounded border border-green-300 focus:ring-green-400"
-                                />
-                                <span className="capitalize">{option}</span>
+                            <div>
+                              <h3 className="text-lg md:text-xl font-bold text-green-800">Veterinary Medicine</h3>
+                              <p className="text-green-600 text-xs md:text-sm">Configure medicine information and tracking</p>
+                            </div>
+                          </div>
+
+                          {/* Medicine Form Fields */}
+                          <div className="space-y-4 md:space-y-6">
+                            {/* Medicine Name */}
+                            <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm relative">
+                              <label className="block text-sm font-bold text-green-800 mb-2" htmlFor={`medicine-name-${idx}`}>
+                                Medicine Name*
                               </label>
-                            ))}
+                              <input
+                                id={`medicine-name-${idx}`}
+                                value={product.name}
+                                onChange={e => handleProductChange(idx, "name", e.target.value)}
+                                className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200"
+                                placeholder="e.g., Antibiotic Solution"
+                                required
+                                autoComplete="off"
+                                onFocus={() => setDropdown(idx, true)}
+                                onClick={() => setDropdown(idx, true)}
+                                onBlur={() => setTimeout(() => setDropdown(idx, false), 150)}
+                              />
+                              <p className="text-xs text-green-600 mt-1">Type medicine name or select from existing</p>
+                              
+                              {/* Custom dropdown suggestions */}
+                              {dropdownOpen[idx] && (category ? allProducts.filter(p => p.category === category).length > 0 : allProducts.length > 0) && (
+                                <div className="absolute left-3 right-3 md:left-4 md:right-4 bg-white border-2 border-green-200 rounded-lg shadow-xl mt-1 max-h-48 overflow-y-auto z-50">
+                                  {(category ? allProducts.filter(p => p.category === category) : allProducts).map((p, i) => (
+                                    <div
+                                      key={i}
+                                      className="px-3 md:px-4 py-2 cursor-pointer hover:bg-green-50 text-green-900 border-b border-green-100 last:border-b-0"
+                                      onMouseDown={() => handleProductChange(idx, "name", p.name)}
+                                    >
+                                      {p.name}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Description */}
+                            <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                              <label className="block text-sm font-bold text-green-800 mb-2" htmlFor={`medicine-desc-${idx}`}>
+                                Medicine Description*
+                              </label>
+                              <textarea
+                                id={`medicine-desc-${idx}`}
+                                value={product.description || ""}
+                                onChange={e => handleProductChange(idx, "description", e.target.value)}
+                                className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 resize-none"
+                                placeholder="e.g., Broad-spectrum antibiotic for treating bacterial infections"
+                                rows={3}
+                                required
+                              />
+                              <p className="text-xs text-green-600 mt-1">Detailed description of the medicine</p>
+                            </div>
+
+                            {/* Good For Animals */}
+                            <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                              <label className="block text-sm font-bold text-green-800 mb-3">
+                                Suitable For Animals*
+                                <span title="Select all animal types this medicine is suitable for" className="ml-1 text-green-400 cursor-help">ℹ</span>
+                              </label>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3">
+                                {['sheep', 'chicken', 'quail'].map(option => (
+                                  <label key={option} className="flex items-center gap-2 md:gap-3 p-3 md:p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-all duration-200 cursor-pointer group">
+                                    <input
+                                      type="checkbox"
+                                      checked={Array.isArray(product.goodFor) && product.goodFor.includes(option)}
+                                      onChange={e => {
+                                        const checked = e.target.checked;
+                                        let updated: string[] = Array.isArray(product.goodFor) ? [...product.goodFor] : [];
+                                        if (checked) {
+                                          if (!updated.includes(option)) updated.push(option);
+                                        } else {
+                                          updated = updated.filter(val => val !== option);
+                                        }
+                                        handleProductChange(idx, "goodFor", updated);
+                                      }}
+                                      className="w-4 h-4 md:w-5 md:h-5 text-green-600 border-2 border-gray-300 rounded focus:ring-green-500"
+                                    />
+                                    <div className="flex items-center gap-1 md:gap-2">
+                                      <span className="text-lg md:text-xl">
+                                        {option === 'sheep' ? '🐑' : option === 'chicken' ? '🐔' : '🐦'}
+                                      </span>
+                                      <span className="font-medium text-gray-700 group-hover:text-green-700 capitalize text-sm md:text-base">
+                                        {option}
+                                      </span>
+                                    </div>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Quantity and Price */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                              <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                                <label className="block text-sm font-bold text-green-800 mb-2">Number of Units*</label>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  placeholder="e.g., 5"
+                                  value={product.quantity}
+                                  onChange={e => handleProductChange(idx, "quantity", Number(e.target.value))}
+                                  className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200"
+                                  required
+                                />
+                                <p className="text-xs text-green-600 mt-1">Total number of medicine units/boxes</p>
+                              </div>
+                              <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                                <label className="block text-sm font-bold text-green-800 mb-2">Unit Price (MAD)*</label>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  step={0.01}
+                                  placeholder="e.g., 45.50"
+                                  value={product.price}
+                                  onChange={e => handleProductChange(idx, "price", Number(e.target.value))}
+                                  className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200"
+                                  required
+                                />
+                                <p className="text-xs text-green-600 mt-1">Price per unit in Moroccan Dirham</p>
+                              </div>
+                            </div>
+
+                            {/* Total Price Display */}
+                            {product.quantity && product.price && (
+                              <div className="bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 rounded-xl p-3 md:p-4">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-base md:text-lg font-bold text-green-800">Total Cost:</span>
+                                  <span className="text-xl md:text-2xl font-bold text-green-700">
+                                    {(product.quantity * product.price).toFixed(2)} MAD
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Individual Unit Tracking */}
+                            {product.quantity > 0 && (
+                              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-3 md:p-4">
+                                <div className="flex items-center mb-4">
+                                  <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                                    <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                  </div>
+                                  <h4 className="text-sm md:text-base font-bold text-green-800">Individual Unit Tracking</h4>
+                                </div>
+                                <div className="space-y-3 max-h-60 overflow-y-auto">
+                                  {Array.from({ length: product.quantity }, (_, unitIdx) => {
+                                    // Generate custom ID based on medicine name
+                                    const medicineName = product.name || 'Medicine';
+                                    const sanitizedName = medicineName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+                                    const defaultCustomId = `${sanitizedName}-${String(unitIdx + 1).padStart(3, '0')}`;
+                                    
+                    const unit = product.units?.[unitIdx] || {
+                      id: `${Date.now()}-${unitIdx}`,
+                      customId: defaultCustomId,
+                      expirationDate: '',
+                      firstUsageDate: ''
+                    };
+                    
+                    return (
+                                      <div key={unit.id} className="bg-white rounded-lg p-3 border-2 border-green-200 shadow-sm">
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                          <div className="flex flex-col">
+                                            <label className="text-xs font-semibold text-green-700 mb-1">Box ID*</label>
+                                            <input
+                                              type="text"
+                                              value={unit.customId}
+                                              onChange={e => handleUnitChange(idx, unitIdx, 'customId', e.target.value)}
+                                              className="border-2 border-green-200 rounded px-2 py-1 text-xs text-gray-900 focus:border-green-400 focus:ring-1 focus:ring-green-200"
+                                              placeholder="e.g. Antibiotic-001"
+                                              required
+                                            />
+                                            <span className="text-xs text-green-600 mt-1">Write this on the box</span>
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <label className="text-xs font-semibold text-green-700 mb-1">Expiration Date*</label>
+                                            <input
+                                              type="date"
+                                              value={unit.expirationDate}
+                                              onChange={e => handleUnitChange(idx, unitIdx, 'expirationDate', e.target.value)}
+                                              className="border-2 border-green-200 rounded px-2 py-1 text-xs text-gray-900 focus:border-green-400 focus:ring-1 focus:ring-green-200"
+                                              required
+                                            />
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <label className="text-xs font-semibold text-green-700 mb-1">First Usage Date</label>
+                                            <input
+                                              type="date"
+                                              value={unit.firstUsageDate || ''}
+                                              onChange={e => handleUnitChange(idx, unitIdx, 'firstUsageDate', e.target.value)}
+                                              className="border-2 border-green-200 rounded px-2 py-1 text-xs text-gray-900 focus:border-green-400 focus:ring-1 focus:ring-green-200"
+                                            />
+                                            <span className="text-xs text-green-600 mt-1">Leave empty if unused</span>
+                                          </div>
+                                          <div className="flex items-center justify-center">
+                                            <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold border border-green-300">
+                                              Unit #{unitIdx + 1}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Usage Description */}
+                            <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                              <label className="block text-sm font-bold text-green-800 mb-2">
+                                Usage Instructions
+                                <span className="text-xs font-normal text-gray-500 ml-2">(Optional)</span>
+                              </label>
+                              <textarea
+                                value={product.usageDescription || ""}
+                                onChange={e => handleProductChange(idx, "usageDescription", e.target.value)}
+                                className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 resize-none"
+                                placeholder="e.g., Administer 2ml per 10kg body weight, twice daily for 5 days"
+                                rows={3}
+                              />
+                              <p className="text-xs text-green-600 mt-1">Add dosage instructions and usage notes</p>
+                            </div>
                           </div>
-                          <span className="text-xs text-gray-500">Select all that apply</span>
                         </div>
-                        {/* Expiration date */}
-                        <div className="flex flex-col w-44">
-                          <label className="text-xs text-green-800 font-semibold mb-1">Expiration Date*</label>
-                          <input
-                            type="date"
-                            value={product.expirationDate || ""}
-                            onChange={e => handleProductChange(idx, "expirationDate", e.target.value)}
-                            className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                            required
-                          />
-                        </div>
-                        {/* First usage date (optional) */}
-                        <div className="flex flex-col w-44">
-                          <label className="text-xs text-green-800 font-semibold mb-1">First Usage Date</label>
-                          <input
-                            type="date"
-                            value={product.firstUsageDate || ""}
-                            onChange={e => handleProductChange(idx, "firstUsageDate", e.target.value)}
-                            className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                          />
-                          <span className="text-xs text-gray-500">Leave empty if not used yet</span>
-                        </div>
-                        {/* Unit, amount, and quantity */}
-                        <div className="flex flex-row gap-2 w-full items-end">
-                          <div className="flex flex-col w-28">
-                            <label className="text-xs text-green-800 font-semibold mb-1">Amount per Unit*</label>
-                            <input
-                              type="number"
-                              min={1}
-                              placeholder="e.g. 300"
-                              value={product.unitAmount || ""}
-                              onChange={e => handleProductChange(idx, "unitAmount", Number(e.target.value))}
-                              className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                              required
-                            />
-                          </div>
-                          <div className="flex flex-col w-24">
-                            <label className="text-xs text-green-800 font-semibold mb-1">Unit*</label>
-                            <select
-                              value={product.unit || ""}
-                              onChange={e => handleProductChange(idx, "unit", e.target.value)}
-                              className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                              required
-                            >
-                              <option value="">Select</option>
-                              <option value="ml">ml</option>
-                              <option value="l">L</option>
-                              <option value="g">g</option>
-                              <option value="kg">kg</option>
-                            </select>
-                          </div>
-                          <div className="flex flex-col w-28">
-                            <label className="text-xs text-green-800 font-semibold mb-1">Number of Units*</label>
-                            <input
-                              type="number"
-                              min={1}
-                              placeholder="e.g. 10"
-                              value={product.quantity}
-                              onChange={e => handleProductChange(idx, "quantity", Number(e.target.value))}
-                              className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                              required
-                            />
-                          </div>
-                        </div>
-                        {/* Usage Description */}
-                        <div className="flex flex-col w-full">
-                          <label className="text-xs text-green-800 font-semibold mb-1">Usage Description</label>
-                          <textarea
-                            value={product.usageDescription || ""}
-                            onChange={e => handleProductChange(idx, "usageDescription", e.target.value)}
-                            className="border border-green-200 rounded px-3 py-2 w-full text-gray-900 min-h-[40px]"
-                            placeholder="Describe how this medicine should be used, dosage, etc."
-                          />
-                            <span className="text-xs text-gray-500">Optional: Add instructions or notes for this medicine&apos;s usage.</span>
-                        </div>
-                        <div className="flex flex-row gap-2 w-full items-end">
-                          <div className="flex flex-col w-36">
-                            <label className="text-xs text-green-800 font-semibold mb-1">Unit Price (MAD)*</label>
-                            <input
-                              type="number"
-                              min={0}
-                              step={0.01}
-                              placeholder="e.g. 250.00"
-                              value={product.price}
-                              onChange={e => handleProductChange(idx, "price", Number(e.target.value))}
-                              className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                              required
-                            />
-                            <span className="text-xs text-gray-500">Enter price per unit in Moroccan Dirham (MAD)</span>
-                          </div>
-                          <div className="flex flex-col w-36">
-                            <label className="text-xs text-green-800 font-semibold mb-1">Total (MAD)</label>
-                            <input
-                              type="text"
-                              value={
-                                product.quantity && product.price ? (product.quantity * product.price).toFixed(2) : ""
-                              }
-                              className="border border-green-100 bg-gray-50 rounded px-3 py-2 w-full text-gray-900 font-semibold"
-                              readOnly
-                              tabIndex={-1}
-                            />
-                            <span className="text-xs text-gray-500">Calculated: unit price × number of units</span>
-                          </div>
-                        </div>
-                      </>
+                      </div>
                     ) : (
                       <>
                         {/* ...existing code for animal_feed... */}
