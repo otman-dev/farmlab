@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FiBox, FiTrendingUp, FiCalendar, FiActivity, FiBarChart, FiArrowUp, FiArrowDown } from "react-icons/fi";
+import { FiBox, FiTrendingUp, FiCalendar, FiActivity, FiBarChart, FiArrowUp } from "react-icons/fi";
 
 interface StockImpactData {
   totalItems: number;
@@ -225,7 +225,7 @@ export default function StockImpactPage() {
               Recent Contributions & Impact
             </h2>
             <div className="space-y-3">
-              {impactData?.recentContributions?.map((contribution, index) => (
+              {impactData?.recentContributions?.map((contribution) => (
                 <div key={contribution.id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
@@ -269,23 +269,33 @@ export default function StockImpactPage() {
 interface ImpactMetricCardProps {
   title: string;
   value: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   trend: string;
   color: 'green' | 'blue' | 'purple' | 'emerald';
 }
 
 function ImpactMetricCard({ title, value, icon: Icon, trend, color }: ImpactMetricCardProps) {
-  const colorClasses = {
-    green: 'bg-green-100 text-green-600',
-    blue: 'bg-blue-100 text-blue-600',
-    purple: 'bg-purple-100 text-purple-600',
-    emerald: 'bg-emerald-100 text-emerald-600'
-  };
+  let colorClass: string;
+
+  switch (color) {
+    case 'green':
+      colorClass = 'bg-green-100 text-green-600';
+      break;
+    case 'blue':
+      colorClass = 'bg-blue-100 text-blue-600';
+      break;
+    case 'purple':
+      colorClass = 'bg-purple-100 text-purple-600';
+      break;
+    case 'emerald':
+      colorClass = 'bg-emerald-100 text-emerald-600';
+      break;
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        <div className={`p-3 rounded-lg ${colorClass}`}>
           <Icon className="h-6 w-6" />
         </div>
         <div className="flex items-center text-green-600">

@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]';
 import DeviceModel from '@/models/Device';
 import cloudConnPromise from '@/lib/mongoose-cloud-conn';
 import { getFoodStockModel } from '@/models/FoodStock.cloud';
 import { getMedicalStockModel } from '@/models/MedicalStock.cloud';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const session = await getServerSession();
-    const user = session?.user as any;
+    const session = await getServerSession(authOptions);
+    const user = session?.user as { role?: string } | undefined;
     
     if (!user || !['admin', 'sponsor'].includes(user.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -99,7 +100,7 @@ export async function GET(req: NextRequest) {
         timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toLocaleString(),
         resolved: false
       }
-    ].filter((_, index) => Math.random() > 0.3); // Randomly show some alerts
+    ].filter((alert, index) => Math.random() > 0.3 && index >= 0); // Randomly show some alerts
 
     return NextResponse.json({
       deviceMetrics,

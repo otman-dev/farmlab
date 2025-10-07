@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]';
 import cloudConnPromise from '@/lib/mongoose-cloud-conn';
 import { getInvoiceModel } from '@/models/Invoice.cloud';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const session = await getServerSession();
-    const user = session?.user as any;
+    const session = await getServerSession(authOptions);
+    const user = session?.user as { role?: string } | undefined;
     
     if (!user || !['admin', 'sponsor'].includes(user.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

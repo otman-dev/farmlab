@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { FiTrendingUp, FiBarChart, FiPieChart, FiActivity, FiCalendar } from "react-icons/fi";
 
 interface AnalyticsData {
@@ -42,11 +42,7 @@ export default function SponsorAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('6months');
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const response = await fetch(`/api/sponsor/analytics?range=${timeRange}`);
       if (response.ok) {
@@ -58,7 +54,11 @@ export default function SponsorAnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   if (loading) {
     return (

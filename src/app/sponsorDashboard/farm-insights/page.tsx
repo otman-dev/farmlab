@@ -107,7 +107,7 @@ export default function FarmInsightsPage() {
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setSelectedTab(tab.key as any)}
+                            onClick={() => setSelectedTab(tab.key as 'overview' | 'environment' | 'animals' | 'operations')}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                 selectedTab === tab.key
                   ? 'bg-green-600 text-white'
