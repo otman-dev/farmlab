@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiPieChart, FiBox, FiFileText, FiUsers, FiActivity, FiSettings, FiTarget } from 'react-icons/fi';
+import { FiHome, FiPieChart, FiBox, FiFileText, FiUsers, FiActivity, FiSettings, FiTarget, FiBarChart, FiPackage, FiShoppingCart } from 'react-icons/fi';
 
 interface SponsorSidebarProps {
   mobileOpen: boolean;
@@ -11,13 +11,10 @@ interface SponsorSidebarProps {
 
 const sponsorNavItems = [
   { path: '/sponsorDashboard', label: 'Dashboard Overview', icon: FiHome },
-  { path: '/sponsorDashboard/analytics', label: 'Farm Analytics', icon: FiPieChart },
-  { path: '/sponsorDashboard/stock-impact', label: 'Stock Impact', icon: FiBox },
-  { path: '/sponsorDashboard/invoices', label: 'Sponsored Invoices', icon: FiFileText },
-  { path: '/sponsorDashboard/farm-insights', label: 'Farm Insights', icon: FiActivity },
-  { path: '/sponsorDashboard/community', label: 'Community Impact', icon: FiUsers },
-  { path: '/sponsorDashboard/goals', label: 'Sponsorship Goals', icon: FiTarget },
-  { path: '/sponsorDashboard/settings', label: 'Preferences', icon: FiSettings },
+  { path: '/sponsorDashboard/analytics', label: 'Analytics & Insights', icon: FiBarChart },
+  { path: '/sponsorDashboard/inventory', label: 'Inventory & Stock', icon: FiPackage },
+  { path: '/sponsorDashboard/financial', label: 'Financial Tracking', icon: FiShoppingCart },
+  { path: '/sponsorDashboard/settings', label: 'Settings', icon: FiSettings },
 ];
 
 export default function SponsorNavigation({ mobileOpen, setMobileOpen }: SponsorSidebarProps) {

@@ -366,20 +366,20 @@ export default function SponsorDashboardPage() {
                   metric={`${stockImpact?.summary?.efficiencyScore || 0}% efficiency`}
                 />
                 <QuickActionCard
+                  title="Registration Analytics"
+                  description="Market intelligence from user signups"
+                  href="/sponsorDashboard/registration-analytics"
+                  icon={FiUsers}
+                  color="purple"
+                  metric={`Market insights`}
+                />
+                <QuickActionCard
                   title="Farm Analytics"
                   description="Comprehensive performance insights"
                   href="/sponsorDashboard/analytics"
                   icon={FiTrendingUp}
                   color="green"
                   metric={`${metrics?.farmImpact || 0} impact score`}
-                />
-                <QuickActionCard
-                  title="Community Impact"
-                  description="See your broader influence"
-                  href="/sponsorDashboard/community"
-                  icon={FiUsers}
-                  color="purple"
-                  metric={`${metrics?.communityReach || 0} animals`}
                 />
                 <QuickActionCard
                   title="Financial ROI"
