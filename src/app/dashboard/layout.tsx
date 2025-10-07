@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import SimpleDashboardNavigation from "@/components/dashboard/SimpleDashboardNavigation";
+import AdminNavigation from "@/components/dashboard/AdminNavigation";
 import ManagerNavigation from "@/components/dashboard/ManagerNavigation";
 import SponsorNavigation from "@/components/dashboard/SponsorNavigation";
 import SimpleHeader from "@/components/dashboard/SimpleHeader";
@@ -114,7 +115,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const headerUser = session?.user ?? { name: '', email: '', image: '' };
   return (
     <div className="flex h-screen bg-gray-50">
-      <SimpleDashboardNavigation mobileOpen={sidebarOpen} setMobileOpen={setSidebarOpen} />
+      <AdminNavigation mobileOpen={sidebarOpen} setMobileOpen={setSidebarOpen} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <SimpleHeader user={headerUser} onOpenSidebar={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">

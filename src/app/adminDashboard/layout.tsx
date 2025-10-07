@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import SimpleDashboardNavigation from "@/components/dashboard/SimpleDashboardNavigation";
+import AdminNavigation from "@/components/dashboard/AdminNavigation";
 import SimpleHeader from "@/components/dashboard/SimpleHeader";
 
 type UserRole = "admin" | "manager" | "sponsor" | "visitor" | "waiting_list";
@@ -17,6 +17,8 @@ interface SessionUser {
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   useEffect(() => {
     if (status === "loading") return;
     const user = session?.user as SessionUser | undefined;
@@ -24,14 +26,19 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       router.replace("/auth/signin");
     }
   }, [session, status, router]);
+
   if (status === "loading") {
     return <div className="flex items-center justify-center h-screen text-green-600 text-xl">Loading...</div>;
   }
+
   return (
     <div className="flex h-screen bg-gray-50">
-      <SimpleDashboardNavigation mobileOpen={false} setMobileOpen={() => {}} />
+      <AdminNavigation mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <SimpleHeader user={session?.user ?? { name: '', email: '', image: '' }} />
+        <SimpleHeader 
+          user={session?.user ?? { name: '', email: '', image: '' }} 
+          onOpenSidebar={() => setMobileOpen(true)} 
+        />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">{children}</main>
       </div>
     </div>

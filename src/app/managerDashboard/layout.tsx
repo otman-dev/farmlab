@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ManagerNavigation from "@/components/dashboard/ManagerNavigation";
+import AdminNavigation from "@/components/dashboard/AdminNavigation";
 import SimpleHeader from "@/components/dashboard/SimpleHeader";
 
 type UserRole = "admin" | "manager" | "sponsor" | "visitor" | "waiting_list";
@@ -31,9 +32,16 @@ export default function ManagerDashboardLayout({ children }: { children: React.R
     return <div className="flex items-center justify-center h-screen text-green-600 text-xl">Loading...</div>;
   }
   
+  const user = session?.user as SessionUser | undefined;
+  const isAdmin = user?.role === "admin";
+  
   return (
     <div className="flex h-screen bg-gray-50">
-      <ManagerNavigation mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      {isAdmin ? (
+        <AdminNavigation mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      ) : (
+        <ManagerNavigation mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      )}
       <div className="flex flex-col flex-1 overflow-hidden">
         <SimpleHeader user={session?.user ?? { name: '', email: '', image: '' }} onOpenSidebar={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">{children}</main>
