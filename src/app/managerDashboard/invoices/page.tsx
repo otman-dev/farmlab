@@ -47,7 +47,6 @@ export default function InvoicesPage() {
     return today.toISOString().slice(0, 10);
   });
 
-  const [invoiceNumber, setInvoiceNumber] = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<InvoiceProduct[]>([{ name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
@@ -57,7 +56,7 @@ export default function InvoicesPage() {
   
   interface Invoice {
     _id: string;
-    invoiceNumber: string;
+    invoiceNumber: number;
     supplier?: Supplier;
     products: InvoiceProduct[];
     grandTotal?: number;
@@ -70,6 +69,13 @@ export default function InvoicesPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   // Track dropdown open state for each product row
   const [dropdownOpen, setDropdownOpen] = useState<boolean[]>([false]);
+  
+  // Edit mode states
+  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch suppliers and invoices on mount
   useEffect(() => {
@@ -83,11 +89,120 @@ export default function InvoicesPage() {
   }, []);
 
   const fetchInvoices = async () => {
-    setLoadingInvoices(true);
-    const res = await fetch("/api/invoices");
-    const data = await res.json();
-    setInvoices(data.invoices || []);
-    setLoadingInvoices(false);
+    try {
+      setLoadingInvoices(true);
+      const res = await fetch("/api/invoices");
+      const data = await res.json();
+      setInvoices(data.invoices || []);
+    } catch (err) {
+      console.error("Failed to fetch invoices:", err);
+    } finally {
+      setLoadingInvoices(false);
+    }
+  };
+
+  const startEditInvoice = (invoice: Invoice) => {
+    setEditingInvoice(invoice);
+    setSupplierId(invoice.supplier?._id || "");
+    setInvoiceDate(invoice.invoiceDate);
+    setCategory(invoice.products[0]?.category || "");
+    setProducts(invoice.products.map(p => ({
+      name: p.name,
+      quantity: p.quantity,
+      price: p.price,
+      description: p.description,
+      category: p.category,
+      unit: p.unit,
+      kgPerUnit: p.kgPerUnit,
+      units: p.units || [],
+      goodFor: p.goodFor,
+      usageDescription: p.usageDescription
+    })));
+    setShowEditModal(true);
+  };
+
+  const cancelEdit = () => {
+    setEditingInvoice(null);
+    setShowEditModal(false);
+    // Reset form
+    setSupplierId("");
+    setInvoiceDate(new Date().toISOString().slice(0, 10));
+    setCategory("");
+    setProducts([{ name: "", quantity: 1, price: 0, kgPerUnit: undefined }]);
+    setError("");
+    setSuccess("");
+  };
+
+  const updateInvoice = async () => {
+    if (!editingInvoice) return;
+    
+    try {
+      setLoading(true);
+      setError("");
+      
+      const res = await fetch("/api/invoices", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          invoiceId: editingInvoice._id,
+          supplierId,
+          products,
+          date: invoiceDate
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setSuccess("Invoice updated successfully!");
+        await fetchInvoices();
+        setTimeout(() => {
+          cancelEdit();
+        }, 1500);
+      } else {
+        setError(data.error || "Failed to update invoice");
+      }
+    } catch (err) {
+      setError("Network error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startDeleteInvoice = (invoice: Invoice) => {
+    setInvoiceToDelete(invoice);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteInvoice = async () => {
+    if (!invoiceToDelete) return;
+    
+    try {
+      setDeleteLoading(true);
+      const res = await fetch(`/api/invoices?id=${invoiceToDelete._id}`, {
+        method: "DELETE"
+      });
+      
+      if (res.ok) {
+        setSuccess("Invoice deleted successfully!");
+        await fetchInvoices();
+        setShowDeleteModal(false);
+        setInvoiceToDelete(null);
+        setTimeout(() => setSuccess(""), 3000);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to delete invoice");
+      }
+    } catch (err) {
+      setError("Network error occurred");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setInvoiceToDelete(null);
   };
 
   const handleProductChange = (idx: number, field: keyof InvoiceProduct, value: string | number | string[] | MedicineUnit[]) => {
@@ -237,11 +352,16 @@ export default function InvoicesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); setSuccess("");
     
-    console.log("=== FORM SUBMISSION ===");
-    console.log("Category:", category);
-    console.log("Products before submission:", products);
+    if (editingInvoice) {
+      await updateInvoice();
+    } else {
+      // Original invoice creation logic
+      setError(""); setSuccess("");
+      
+      console.log("=== FORM SUBMISSION ===");
+      console.log("Category:", category);
+      console.log("Products before submission:", products);
     
     if (category === 'animal_medicine') {
       products.forEach((product, idx) => {
@@ -254,7 +374,6 @@ export default function InvoicesPage() {
     }
     console.log("======================");
     
-    if (!invoiceNumber.trim()) return setError("Invoice number is required");
     if (!supplierId) return setError("Supplier is required");
     if (products.some(p => !p.name || p.quantity <= 0 || p.price < 0)) return setError("All products must have a name, quantity > 0, and price >= 0");
     
@@ -311,7 +430,6 @@ export default function InvoicesPage() {
     }
     // Now submit invoice
     const invoicePayload = { 
-      invoiceNumber, 
       supplierId, 
       products: products.map(p => ({ ...p, category })), 
       date: invoiceDate 
@@ -347,7 +465,6 @@ export default function InvoicesPage() {
         successMessage += "\n\nStock Updates:\n" + data.stockUpdates.join("\n");
       }
       setSuccess(successMessage);
-      setInvoiceNumber("");
       setSupplierId("");
   setProducts([{ name: "", quantity: 1, price: 0 }]);
   setInvoiceDate(new Date().toISOString().slice(0, 10));
@@ -355,18 +472,17 @@ export default function InvoicesPage() {
     } else {
       setError(data.error || "Failed to add invoice");
     }
+    }
   };
 
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-10">
       <div className="bg-gradient-to-tr from-green-50 to-green-100 rounded-2xl shadow-lg p-8 border border-green-200">
-        <h1 className="text-3xl font-extrabold text-green-800 mb-6 tracking-tight">Add New Invoice</h1>
+        <h1 className="text-3xl font-extrabold text-green-800 mb-6 tracking-tight">
+          {editingInvoice ? 'Edit Invoice' : 'Add New Invoice'}
+        </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block font-semibold mb-1 text-green-900">Invoice Number*</label>
-              <input value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} className="border-2 border-green-200 rounded-lg px-4 py-2 w-full focus:outline-none focus:border-green-500 text-gray-900" required />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block font-semibold mb-1 text-green-900">Supplier*</label>
               <select value={supplierId} onChange={e => setSupplierId(e.target.value)} className="border-2 border-green-200 rounded-lg px-4 py-2 w-full focus:outline-none focus:border-green-500 text-gray-900" required>
@@ -412,8 +528,16 @@ export default function InvoicesPage() {
               }
             }} className="border-2 border-green-200 rounded-lg px-4 py-2 w-full focus:outline-none focus:border-green-500 text-gray-900" required>
               <option value="">Select category</option>
-              <option value="animal_feed">Animal Feed</option>
-              <option value="animal_medicine">Animal Medicine</option>
+              <optgroup label="Animal Products">
+                <option value="animal_feed">Animal Feed</option>
+                <option value="animal_medicine">Animal Medicine</option>
+              </optgroup>
+              <optgroup label="Plant Products">
+                <option value="plant_seeds">Plant Seeds</option>
+                <option value="plant_seedlings">Plant Seedlings</option>
+                <option value="plant_nutrition">Plant Nutrition</option>
+                <option value="plant_medicine">Plant Medicine</option>
+              </optgroup>
             </select>
           </div>
           {category && (
@@ -834,7 +958,18 @@ export default function InvoicesPage() {
               </div>
             </div>
           )}
-          <button type="submit" className="bg-gradient-to-tr from-green-500 to-green-700 text-white font-bold rounded-lg px-8 py-3 shadow hover:scale-105 hover:from-green-600 hover:to-green-800 transition-all duration-150 mt-2" disabled={loading}>{loading ? "Saving..." : "Add Invoice"}</button>
+          <button type="submit" className="bg-gradient-to-tr from-green-500 to-green-700 text-white font-bold rounded-lg px-8 py-3 shadow hover:scale-105 hover:from-green-600 hover:to-green-800 transition-all duration-150 mt-2" disabled={loading}>
+            {loading ? "Saving..." : editingInvoice ? "Update Invoice" : "Add Invoice"}
+          </button>
+          {editingInvoice && (
+            <button 
+              type="button" 
+              onClick={cancelEdit}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg px-8 py-3 shadow transition-all duration-150"
+            >
+              Cancel Edit
+            </button>
+          )}
         </form>
       </div>
 
@@ -856,6 +991,7 @@ export default function InvoicesPage() {
                     <th className="px-4 py-3 border-b font-bold text-green-900">Products</th>
                     <th className="px-4 py-3 border-b font-bold text-green-900">Grand Total (MAD)</th>
                     <th className="px-4 py-3 border-b font-bold text-green-900">Date</th>
+                    <th className="px-4 py-3 border-b font-bold text-green-900">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -878,6 +1014,24 @@ export default function InvoicesPage() {
                         {typeof inv.grandTotal === 'number' ? inv.grandTotal.toFixed(2) : ''}
                       </td>
                       <td className="px-4 py-2 text-xs text-gray-500">{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString() : "-"}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => startEditInvoice(inv)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200"
+                            title="Edit Invoice"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => startDeleteInvoice(inv)}
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200"
+                            title="Delete Invoice"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -960,7 +1114,7 @@ export default function InvoicesPage() {
 
                     {/* Total Summary at bottom */}
                     <div className="mt-6 pt-4 border-t border-green-200">
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-4">
                         <div className="text-green-800 font-semibold">Invoice Total</div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-green-700">
@@ -971,6 +1125,21 @@ export default function InvoicesPage() {
                           </div>
                         </div>
                       </div>
+                      {/* Action buttons for mobile */}
+                      <div className="flex gap-3 mt-4">
+                        <button
+                          onClick={() => startEditInvoice(inv)}
+                          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                        >
+                          Edit Invoice
+                        </button>
+                        <button
+                          onClick={() => startDeleteInvoice(inv)}
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -979,6 +1148,59 @@ export default function InvoicesPage() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && invoiceToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-red-100 rounded-full">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Delete Invoice</h3>
+                <p className="text-gray-600 text-sm">This action cannot be undone</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 mb-2">
+                Are you sure you want to delete invoice <strong>#{invoiceToDelete.invoiceNumber}</strong>?
+              </p>
+              <div className="bg-gray-50 rounded p-3">
+                <p className="text-sm text-gray-600">
+                  Supplier: {invoiceToDelete.supplier?.entrepriseName || 'N/A'}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Total: {typeof invoiceToDelete.grandTotal === 'number' ? invoiceToDelete.grandTotal.toFixed(2) : '0.00'} MAD
+                </p>
+                <p className="text-sm text-gray-600">
+                  Products: {invoiceToDelete.products.length}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={cancelDelete}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteInvoice}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete Invoice'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -139,7 +139,7 @@ function generateCategoryBreakdown(
 
 function generateDetailedContributions(invoices: Array<{
   _id: { toString(): string };
-  invoiceNumber?: string;
+  invoiceNumber?: number;
   createdAt: string | Date;
   grandTotal?: number;
   products?: Array<{

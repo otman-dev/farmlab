@@ -2,7 +2,7 @@ import { Schema, Document, Connection, Model } from 'mongoose';
 
 export interface IProduct extends Document {
   name: string;
-  category: 'animal_feed' | 'animal_medicine';
+  category: 'animal_feed' | 'animal_medicine' | 'plant_seeds' | 'plant_seedlings' | 'plant_nutrition' | 'plant_medicine';
   price?: number;
   kilogramQuantity?: number; // animal_feed only - DEPRECATED, use kgPerUnit
   kgPerUnit?: number; // animal_feed only - kilograms per unit/package
@@ -15,11 +15,20 @@ export interface IProduct extends Document {
   goodFor?: string[];
   amountPerUnit?: number;
   unit?: string;
+  // Plant-specific fields
+  seedType?: string; // For seeds - type classification
+  plantingInstructions?: string; // For seeds/seedlings
+  harvestTime?: string; // Expected harvest time
+  growthConditions?: string; // Optimal growing conditions
 }
 
 const ProductSchema: Schema = new Schema<IProduct>({
   name: { type: String, required: true },
-  category: { type: String, enum: ['animal_feed', 'animal_medicine'], required: true },
+  category: { 
+    type: String, 
+    enum: ['animal_feed', 'animal_medicine', 'plant_seeds', 'plant_seedlings', 'plant_nutrition', 'plant_medicine'], 
+    required: true 
+  },
   price: { type: Number },
   kilogramQuantity: { type: Number }, // DEPRECATED - keeping for backward compatibility
   kgPerUnit: { type: Number }, // animal_feed only - kilograms per unit/package
@@ -32,6 +41,11 @@ const ProductSchema: Schema = new Schema<IProduct>({
   goodFor: [{ type: String }],
   amountPerUnit: { type: Number },
   unit: { type: String },
+  // Plant-specific fields
+  seedType: { type: String }, // For seeds
+  plantingInstructions: { type: String }, // For seeds/seedlings
+  harvestTime: { type: String }, // Expected harvest time
+  growthConditions: { type: String }, // Optimal growing conditions
 });
 
 // Ensure no duplicate products by name+category

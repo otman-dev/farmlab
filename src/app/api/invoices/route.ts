@@ -12,10 +12,10 @@ export async function POST(req: NextRequest) {
     const conn = await cloudConnPromise;
     const Invoice = getInvoiceModel(conn);
     const body = await req.json();
-    const { invoiceNumber, supplierId, products, date } = body;
+    const { supplierId, products, date } = body;
     
     // Basic validation
-    if (!invoiceNumber || !supplierId || !products || !Array.isArray(products) || products.length === 0) {
+    if (!supplierId || !products || !Array.isArray(products) || products.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     
@@ -25,12 +25,6 @@ export async function POST(req: NextRequest) {
     
     if (!supplier) {
       return NextResponse.json({ error: 'Supplier not found' }, { status: 400 });
-    }
-    
-    // Check for duplicate invoice number
-    const existing = await Invoice.findOne({ invoiceNumber });
-    if (existing) {
-      return NextResponse.json({ error: 'Invoice number already exists' }, { status: 400 });
     }
     
     // Calculate totals for products
@@ -98,7 +92,6 @@ export async function POST(req: NextRequest) {
     
     // Create invoice
     const invoice = await Invoice.create({
-      invoiceNumber,
       supplier: {
         _id: supplier._id,
         name: supplier.name,
@@ -302,6 +295,97 @@ export async function GET() {
   } catch (err) {
     console.error('Error fetching invoices:', err);
     return NextResponse.json({ error: 'Failed to fetch invoices' }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const conn = await cloudConnPromise;
+    const Invoice = getInvoiceModel(conn);
+    const Supplier = getSupplierModel(conn);
+    const body = await req.json();
+    const { invoiceId, supplierId, products, date } = body;
+    
+    // Basic validation
+    if (!invoiceId) {
+      return NextResponse.json({ error: 'Invoice ID is required' }, { status: 400 });
+    }
+    if (!supplierId || !products || !Array.isArray(products) || products.length === 0) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+    
+    // Check if invoice exists
+    const existingInvoice = await Invoice.findById(invoiceId);
+    if (!existingInvoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+    }
+    
+    // Fetch supplier details
+    const supplier = await Supplier.findById(supplierId);
+    if (!supplier) {
+      return NextResponse.json({ error: 'Supplier not found' }, { status: 400 });
+    }
+    
+    // Calculate totals and prepare products
+    const productsWithCalcs = products.map((prod: any) => {
+      const totalPrice = prod.quantity && prod.price ? prod.quantity * prod.price : 0;
+      return { ...prod, totalPrice };
+    });
+    
+    const grandTotal = productsWithCalcs.reduce((sum: number, prod: any) => sum + (prod.totalPrice || 0), 0);
+    
+    // Update the invoice
+    const updatedInvoice = await Invoice.findByIdAndUpdate(
+      invoiceId,
+      {
+        supplier: {
+          _id: supplier._id,
+          name: supplier.name,
+          entrepriseName: supplier.entrepriseName
+        },
+        products: productsWithCalcs,
+        grandTotal,
+        invoiceDate: date || new Date().toISOString().slice(0, 10)
+      },
+      { new: true }
+    );
+    
+    return NextResponse.json({ 
+      invoice: updatedInvoice, 
+      message: 'Invoice updated successfully' 
+    });
+  } catch (err) {
+    console.error('Error updating invoice:', err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const conn = await cloudConnPromise;
+    const Invoice = getInvoiceModel(conn);
+    const { searchParams } = new URL(req.url);
+    const invoiceId = searchParams.get('id');
+    
+    if (!invoiceId) {
+      return NextResponse.json({ error: 'Invoice ID is required' }, { status: 400 });
+    }
+    
+    // Check if invoice exists
+    const existingInvoice = await Invoice.findById(invoiceId);
+    if (!existingInvoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+    }
+    
+    // Delete the invoice
+    await Invoice.findByIdAndDelete(invoiceId);
+    
+    return NextResponse.json({ 
+      message: 'Invoice deleted successfully' 
+    });
+  } catch (err) {
+    console.error('Error deleting invoice:', err);
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
 }
 

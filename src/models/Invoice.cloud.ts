@@ -13,7 +13,7 @@ export interface IInvoiceProduct {
 }
 
 export interface IInvoice extends Document {
-  invoiceNumber: string;
+  invoiceNumber: number; // Auto-increment internal number
   supplier: {
     _id: string;
     name: string;
@@ -38,7 +38,7 @@ const InvoiceProductSchema = new Schema<IInvoiceProduct>({
 });
 
 const InvoiceSchema: Schema = new Schema<IInvoice>({
-  invoiceNumber: { type: String, required: true, unique: true },
+  invoiceNumber: { type: Number, unique: true }, // Will be auto-generated
   supplier: {
     _id: { type: String, required: true },
     name: { type: String, required: true },
@@ -48,6 +48,20 @@ const InvoiceSchema: Schema = new Schema<IInvoice>({
   grandTotal: { type: Number, required: true },
   invoiceDate: { type: Date, required: true },
   createdAt: { type: Date, default: Date.now },
+});
+
+// Auto-generate invoice number before saving
+InvoiceSchema.pre('save', async function (next) {
+  if (this.isNew && !this.invoiceNumber) {
+    try {
+      // Find the highest invoice number and increment
+      const lastInvoice = await (this.constructor as any).findOne({}, {}, { sort: { invoiceNumber: -1 } });
+      this.invoiceNumber = lastInvoice ? lastInvoice.invoiceNumber + 1 : 1001; // Start from 1001
+    } catch (error) {
+      return next(error);
+    }
+  }
+  next();
 });
 
 export function getInvoiceModel(conn: Connection): Model<IInvoice> {

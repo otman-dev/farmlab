@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiActivity, FiServer } from 'react-icons/fi';
+import { FiActivity, FiServer, FiChevronDown, FiChevronRight } from 'react-icons/fi';
+import { useState } from 'react';
 
 interface ManagerSidebarProps {
   mobileOpen: boolean;
@@ -13,6 +14,7 @@ const managerNavItems = [
   { path: '/managerDashboard', label: 'Dashboard', icon: FiServer },
   { path: '/managerDashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
   { path: '/managerDashboard/food-stock', label: 'Food Stock', icon: FiActivity },
+  { path: '/managerDashboard/plant-stock', label: 'Plant Stock', icon: FiActivity },
   { path: '/managerDashboard/staff', label: 'Staff Management', icon: FiServer },
   { path: '/managerDashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
   { path: '/managerDashboard/products', label: 'Products', icon: FiServer },

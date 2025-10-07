@@ -62,6 +62,7 @@ export default function AdminNavigation({ mobileOpen, setMobileOpen }: AdminNavi
     { path: '/managerDashboard', label: 'Manager Dashboard', icon: FiTrendingUp },
     { path: '/managerDashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
     { path: '/managerDashboard/food-stock', label: 'Food Stock', icon: FiActivity },
+    { path: '/managerDashboard/plant-stock', label: 'Plant Stock', icon: FiActivity },
     { path: '/managerDashboard/staff', label: 'Staff Management', icon: FiUserCheck },
     { path: '/managerDashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
     { path: '/managerDashboard/products', label: 'Products', icon: FiServer },

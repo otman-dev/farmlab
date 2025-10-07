@@ -191,7 +191,7 @@ function getUniqueMonthsFromInvoices(invoices: { createdAt: string | Date }[]) {
 }
 
 async function generateRecentActivities(
-  invoices: { _id: { toString(): string }; invoiceNumber?: string; products?: { quantity?: number }[]; createdAt: string | Date; grandTotal?: number }[],
+  invoices: { _id: { toString(): string }; invoiceNumber?: number; products?: { quantity?: number }[]; createdAt: string | Date; grandTotal?: number }[],
   foodStocks: { _id: { toString(): string }; quantity?: number; createdAt: string | Date; updatedAt?: string | Date }[],
   medicalStocks: { _id: { toString(): string }; quantity?: number; createdAt: string | Date; updatedAt?: string | Date }[],
   medicineUnits: { _id: { toString(): string }; productName: string; isUsed: boolean; firstUsageDate?: string | Date }[]
