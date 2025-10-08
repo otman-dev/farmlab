@@ -9,10 +9,7 @@ import {
   FiUsers, 
   FiServer,
   FiActivity,
-  FiBarChart,
-  FiPackage,
-  FiShoppingCart,
-  FiStar
+  FiBarChart
 } from "react-icons/fi";
 
 export default function AdminDashboardPage() {

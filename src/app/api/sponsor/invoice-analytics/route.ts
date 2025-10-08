@@ -5,7 +5,7 @@ import cloudConnPromise from '@/lib/mongoose-cloud-conn';
 import { getInvoiceModel } from '@/models/Invoice.cloud';
 import { getSupplierModel } from '@/models/Supplier.cloud';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     const user = session?.user as { role?: string } | undefined;

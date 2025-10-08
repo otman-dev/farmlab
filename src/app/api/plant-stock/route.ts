@@ -3,7 +3,7 @@ import { getCloudConnection } from '@/lib/mongodb-cloud';
 import { getPlantStockModel } from '@/models/PlantStock.cloud';
 import { getProductModel } from '@/models/Product.cloud';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const conn = await getCloudConnection();
     const PlantStock = getPlantStockModel(conn);

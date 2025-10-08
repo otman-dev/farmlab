@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import SimpleDashboardNavigation from "@/components/dashboard/SimpleDashboardNavigation";
 import AdminNavigation from "@/components/dashboard/AdminNavigation";
 import ManagerNavigation from "@/components/dashboard/ManagerNavigation";
 import SponsorNavigation from "@/components/dashboard/SponsorNavigation";

@@ -9,7 +9,7 @@ import { getFoodStockModel } from '@/models/FoodStock.cloud';
 import { getInvoiceModel } from '@/models/Invoice.cloud';
 import { getMedicineUnitModel } from '@/models/MedicineUnit.cloud';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     const user = session?.user as { role?: string } | undefined;
