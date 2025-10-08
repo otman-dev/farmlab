@@ -16,7 +16,7 @@ export interface IInvoice extends Document {
   invoiceNumber: number; // Auto-increment internal number
   supplier: {
     _id: string;
-    name: string;
+    name?: string; // Make optional to match Supplier model
     entrepriseName: string;
   };
   products: IInvoiceProduct[];
@@ -38,10 +38,10 @@ const InvoiceProductSchema = new Schema<IInvoiceProduct>({
 });
 
 const InvoiceSchema: Schema = new Schema<IInvoice>({
-  invoiceNumber: { type: Number, unique: true }, // Will be auto-generated
+  invoiceNumber: { type: Number, unique: true, sparse: true }, // sparse allows multiple null values
   supplier: {
     _id: { type: String, required: true },
-    name: { type: String, required: true },
+    name: { type: String, required: false }, // Make optional
     entrepriseName: { type: String, required: true },
   },
   products: [InvoiceProductSchema],
@@ -54,10 +54,20 @@ const InvoiceSchema: Schema = new Schema<IInvoice>({
 InvoiceSchema.pre('save', async function (next) {
   if (this.isNew && !this.invoiceNumber) {
     try {
-      // Find the highest invoice number and increment
-      const lastInvoice = await (this.constructor as any).findOne({}, {}, { sort: { invoiceNumber: -1 } });
-      this.invoiceNumber = lastInvoice ? lastInvoice.invoiceNumber + 1 : 1001; // Start from 1001
+      // Find the latest invoice and increment by 1
+      const latestInvoice = await (this.constructor as any)
+        .findOne({})
+        .sort({ invoiceNumber: -1 })
+        .select('invoiceNumber');
+      
+      // Start from 1 if no invoices exist, otherwise increment by 1
+      this.invoiceNumber = latestInvoice && latestInvoice.invoiceNumber 
+        ? latestInvoice.invoiceNumber + 1 
+        : 1;
+      
+      console.log('Generated invoice number:', this.invoiceNumber);
     } catch (error) {
+      console.error('Error generating invoice number:', error);
       return next(error);
     }
   }
@@ -65,5 +75,6 @@ InvoiceSchema.pre('save', async function (next) {
 });
 
 export function getInvoiceModel(conn: Connection): Model<IInvoice> {
-  return conn.models.Invoice || conn.model<IInvoice>('Invoice', InvoiceSchema);
+  // Check if model already exists, if so return it, otherwise create new one
+  return conn.models.Invoice as Model<IInvoice> || conn.model<IInvoice>('Invoice', InvoiceSchema);
 }

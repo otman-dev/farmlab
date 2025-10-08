@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FiPlus, FiEdit2, FiTrash2, FiGrid, FiSun, FiDroplet, FiCalendar } from "react-icons/fi";
+import { PLANT_CATEGORIES, PLANT_CATEGORY_LABEL } from '@/lib/productCategories';
 
 interface Product {
   _id: string;
@@ -59,8 +60,26 @@ export default function PlantStockPage() {
       // Fetch plant products
       const productsResponse = await fetch("/api/products?category=plant_seeds,plant_seedlings,plant_nutrition,plant_medicine");
       if (!productsResponse.ok) throw new Error("Failed to fetch products");
-      const productsData = await productsResponse.json();
-      setProducts(productsData || []);
+      const productsJson = await productsResponse.json();
+      // API may return { products } or an array directly; normalize to array
+      const productsData = Array.isArray(productsJson) ? productsJson : productsJson.products || [];
+      // Preserve plant-specific fields when setting products
+      setProducts(
+        productsData.map((p: any) => ({
+          _id: p._id,
+          name: p.name,
+          description: p.description,
+          unit: p.unit,
+          amountPerUnit: p.amountPerUnit,
+          category: p.category,
+          seedType: p.seedType,
+          plantingInstructions: p.plantingInstructions,
+          harvestTime: p.harvestTime,
+          growthConditions: p.growthConditions,
+          unitType: p.unitType,
+          kgPerUnit: p.kgPerUnit || p.kilogramQuantity
+        }))
+      );
 
     } catch (err: any) {
       setError(err.message || "Failed to load data");
@@ -129,6 +148,25 @@ export default function PlantStockPage() {
     }
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  const getAvailableCount = (stock: PlantStock) => {
+    // If unit-level tracking exists prefer counting units that are not harvested/failed
+    if (stock.units && stock.units.length > 0) {
+      return stock.units.filter(u => u.status !== 'harvested' && u.status !== 'failed').length;
+    }
+    // fallback to quantity
+    return stock.quantity;
+  };
+
+  const getTotalUnits = (stock: PlantStock) => {
+    return stock.units && stock.units.length > 0 ? stock.units.length : stock.quantity;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -167,20 +205,20 @@ export default function PlantStockPage() {
 
       {/* Stock Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {['plant_seeds', 'plant_seedlings', 'plant_nutrition', 'plant_medicine'].map((category) => {
+        {PLANT_CATEGORIES.map((c) => {
           const categoryStocks = plantStocks.filter(stock => {
             const product = products.find(p => p._id === stock.productId);
-            return product?.category === category;
+            return product?.category === c.value;
           });
           const totalQuantity = categoryStocks.reduce((sum, stock) => sum + stock.quantity, 0);
           
           return (
-            <div key={category} className="bg-white p-6 rounded-lg shadow-sm border">
+            <div key={c.value} className="bg-white p-6 rounded-lg shadow-sm border">
               <div className="flex items-center gap-3">
-                {getCategoryIcon(category)}
+                {getCategoryIcon(c.value)}
                 <div>
                   <p className="text-2xl font-bold text-gray-900">{totalQuantity}</p>
-                  <p className="text-gray-600 text-sm">{getCategoryLabel(category)}</p>
+                  <p className="text-gray-600 text-sm">{PLANT_CATEGORY_LABEL(c.value)}</p>
                 </div>
               </div>
             </div>
@@ -230,6 +268,9 @@ export default function PlantStockPage() {
                             {product?.description && (
                               <p className="text-sm text-gray-500">{product.description}</p>
                             )}
+                            <div className="text-xs text-gray-500 mt-1">
+                              {getTotalUnits(stock)} total units • Last updated: {formatDate(stock.createdAt)}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -239,18 +280,25 @@ export default function PlantStockPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <p className="text-sm font-medium text-gray-900">{stock.quantity}</p>
+                        <p className="text-sm font-medium text-gray-900">{getTotalUnits(stock)}</p>
                         {product?.unit && (
                           <p className="text-sm text-gray-500">{product.unit}</p>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-wrap gap-1">
-                          {Object.entries(statusCounts).map(([status, count]) => (
-                            <span key={status} className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
-                              {count} {status}
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-wrap gap-1">
+                            {Object.entries(statusCounts).map(([status, count]) => (
+                              <span key={status} className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+                                {count} {status}
+                              </span>
+                            ))}
+                          </div>
+                          <div>
+                            <span className={`inline-block px-3 py-1 rounded-full border text-sm font-bold ${getAvailableCount(stock) === 0 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                              {getAvailableCount(stock)} available
                             </span>
-                          ))}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -296,12 +344,42 @@ export default function PlantStockPage() {
                   required
                 >
                   <option value="">Select a plant product</option>
-                  {products.map((product) => (
-                    <option key={product._id} value={product._id}>
-                      {product.name} ({getCategoryLabel(product.category)})
-                    </option>
-                  ))}
+                  {products.map((product) => {
+                    const labelParts = [product.name, `(${getCategoryLabel(product.category)})`];
+                    if ((product as any).unitType === 'weight' || (product as any).kgPerUnit) {
+                      labelParts.push(`${(product as any).kgPerUnit || ''} kg`);
+                    } else if ((product as any).unit) {
+                      if ((product as any).amountPerUnit) {
+                        labelParts.push(`${(product as any).amountPerUnit} per ${(product as any).unit}`);
+                      } else {
+                        labelParts.push(`${(product as any).unit}`);
+                      }
+                    }
+                    return (
+                      <option key={product._id} value={product._id}>
+                        {labelParts.filter(Boolean).join(' ')}
+                      </option>
+                    );
+                  })}
                 </select>
+
+                {/* Show selected product packaging details */}
+                {selectedProduct && (() => {
+                  const prod = products.find(p => p._id === selectedProduct);
+                  if (!prod) return null;
+                  return (
+                    <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700">
+                      {((prod as any).unitType === 'weight' || (prod as any).kgPerUnit) ? (
+                        <div>Packaging: {(prod as any).unitType === 'weight' ? 'Weight-based' : 'Weight-based'} — <strong>{(prod as any).kgPerUnit || '\u2014'} kg</strong></div>
+                      ) : (prod as any).unit ? (
+                        <div>Unit: <strong>{(prod as any).unit}</strong>{(prod as any).amountPerUnit ? ` — ${ (prod as any).amountPerUnit } per unit` : ''}</div>
+                      ) : (
+                        <div>No packaging/unit info available</div>
+                      )}
+                      {prod.seedType && <div className="mt-1">Seed Type: <strong>{prod.seedType}</strong></div>}
+                    </div>
+                  );
+                })()}
               </div>
 
               <div>

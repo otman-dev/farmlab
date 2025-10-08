@@ -198,7 +198,7 @@ export default function InventoryMonitorPage() {
   };
 
   const filteredSuppliers = data.suppliers.all.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (supplier.name || supplier.entrepriseName || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredProducts = data.products.all.filter(product => {
@@ -485,7 +485,7 @@ export default function InventoryMonitorPage() {
                     {filteredSuppliers.slice(0, 20).map((supplier, index) => (
                       <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 px-4">
-                          <div className="font-medium text-gray-800">{supplier.name}</div>
+                          <div className="font-medium text-gray-800">{supplier.name || supplier.entrepriseName || 'Unknown'}</div>
                           <div className="text-xs text-gray-500">{supplier.categoryCount} categories</div>
                         </td>
                         <td className="py-3 px-4 text-right font-medium">

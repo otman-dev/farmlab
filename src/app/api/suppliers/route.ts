@@ -21,26 +21,36 @@ export async function POST(request: NextRequest) {
     const conn = await cloudConnPromise;
     const Supplier = getSupplierModel(conn);
     const data = await request.json();
-    const requiredFields = ['name', 'entrepriseName', 'address', 'phones'];
-    for (const field of requiredFields) {
-      if (!data[field] || (field === 'phones' && (!Array.isArray(data.phones) || data.phones.length === 0))) {
-        return NextResponse.json({ error: `${field} is required` }, { status: 400 });
-      }
+    
+    // Validate required fields with better error messages
+    if (!data.entrepriseName) {
+      return NextResponse.json({ error: 'Company name is required' }, { status: 400 });
     }
+    if (!data.address) {
+      return NextResponse.json({ error: 'Address is required' }, { status: 400 });
+    }
+    
+    // Filter out empty phone numbers
+    const validPhones = (data.phones || []).filter((phone: string) => phone && phone.trim());
+    
     const supplier = await Supplier.create({
-      name: data.name,
+      name: data.name || '', // Make name optional with default empty string
       entrepriseName: data.entrepriseName,
       address: data.address,
-      description: data.description,
-      phones: data.phones,
-      email: data.email,
-      city: data.city,
-      category: data.category,
-      notes: data.notes,
+      description: data.description || '',
+      phones: validPhones, // Use filtered phones (can be empty array)
+      email: data.email || '',
+      city: data.city || '',
+      notes: data.notes || '',
     });
     return NextResponse.json({ supplier });
   } catch (err) {
     console.error('Error creating supplier:', err);
+    // Handle mongoose validation errors
+    if ((err as any).name === 'ValidationError') {
+      const validationErrors = Object.values((err as any).errors).map((error: any) => error.message);
+      return NextResponse.json({ error: validationErrors.join(', ') }, { status: 400 });
+    }
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
 }

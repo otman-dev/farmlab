@@ -231,7 +231,7 @@ function calculateSupplierAnalysis(invoices: any[], suppliers: any[]) {
   const analysis = Object.entries(supplierSpending)
     .map(([id, data]) => ({
       supplierId: id,
-      supplierName: data.supplier.name,
+      supplierName: data.supplier.name || data.supplier.entrepriseName || 'Unknown',
       totalSpent: Math.round(data.amount),
       invoiceCount: data.count,
       itemCount: data.items,

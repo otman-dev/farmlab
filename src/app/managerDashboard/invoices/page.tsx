@@ -4,6 +4,7 @@
 
 
 import React, { useEffect, useState } from "react";
+import { PLANT_CATEGORIES } from '@/lib/productCategories';
 
 interface InvoiceProduct {
   name: string;
@@ -31,6 +32,8 @@ interface MedicineUnit {
 interface Product {
   name: string;
   category: string;
+  description?: string;
+  kgPerUnit?: number;
 }
 
 
@@ -104,7 +107,9 @@ export default function InvoicesPage() {
   const startEditInvoice = (invoice: Invoice) => {
     setEditingInvoice(invoice);
     setSupplierId(invoice.supplier?._id || "");
-    setInvoiceDate(invoice.invoiceDate);
+    // Convert date to YYYY-MM-DD format for date input
+    const dateValue = invoice.invoiceDate ? new Date(invoice.invoiceDate).toISOString().slice(0, 10) : "";
+    setInvoiceDate(dateValue);
     setCategory(invoice.products[0]?.category || "");
     setProducts(invoice.products.map(p => ({
       name: p.name,
@@ -326,6 +331,18 @@ export default function InvoicesPage() {
     return !allProducts.some(p => p.name.trim().toLowerCase() === name.trim().toLowerCase() && p.category === category);
   };
 
+  // Helper: get existing product data
+  const getExistingProduct = (name: string) => {
+    return allProducts.find(p => p.name.trim().toLowerCase() === name.trim().toLowerCase() && p.category === category);
+  };
+
+  // Helper: check if we need to show kg input (new product OR existing product without kgPerUnit)
+  const shouldShowKgInput = (productName: string) => {
+    if (!productName) return false;
+    const existingProduct = getExistingProduct(productName);
+    return !existingProduct || !existingProduct.kgPerUnit;
+  };
+
   const addProduct = () => {
     const newProduct = category === 'animal_medicine' 
       ? { 
@@ -532,12 +549,11 @@ export default function InvoicesPage() {
                 <option value="animal_feed">Animal Feed</option>
                 <option value="animal_medicine">Animal Medicine</option>
               </optgroup>
-              <optgroup label="Plant Products">
-                <option value="plant_seeds">Plant Seeds</option>
-                <option value="plant_seedlings">Plant Seedlings</option>
-                <option value="plant_nutrition">Plant Nutrition</option>
-                <option value="plant_medicine">Plant Medicine</option>
-              </optgroup>
+                <optgroup label="Plant Products">
+                  {PLANT_CATEGORIES.map(c => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </optgroup>
             </select>
           </div>
           {category && (
@@ -601,31 +617,58 @@ export default function InvoicesPage() {
                                     <div
                                       key={i}
                                       className="px-3 md:px-4 py-2 cursor-pointer hover:bg-green-50 text-green-900 border-b border-green-100 last:border-b-0"
-                                      onMouseDown={() => handleProductChange(idx, "name", p.name)}
+                                      onMouseDown={() => {
+                                        // Load full existing product data for medicine
+                                        setProducts(products => {
+                                          const updated = [...products];
+                                          updated[idx] = {
+                                            ...updated[idx],
+                                            name: p.name,
+                                            description: p.description || ""
+                                          };
+                                          return updated;
+                                        });
+                                        setDropdown(idx, false);
+                                      }}
                                     >
-                                      {p.name}
+                                      <div>
+                                        <div className="font-semibold">{p.name}</div>
+                                        {p.description && (
+                                          <div className="text-xs text-green-600 mt-1">{p.description}</div>
+                                        )}
+                                      </div>
                                     </div>
                                   ))}
                                 </div>
                               )}
                             </div>
 
-                            {/* Description */}
-                            <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
-                              <label className="block text-sm font-bold text-green-800 mb-2" htmlFor={`medicine-desc-${idx}`}>
-                                Medicine Description*
-                              </label>
-                              <textarea
-                                id={`medicine-desc-${idx}`}
-                                value={product.description || ""}
-                                onChange={e => handleProductChange(idx, "description", e.target.value)}
-                                className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 resize-none"
-                                placeholder="e.g., Broad-spectrum antibiotic for treating bacterial infections"
-                                rows={3}
-                                required
-                              />
-                              <p className="text-xs text-green-600 mt-1">Detailed description of the medicine</p>
-                            </div>
+                            {/* Description - only for new products */}
+                            {product.name && isNewProduct(product.name) ? (
+                              <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                                <label className="block text-sm font-bold text-green-800 mb-2" htmlFor={`medicine-desc-${idx}`}>
+                                  Medicine Description*
+                                </label>
+                                <textarea
+                                  id={`medicine-desc-${idx}`}
+                                  value={product.description || ""}
+                                  onChange={e => handleProductChange(idx, "description", e.target.value)}
+                                  className="w-full border-2 border-green-200 rounded-lg px-3 md:px-4 py-2 md:py-3 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 resize-none"
+                                  placeholder="e.g., Broad-spectrum antibiotic for treating bacterial infections"
+                                  rows={3}
+                                  required
+                                />
+                                <p className="text-xs text-green-600 mt-1">Detailed description of the medicine</p>
+                              </div>
+                            ) : product.name && (
+                              <div className="bg-green-50 rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
+                                <label className="block text-sm font-bold text-green-800 mb-2">Medicine Description</label>
+                                <div className="text-gray-700 bg-white border border-green-200 rounded px-3 py-2 min-h-[60px]">
+                                  {product.description || "No description available"}
+                                </div>
+                                <p className="text-xs text-green-600 mt-1">From existing product</p>
+                              </div>
+                            )}
 
                             {/* Good For Animals */}
                             <div className="bg-white rounded-xl p-3 md:p-4 border border-green-200 shadow-sm">
@@ -823,9 +866,30 @@ export default function InvoicesPage() {
                                 <div
                                   key={i}
                                   className="px-4 py-2 cursor-pointer hover:bg-green-100 text-green-900"
-                                  onMouseDown={() => handleProductChange(idx, "name", p.name)}
+                                  onMouseDown={() => {
+                                    // Load full existing product data
+                                    setProducts(products => {
+                                      const updated = [...products];
+                                      updated[idx] = {
+                                        ...updated[idx],
+                                        name: p.name,
+                                        description: p.description || "",
+                                        // Only set kgPerUnit if the existing product has it
+                                        kgPerUnit: p.kgPerUnit || updated[idx].kgPerUnit || undefined
+                                      };
+                                      return updated;
+                                    });
+                                    setDropdown(idx, false);
+                                  }}
                                 >
-                                  {p.name}
+                                  <div>
+                                    <div className="font-semibold">{p.name}</div>
+                                    {p.kgPerUnit ? (
+                                      <div className="text-xs text-green-600">Weight: {p.kgPerUnit} kg/unit</div>
+                                    ) : (
+                                      <div className="text-xs text-orange-600">⚠️ Missing weight info - will need input</div>
+                                    )}
+                                  </div>
                                 </div>
                               ))}
                             </div>
@@ -861,21 +925,36 @@ export default function InvoicesPage() {
                           />
                           <span className="text-xs text-gray-500">Enter the number of units</span>
                         </div>
-                        <div className="flex flex-col w-32">
-                          <label className="text-xs text-green-800 font-semibold mb-1" htmlFor={`kgperunit-${idx}`}>Kilograms per Unit*</label>
-                          <input
-                            id={`kgperunit-${idx}`}
-                            type="number"
-                            min={1}
-                            step={0.01}
-                            placeholder="e.g. 40"
-                            value={product.kgPerUnit || ""}
-                            onChange={e => handleProductChange(idx, "kgPerUnit", Number(e.target.value))}
-                            className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
-                            required
-                          />
-                          <span className="text-xs text-gray-500">Enter the weight in kilograms for each unit</span>
-                        </div>
+                        {/* Conditionally show kgPerUnit field */}
+                        {shouldShowKgInput(product.name) ? (
+                          <div className="flex flex-col w-32">
+                            <label className="text-xs text-green-800 font-semibold mb-1" htmlFor={`kgperunit-${idx}`}>Kilograms per Unit*</label>
+                            <input
+                              id={`kgperunit-${idx}`}
+                              type="number"
+                              min={1}
+                              step={0.01}
+                              placeholder="e.g. 40"
+                              value={product.kgPerUnit || ""}
+                              onChange={e => handleProductChange(idx, "kgPerUnit", Number(e.target.value))}
+                              className="border border-green-200 rounded px-3 py-2 w-full text-gray-900"
+                              required
+                            />
+                            <span className="text-xs text-gray-500">
+                              {isNewProduct(product.name) 
+                                ? "Enter the weight in kilograms for each unit" 
+                                : "Product exists but missing weight - please enter"}
+                            </span>
+                          </div>
+                        ) : product.name && (
+                          <div className="flex flex-col w-32">
+                            <label className="text-xs text-green-800 font-semibold mb-1">Weight per Unit</label>
+                            <div className="bg-green-50 border border-green-200 rounded px-3 py-2 w-full text-green-800 font-semibold">
+                              {product.kgPerUnit || "—"} kg
+                            </div>
+                            <span className="text-xs text-green-600">From existing product</span>
+                          </div>
+                        )}
                         <div className="flex flex-row gap-2 w-full items-end">
                           <div className="flex flex-col w-36">
                             <label className="text-xs text-green-800 font-semibold mb-1" htmlFor={`price-${idx}`}>Unit Price (MAD)*</label>
@@ -997,7 +1076,9 @@ export default function InvoicesPage() {
                 <tbody>
                   {invoices.map((inv, idx) => (
                     <tr key={inv._id} className={idx % 2 === 0 ? "bg-white" : "bg-green-50" + " border-b hover:bg-green-100 transition-all"}>
-                      <td className="px-4 py-2 font-semibold text-green-800">{inv.invoiceNumber}</td>
+                      <td className="px-4 py-2 font-semibold text-green-800">
+                        {inv.invoiceNumber || `INV-${inv._id?.slice(-6)}`}
+                      </td>
                       <td className="px-4 py-2 text-gray-900 font-medium">{inv.supplier?.entrepriseName || "-"}</td>
                       <td className="px-4 py-2">
                         <ul className="space-y-1">
@@ -1046,7 +1127,9 @@ export default function InvoicesPage() {
                   <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-bold text-white text-lg tracking-wide">#{inv.invoiceNumber}</h3>
+                        <h3 className="font-bold text-white text-lg tracking-wide">
+                          #{inv.invoiceNumber || `INV-${inv._id?.slice(-6)}`}
+                        </h3>
                         <p className="text-green-100 text-sm opacity-90">{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString() : "-"}</p>
                       </div>
                       <div className="text-right">
@@ -1167,7 +1250,7 @@ export default function InvoicesPage() {
             
             <div className="mb-6">
               <p className="text-gray-700 mb-2">
-                Are you sure you want to delete invoice <strong>#{invoiceToDelete.invoiceNumber}</strong>?
+                Are you sure you want to delete invoice <strong>#{invoiceToDelete.invoiceNumber || `INV-${invoiceToDelete._id?.slice(-6)}`}</strong>?
               </p>
               <div className="bg-gray-50 rounded p-3">
                 <p className="text-sm text-gray-600">

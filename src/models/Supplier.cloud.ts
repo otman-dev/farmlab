@@ -1,7 +1,7 @@
 import { Schema, Document, Connection, Model } from 'mongoose';
 
 export interface ISupplier extends Document {
-  name: string; // Contact person or main name
+  name?: string; // Contact person or main name - now optional
   entrepriseName: string;
   address: string;
   description?: string;
@@ -14,15 +14,15 @@ export interface ISupplier extends Document {
 }
 
 const SupplierSchema: Schema = new Schema<ISupplier>({
-  name: { type: String, required: true },
+  name: { type: String, required: false, default: '' }, // Make name optional
   entrepriseName: { type: String, required: true },
   address: { type: String, required: true },
-  description: { type: String },
-  phones: { type: [String], required: true, default: [] },
-  email: { type: String },
-  city: { type: String },
-  category: { type: String },
-  notes: { type: String },
+  description: { type: String, required: false, default: '' },
+  phones: { type: [String], required: false, default: [] }, // Make phones optional
+  email: { type: String, required: false, default: '' },
+  city: { type: String, required: false, default: '' },
+  category: { type: String, required: false, default: '' },
+  notes: { type: String, required: false, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 

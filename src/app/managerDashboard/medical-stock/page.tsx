@@ -33,6 +33,7 @@ interface MedicineUnitDetailed {
   isExpired: boolean;
   invoiceId?: string;
   createdAt: string;
+  
   updatedAt: string;
 }
 
@@ -112,6 +113,25 @@ export default function MedicalStockPage() {
   };
 
   const getQuantity = (productId: string) => {
+    // Prefer counting individual medicine units (unused and not expired) when available
+    const unitsForProduct = medicineUnits.filter(u => u.productId === productId);
+    if (unitsForProduct.length > 0) {
+      const availableCount = unitsForProduct.filter(u => !u.isUsed && !u.isExpired).length;
+      // If unit-level tracking exists but availableCount is 0 while the
+      // MedicalStock record still has quantity > 0, fall back to that quantity.
+      // This handles situations where unit flags may be inconsistent (e.g. timezone
+      // issues marking units expired) but the overall stock quantity is positive.
+      if (availableCount === 0) {
+        const stock = medicalStocks.find(s => s.productId === productId);
+        if (stock && stock.quantity > 0) {
+          console.warn(`Available units computed as 0 for product ${productId} from unit flags; falling back to MedicalStock.quantity=${stock.quantity}`);
+          return stock.quantity;
+        }
+      }
+      return availableCount;
+    }
+
+    // Fallback to MedicalStock.quantity when no unit-level tracking exists
     const stock = medicalStocks.find(s => s.productId === productId);
     return stock ? stock.quantity : 0;
   };
@@ -414,11 +434,12 @@ export default function MedicalStockPage() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredProducts.map(product => {
-                      const quantity = getQuantity(product._id);
+                      const availableCount = getQuantity(product._id);
                       const isIncPending = pending[product._id + "increment"];
                       const isDecPending = pending[product._id + "decrement"];
                       const lastUpdated = getLastUpdated(product._id);
                       const productUnits = getProductUnits(product._id);
+                      const totalUnits = productUnits.length > 0 ? productUnits.length : getQuantity(product._id);
                       const expiredCount = productUnits.filter(u => u.isExpired).length;
                       const expiringSoonCount = productUnits.filter(u => !u.isExpired && !u.isUsed && isExpiringSoon(u.expirationDate)).length;
                       
@@ -435,7 +456,7 @@ export default function MedicalStockPage() {
                             <div className="flex-1">
                               <div className="font-bold text-green-900 text-lg truncate">{product.name}</div>
                               <div className="text-xs text-gray-500">
-                                {productUnits.length} total units • Last updated: {formatDate(lastUpdated)}
+                                {totalUnits} total units • Last updated: {formatDate(lastUpdated)}
                               </div>
                             </div>
                           </div>
@@ -443,15 +464,15 @@ export default function MedicalStockPage() {
                           {/* Progress Bar */}
                           <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
                             <div
-                              className={`${getProgressBar(quantity)} h-3 rounded-full transition-all duration-300`}
-                              style={{ width: `${Math.min(quantity, 30) / 30 * 100}%` }}
+                              className={`${getProgressBar(availableCount)} h-3 rounded-full transition-all duration-300`}
+                              style={{ width: `${Math.min(availableCount, 30) / 30 * 100}%` }}
                             />
                           </div>
                           
                           {/* Stock Status and Actions */}
                           <div className="flex items-center justify-between gap-2 mb-4">
-                            <span className={`inline-block px-3 py-1 rounded-full border text-sm font-bold ${getStockBadge(quantity)} transition-all duration-200`}>
-                              {quantity} available
+                            <span className={`inline-block px-3 py-1 rounded-full border text-sm font-bold ${getStockBadge(availableCount)} transition-all duration-200`}>
+                              {availableCount} available
                             </span>
                             <div className="flex gap-2">
                               <button
@@ -464,7 +485,7 @@ export default function MedicalStockPage() {
                               </button>
                               <button
                                 className="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 text-base shadow disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={isDecPending || quantity === 0}
+                                disabled={isDecPending || availableCount === 0}
                                 onClick={() => updateUnits(product._id, "decrement")}
                                 title="Remove unit"
                               >

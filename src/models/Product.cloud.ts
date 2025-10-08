@@ -5,7 +5,7 @@ export interface IProduct extends Document {
   category: 'animal_feed' | 'animal_medicine' | 'plant_seeds' | 'plant_seedlings' | 'plant_nutrition' | 'plant_medicine';
   price?: number;
   kilogramQuantity?: number; // animal_feed only - DEPRECATED, use kgPerUnit
-  kgPerUnit?: number; // animal_feed only - kilograms per unit/package
+  kgPerUnit?: number; // animal_feed and weight-based plant_seeds - kilograms per unit/package
   unitPrice?: number; // animal_feed only, auto-calculated
   unitCount?: number; // animal_feed only
   total?: number; // animal_feed only, auto-calculated
@@ -15,6 +15,8 @@ export interface IProduct extends Document {
   goodFor?: string[];
   amountPerUnit?: number;
   unit?: string;
+  // Plant seeds specific
+  unitType?: 'weight' | 'count'; // For plant_seeds: weight-based (kg) or count-based (seed quantity)
   // Plant-specific fields
   seedType?: string; // For seeds - type classification
   plantingInstructions?: string; // For seeds/seedlings
@@ -31,7 +33,7 @@ const ProductSchema: Schema = new Schema<IProduct>({
   },
   price: { type: Number },
   kilogramQuantity: { type: Number }, // DEPRECATED - keeping for backward compatibility
-  kgPerUnit: { type: Number }, // animal_feed only - kilograms per unit/package
+  kgPerUnit: { type: Number }, // animal_feed and weight-based plant_seeds - kilograms per unit/package
   unitPrice: { type: Number },
   unitCount: { type: Number },
   total: { type: Number },
@@ -41,6 +43,8 @@ const ProductSchema: Schema = new Schema<IProduct>({
   goodFor: [{ type: String }],
   amountPerUnit: { type: Number },
   unit: { type: String },
+  // Plant seeds specific
+  unitType: { type: String, enum: ['weight', 'count'] }, // For plant_seeds
   // Plant-specific fields
   seedType: { type: String }, // For seeds
   plantingInstructions: { type: String }, // For seeds/seedlings

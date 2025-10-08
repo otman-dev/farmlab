@@ -5,6 +5,7 @@ import { getFoodStockModel } from '@/models/FoodStock.cloud';
 import { getMedicalStockModel } from '@/models/MedicalStock.cloud';
 import { getMedicineUnitModel } from '@/models/MedicineUnit.cloud';
 import { getProductModel } from '@/models/Product.cloud';
+import { getPlantStockModel } from '@/models/PlantStock.cloud';
 import { getSupplierModel } from '@/models/Supplier.cloud';
 
 export async function POST(req: NextRequest) {
@@ -91,15 +92,23 @@ export async function POST(req: NextRequest) {
     );
     
     // Create invoice
-    const invoice = await Invoice.create({
+    const invoiceData = {
       supplier: {
         _id: supplier._id,
-        name: supplier.name,
+        name: supplier.name || '', // Provide empty string as fallback to satisfy validation
         entrepriseName: supplier.entrepriseName
       },
       products: productsWithCalcs,
       grandTotal,
       invoiceDate: date ? new Date(date) : new Date()
+    };
+    
+    console.log('Creating invoice with data:', JSON.stringify(invoiceData, null, 2));
+    const invoice = await Invoice.create(invoiceData);
+    console.log('Invoice created successfully:', {
+      _id: invoice._id,
+      invoiceNumber: invoice.invoiceNumber,
+      supplier: invoice.supplier
     });
 
     // Update food and medical stock automatically
@@ -110,7 +119,7 @@ export async function POST(req: NextRequest) {
     const stockUpdates = [];
     
     for (const product of productsWithCalcs) {
-      if (product.quantity > 0 && (product.category === 'animal_feed' || product.category === 'animal_medicine')) {
+      if (product.quantity > 0 && (product.category === 'animal_feed' || product.category === 'animal_medicine' || ['plant_seeds','plant_seedlings','plant_nutrition','plant_medicine'].includes(product.category))) {
         try {
           // Find the product by name to get its ID
           const productDoc = await Product.findOne({ name: product.name });
@@ -231,6 +240,20 @@ export async function POST(req: NextRequest) {
                 }
               }
             }
+              else if (['plant_seeds','plant_seedlings','plant_nutrition','plant_medicine'].includes(product.category)) {
+                // Update plant stock quantities (simple increment)
+                const PlantStock = getPlantStockModel(conn);
+                let plantStock = await PlantStock.findOne({ productId });
+                if (plantStock) {
+                  const oldQuantity = plantStock.quantity;
+                  plantStock.quantity += product.quantity;
+                  await plantStock.save();
+                  stockUpdates.push(`Plant Stock - ${product.name}: ${oldQuantity} + ${product.quantity} = ${plantStock.quantity} units`);
+                } else {
+                  plantStock = await PlantStock.create({ productId, quantity: product.quantity });
+                  stockUpdates.push(`Plant Stock - ${product.name}: Created with ${product.quantity} units`);
+                }
+              }
           } else {
             console.warn(`Product not found in database: ${product.name}`);
             stockUpdates.push(`Warning: Product "${product.name}" not found in database`);
