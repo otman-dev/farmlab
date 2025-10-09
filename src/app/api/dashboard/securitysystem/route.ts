@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb-client';
+import getSensorLogsCollection from '@/lib/mongodb-preview-client';
 
 export async function GET() {
   try {
-    const client = await clientPromise;
-    const db = client.db('farmLab');
-    // Get the latest log from securitySystem01_logs
-    const doc = await db.collection('securitySystem01_logs')
-      .find({})
+    const collection = await getSensorLogsCollection();
+    const doc = await collection
+      .find({ 'payload.device_id': 'securitySystem01' })
       .sort({ timestamp: -1 })
       .limit(1)
       .toArray();
@@ -16,7 +14,7 @@ export async function GET() {
     }
     return NextResponse.json({ log: doc[0] });
   } catch (error) {
-    console.error('Error fetching security log:', error);
+    console.error('Error fetching security log (preview):', error);
     return NextResponse.json({ error: 'Failed to fetch security log' }, { status: 500 });
   }
 }

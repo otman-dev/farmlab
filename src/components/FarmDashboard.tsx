@@ -26,25 +26,27 @@ export default function FarmDashboard() {
         const data = await res.json();
         
         if (res.ok && data.sensorStations?.length > 0) {
-          // Get the latest sensor data with air temp and humidity
-          interface SensorStation {
-            timestamp?: number;
-            device_id?: string;
-            sensors?: {
-              air_temp_c?: number;
-              air_humidity_percent?: number;
+          // Normalize preview schema
+          const normalized = (data.sensorStations as any[]).map((s) => {
+            const latest = s.latest || s;
+            const payload = latest.payload || {};
+            return {
+              device_id: s.device_id || payload.device_id || s.device_id,
+              sensors: payload.sensors || latest.sensors || {},
+              timestamp: payload.datetime_unix || (latest.datetime_unix ?? latest.timestamp) || 0,
             };
-          }
-          const latestStation = (data.sensorStations as SensorStation[])
-            .filter((station: SensorStation) => station.sensors?.air_temp_c !== undefined || station.sensors?.air_humidity_percent !== undefined)
-            .sort((a: SensorStation, b: SensorStation) => (b.timestamp || 0) - (a.timestamp || 0))[0];
-          
+          });
+
+          const latestStation = normalized
+            .filter((station) => station.sensors && (station.sensors.air_temp_c !== undefined || station.sensors.air_humidity_percent !== undefined))
+            .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0];
+
           if (latestStation) {
             setSensorData({
-              air_temp_c: latestStation.sensors?.air_temp_c,
-              air_humidity_percent: latestStation.sensors?.air_humidity_percent,
+              air_temp_c: latestStation.sensors.air_temp_c,
+              air_humidity_percent: latestStation.sensors.air_humidity_percent,
               timestamp: latestStation.timestamp,
-              device_id: latestStation.device_id
+              device_id: latestStation.device_id,
             });
             setConnectionStatus('connected');
           }

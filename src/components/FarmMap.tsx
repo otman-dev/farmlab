@@ -29,22 +29,27 @@ export default function FarmMap({ latitude, longitude, locationName }: MapProps)
         
         if (res.ok && data.sensorStations?.length > 0) {
           // Get the latest sensor data with air temp and humidity
-          interface SensorStation {
-            timestamp?: number;
-            sensors?: {
-              air_temp_c?: number;
-              air_humidity_percent?: number;
+          // Normalize preview schema: server may return { device_id, latest } where latest.payload contains sensors
+          type RawStation = any;
+          const normalized = (data.sensorStations as RawStation[]).map((s) => {
+            const latest = s.latest || s; // support both shapes
+            const payload = latest.payload || {};
+            return {
+              device_id: s.device_id || payload.device_id || s.device_id,
+              sensors: payload.sensors || latest.sensors || {},
+              timestamp: payload.datetime_unix || (latest.datetime_unix ?? latest.timestamp) || 0,
             };
-          }
-          const latestStation = (data.sensorStations as SensorStation[])
-            .filter((station: SensorStation) => station.sensors?.air_temp_c !== undefined || station.sensors?.air_humidity_percent !== undefined)
-            .sort((a: SensorStation, b: SensorStation) => (b.timestamp || 0) - (a.timestamp || 0))[0];
-          
+          });
+
+          const latestStation = normalized
+            .filter((station) => station.sensors && (station.sensors.air_temp_c !== undefined || station.sensors.air_humidity_percent !== undefined))
+            .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0];
+
           if (latestStation) {
             setSensorData({
-              air_temp_c: latestStation.sensors?.air_temp_c,
-              air_humidity_percent: latestStation.sensors?.air_humidity_percent,
-              timestamp: latestStation.timestamp
+              air_temp_c: latestStation.sensors.air_temp_c,
+              air_humidity_percent: latestStation.sensors.air_humidity_percent,
+              timestamp: latestStation.timestamp,
             });
           }
         } else {

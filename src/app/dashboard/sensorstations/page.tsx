@@ -42,7 +42,21 @@ export default function SensorStationsPage() {
         const res = await fetch("/api/dashboard/sensorstations");
         const data = await res.json();
         if (res.ok) {
-          setStations(data.sensorStations || []);
+          // Normalize preview schema: server returns [{ device_id, latest }] or older shape
+          const normalized = (data.sensorStations || []).map((s: any) => {
+            const latest = s.latest || s;
+            const payload = latest.payload || {};
+            return {
+              _id: latest._id || s._id || `${payload.device_id}-${payload.datetime_unix}`,
+              device_id: s.device_id || payload.device_id || latest.device_id,
+              collection: s.collection || '',
+              source: payload.source || latest.source || '',
+              bridge: payload.bridge || latest.bridge || '',
+              timestamp: payload.datetime_unix || latest.datetime_unix || latest.timestamp || 0,
+              sensors: payload.sensors || latest.sensors || {},
+            } as SensorStation;
+          });
+          setStations(normalized);
         } else {
           setError(data.error || "Failed to fetch sensor stations");
         }

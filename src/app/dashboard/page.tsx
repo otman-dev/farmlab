@@ -314,6 +314,7 @@ function AdminDashboard() {
   const totalDevices = devices.length;
   const onlineDevices = devices.filter(d => d.status === 'online').length;
   const offlineDevices = devices.filter(d => d.status === 'offline').length;
+  const maintenanceDevices = devices.filter(d => d.status === 'maintenance').length;
 
   return (
     <div>
@@ -323,7 +324,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 rounded-md bg-blue-100 p-3">
@@ -361,6 +362,20 @@ function AdminDashboard() {
               <h3 className="text-lg font-medium text-gray-900">Offline</h3>
               <div className="mt-1 text-3xl font-semibold text-gray-800">
                 {loading ? '...' : offlineDevices}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 rounded-md bg-purple-100 p-3">
+              <FiShield className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="ml-5">
+              <h3 className="text-lg font-medium text-gray-900">Maintenance</h3>
+              <div className="mt-1 text-3xl font-semibold text-gray-800">
+                {loading ? '...' : maintenanceDevices}
               </div>
             </div>
           </div>
@@ -426,8 +441,8 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {devices.slice(0, 5).map((device) => (
-                  <tr key={device._id} className="hover:bg-gray-50">
+                {devices.slice(0, 5).map((device, idx) => (
+                  <tr key={device._id ?? device.device_id ?? `device-${idx}`} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{device.name}</div>
                     </td>

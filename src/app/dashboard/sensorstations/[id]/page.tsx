@@ -85,12 +85,24 @@ export default function SensorStationDetailPage() {
         const res = await fetch(`/api/dashboard/sensorstations/${id}`);
         const data = await res.json();
         if (res.ok) {
-          setReadings(data.readings || []);
+          // Normalize preview readings: each reading may be { payload: { sensors, datetime_unix, device_id } }
+          const rawReadings = data.readings || [];
+          const normalized = rawReadings.map((r: any) => {
+            const payload = r.payload || r;
+            return {
+              _id: r._id || payload._id || `${payload.device_id || id}-${payload.datetime_unix || payload.datetime_unix}`,
+              device_id: payload.device_id || r.device_id || id,
+              sensors: payload.sensors || r.sensors || {},
+              datetime_unix: payload.datetime_unix || r.datetime_unix || r.timestamp || 0,
+            } as Reading;
+          }).sort((a: Reading, b: Reading) => a.datetime_unix - b.datetime_unix);
+
+          setReadings(normalized);
           setDataRange(data.dataRange || null);
-          
+
           // Initialize sensor configs
-          if (data.readings && data.readings.length > 0) {
-            const sensors = Object.keys(data.readings[0].sensors);
+          if (normalized.length > 0) {
+            const sensors = Object.keys(normalized[0].sensors);
             const configs: Record<string, SensorConfig> = {};
             sensors.forEach((sensor, index) => {
               configs[sensor] = {

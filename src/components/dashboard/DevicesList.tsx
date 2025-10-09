@@ -100,6 +100,8 @@ export default function DevicesList() {
         return 'text-green-500';
       case 'offline':
         return 'text-red-500';
+      case 'maintenance':
+        return 'text-purple-600';
       default:
         return 'text-yellow-500';
     }
@@ -114,6 +116,8 @@ export default function DevicesList() {
         return 'bg-green-100 text-green-800';
       case 'offline':
         return 'bg-red-100 text-red-800';
+      case 'maintenance':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-yellow-100 text-yellow-800';
     }
@@ -191,7 +195,8 @@ export default function DevicesList() {
                     </div>
                     <div className={device.status === 'online' ? 'text-green-600' : 'text-gray-600'}>
                       <HeartbeatIndicator 
-                        lastHeartbeat={device.last_heartbeat}
+                        // preview API returns `last_seen` (ISO string); fall back to that
+                        lastHeartbeat={device.last_heartbeat ?? device.last_seen ?? device.last_seen_formatted}
                         status={device.status}
                         size="sm"
                       />
