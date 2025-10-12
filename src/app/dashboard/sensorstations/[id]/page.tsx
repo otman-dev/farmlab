@@ -85,17 +85,21 @@ export default function SensorStationDetailPage() {
         const res = await fetch(`/api/dashboard/sensorstations/${id}`);
         const data = await res.json();
         if (res.ok) {
-          // Normalize preview readings: each reading may be { payload: { sensors, datetime_unix, device_id } }
+          // Normalize readings from history database: each reading is { payload: { sensors, datetime_unix, device_id } }
           const rawReadings = data.readings || [];
           const normalized = rawReadings.map((r: any) => {
             const payload = r.payload || r;
             return {
-              _id: r._id || payload._id || `${payload.device_id || id}-${payload.datetime_unix || payload.datetime_unix}`,
-              device_id: payload.device_id || r.device_id || id,
-              sensors: payload.sensors || r.sensors || {},
-              datetime_unix: payload.datetime_unix || r.datetime_unix || r.timestamp || 0,
+              _id: r._id || `${payload.device_id || id}-${payload.datetime_unix}`,
+              device_id: payload.device_id || id,
+              sensors: payload.sensors || {},
+              // Strictly use datetime_unix from payload
+              datetime_unix: payload.datetime_unix || 0,
             } as Reading;
-          }).sort((a: Reading, b: Reading) => a.datetime_unix - b.datetime_unix);
+          })
+          // Make sure readings are sorted by datetime_unix
+          .filter((r: Reading) => r.datetime_unix > 0) // Filter out any readings with invalid timestamps
+          .sort((a: Reading, b: Reading) => a.datetime_unix - b.datetime_unix);
 
           setReadings(normalized);
           setDataRange(data.dataRange || null);
@@ -112,6 +116,14 @@ export default function SensorStationDetailPage() {
             });
             setSensorConfigs(configs);
           }
+          
+          // Log the data range for debugging
+          console.log('Data range:', {
+            count: normalized.length,
+            from: normalized.length > 0 ? new Date(normalized[0].datetime_unix * 1000).toISOString() : 'none',
+            to: normalized.length > 0 ? new Date(normalized[normalized.length - 1].datetime_unix * 1000).toISOString() : 'none',
+            apiRange: data.dataRange
+          });
         } else {
           setError(data.error || "Failed to fetch readings");
         }
@@ -132,8 +144,23 @@ export default function SensorStationDetailPage() {
         const res = await fetch(`/api/dashboard/sensorstations/${id}`);
         const data = await res.json();
         if (res.ok) {
-          setReadings(data.readings || []);
+          // Process readings the same way as in the initial load
+          const rawReadings = data.readings || [];
+          const normalized = rawReadings.map((r: any) => {
+            const payload = r.payload || r;
+            return {
+              _id: r._id || `${payload.device_id || id}-${payload.datetime_unix}`,
+              device_id: payload.device_id || id,
+              sensors: payload.sensors || {},
+              datetime_unix: payload.datetime_unix || 0,
+            } as Reading;
+          })
+          .filter((r: Reading) => r.datetime_unix > 0)
+          .sort((a: Reading, b: Reading) => a.datetime_unix - b.datetime_unix);
+          
+          setReadings(normalized);
           setDataRange(data.dataRange || null);
+          console.log("Auto-refresh successful, fetched", normalized.length, "readings");
         }
       } catch (err) {
         console.error("Auto-refresh failed:", err);
@@ -288,6 +315,20 @@ export default function SensorStationDetailPage() {
   const setLast24Hours = () => {
     if (!availableDataRange) return;
     
+    // Always prefer using the latest reading from our data set
+    if (readings.length > 0) {
+      const latestReading = readings[readings.length - 1];
+      const end = new Date(latestReading.datetime_unix * 1000);
+      const start = new Date(end.getTime() - (24 * 60 * 60 * 1000));
+      
+      setCustomDateRange({
+        start: start.toISOString().slice(0, 16),
+        end: end.toISOString().slice(0, 16)
+      });
+      return;
+    }
+    
+    // Fallback to availableDataRange
     const end = new Date(availableDataRange.latest + ':00'); // Add seconds
     const start = new Date(end.getTime() - (24 * 60 * 60 * 1000));
     
