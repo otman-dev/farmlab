@@ -9,8 +9,10 @@ import {
   FiUsers, 
   FiServer,
   FiActivity,
-  FiBarChart
+  FiBarChart,
+  FiThermometer
 } from "react-icons/fi";
+import SensorStationsComparisonChart from "@/components/dashboard/SensorStationsComparisonChart";
 
 export default function AdminDashboardPage() {
   const roleCards = [
@@ -169,6 +171,25 @@ export default function AdminDashboardPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Sensor Stations Comparison Chart */}
+      <div className="mt-8 mb-8">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FiThermometer className="text-blue-600" size={20} />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900">Sensor Stations Overview</h3>
+          </div>
+          <Link 
+            href="/dashboard/sensorstations"
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            View All Stations →
+          </Link>
+        </div>
+        <SensorStationsComparisonChart />
       </div>
 
       {/* Quick Actions */}
