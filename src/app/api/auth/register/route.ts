@@ -5,8 +5,17 @@ import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
   try {
+    // For direct API requests from the regular registration form,
+    // we want to create a pending user that must complete the multistep registration
     const body = await request.json();
     console.log("Registration request received:", { ...body, password: '[REDACTED]' });
+    
+    // If user is already authenticated with OAuth and completing their profile
+    if (body.googleAuthenticated) {
+      console.log('OAuth user completing profile - processing normally');
+    } else {
+      console.log('Direct registration attempt - will create pending user that must complete the multistep form');
+    }
     
     const { 
       email, 
@@ -83,13 +92,15 @@ export async function POST(request: NextRequest) {
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create user with waiting_list role using direct collection insert
+    // Create user with pending role so they must complete multistep registration
     const userData = {
       email: email.toLowerCase(),
       password: hashedPassword,
       name: full_name,
       phone: phone || '',
-      role: userRole, // Use the derived role (will be 'waiting_list')
+      role: 'pending', // Force pending role to require multistep registration completion
+      registrationCompleted: false, // Mark as incomplete
+      googleAuthenticated: false, // This is a regular email registration
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -125,9 +136,10 @@ export async function POST(request: NextRequest) {
     console.log("Registration response saved:", { responseId });
 
     return NextResponse.json({
-      message: "Registration successful! You've been added to our waitlist.",
+      message: "Registration started! Please complete your profile to continue.",
       userId: userId,
-      responseId: responseId
+      responseId: responseId,
+      redirectTo: "/auth/complete-profile"
     }, { status: 201 });
 
   } catch (error) {

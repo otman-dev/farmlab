@@ -12,6 +12,8 @@ interface UncontrolledInputProps {
 	showPassword?: boolean;
 	onTogglePassword?: () => void;
 	onChange: (id: string, value: string) => void;
+	// Flag to indicate if this is for an OAuth user
+	isOAuthUser?: boolean;
 }
 
 // Completely uncontrolled input that never loses focus
@@ -25,7 +27,8 @@ export const UncontrolledInput: React.FC<UncontrolledInputProps> = ({
 	error,
 	showPassword,
 	onTogglePassword,
-	onChange
+	onChange,
+	isOAuthUser
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	
@@ -50,6 +53,7 @@ export const UncontrolledInput: React.FC<UncontrolledInputProps> = ({
 			<label htmlFor={id} className="block font-semibold mb-2 text-gray-900">
 				{label}
 				{required && <span className="text-red-500 ml-1">*</span>}
+				{id === 'country' && isOAuthUser && <span className="ml-2 text-sm font-normal text-blue-600">(Required for Google sign-in)</span>}
 			</label>
 			<div className="relative">
 				<input
@@ -60,7 +64,9 @@ export const UncontrolledInput: React.FC<UncontrolledInputProps> = ({
 					className={`w-full px-4 py-3 sm:py-4 rounded-xl border-2 transition-all text-base sm:text-lg font-medium ${
 						error 
 							? 'border-red-400 focus:border-red-500 focus:ring-red-200 bg-red-50 text-red-900 placeholder-red-400' 
-							: 'border-gray-300 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500'
+							: id === 'country' && isOAuthUser 
+								? 'border-blue-300 focus:border-blue-500 focus:ring-blue-200 bg-blue-50 hover:border-blue-400 text-blue-900 placeholder-blue-400'
+								: 'border-gray-300 focus:border-green-500 focus:ring-green-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500'
 					} focus:outline-none focus:ring-4 shadow-sm hover:shadow-md focus:shadow-lg`}
 					onInput={handleInput}
 					placeholder={`Enter your ${label.toLowerCase()}`}
@@ -92,7 +98,10 @@ export const UncontrolledInput: React.FC<UncontrolledInputProps> = ({
 					<svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 					</svg>
-					{error}
+					{/* Special handling for country field if it's an OAuth user */}
+					{id === 'country' && isOAuthUser ? 
+						'Country is required even with Google sign-in' : 
+						error}
 				</div>
 			)}
 		</div>

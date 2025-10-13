@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FiUsers, FiTrendingUp, FiTarget, FiHeart, FiBookOpen, FiCode, FiSearch, FiMonitor, FiMapPin, FiMail, FiBarChart2 } from "react-icons/fi";
 import LaunchCountdown from "@/components/LaunchCountdown";
 import Footer from "@/components/Footer";
+import LogoutButton from "@/components/LogoutButton";
 import { useI18n } from "./LanguageProvider";
 
 export default function RootContent() {
@@ -13,6 +14,7 @@ export default function RootContent() {
   return (
     <>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-16 lg:py-24">
+
         <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
           <div className="lg:col-span-7 text-center lg:text-left mb-10 lg:mb-0">
             <div className="flex items-center justify-center lg:justify-start mb-6">
@@ -698,7 +700,7 @@ export default function RootContent() {
               {t("cta.description")}
             </p>
             
-            {/* CTA buttons */}
+            {/* CTA buttons - Both go to Google OAuth */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Link
                 href="/auth/register"
@@ -709,7 +711,7 @@ export default function RootContent() {
               </Link>
               
               <Link
-                href="/auth/signin"
+                href="/auth/register"
                 className="w-full sm:w-auto flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:bg-opacity-10 transition-all duration-300"
                 aria-label={t("cta.secondary")}
               >

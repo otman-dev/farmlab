@@ -3,8 +3,8 @@
 
 import { MongoClient } from 'mongodb';
 
-// Using the connection string with auth source parameter and farmLab database
-const uri = process.env.MONGODB_URI || 'mongodb://rasmus:wordpiss@adro.ddns.net:27017/farmLab?authSource=admin';
+// Using the MongoDB Atlas connection string
+const uri = process.env.MONGODB_URI || 'mongodb+srv://mouhib_db_user:Hhk7qIiF5lUjNf2b@farm-cluster-01.mxvp7p0.mongodb.net/farmLab';
 
 // Log the actual URI being used (with credentials masked)
 console.log(`MONGODB_URI from env or default in mongodb-client.ts: ${uri.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')}`);

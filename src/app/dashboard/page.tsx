@@ -31,6 +31,22 @@ export default function Dashboard() {
     );
   }
 
+  console.log('Dashboard page: User has role:', user.role);
+  
+  // Redirect waiting_list users
+  if (user.role === 'waiting_list') {
+    // We should handle this in middleware, but as a backup:
+    typeof window !== 'undefined' && window.location.replace('/comingsoon');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500 mb-4"></div>
+          <p>Redirecting to waiting list page...</p>
+        </div>
+      </div>
+    );
+  }
+  
   // Show visitor presentation dashboard
   if (user.role === 'visitor') {
     return <VisitorPresentation />;

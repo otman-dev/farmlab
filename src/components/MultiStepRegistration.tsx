@@ -3,6 +3,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { FiArrowRight, FiArrowLeft, FiCheckCircle, FiTarget, FiChevronDown, FiChevronUp, FiUsers } from "react-icons/fi";
 import { UncontrolledInput } from "./UncontrolledInput";
+import { useI18n } from "./LanguageProvider";
 
 // Define types first
 type FormDataType = Record<string, string | string[] | number | boolean | undefined>;
@@ -32,9 +33,17 @@ const formJson = {
 					   { "id": "full_name", "label": "Full Name", "type": "text", "required": true },
 					   { "id": "email", "label": "Email Address", "type": "email", "required": true },
 					   { "id": "password", "label": "Create Password", "type": "password", "required": true, "minLength": 8 },
-					   { "id": "country", "label": "Country / Region", "type": "text", "required": true },
+					   { "id": "country", "label": "Country / Region", "type": "text", "required": true }, // Always required, even with OAuth
 					   { "id": "organization", "label": "Organization / Farm / Company Name", "type": "text", "required": false }
 				   ]
+			},
+			{
+				"id": "oauth_basic_info",
+				"title": "Complete Your Profile",
+				"questions": [
+					{ "id": "country", "label": "Country / Region", "type": "text", "required": true },
+					{ "id": "organization", "label": "Organization / Farm / Company Name", "type": "text", "required": false }
+				]
 			},
 			{
 				"id": "user_type",
@@ -159,9 +168,176 @@ const branchLogic: { [key: string]: string } = {
 		"from-cyan-200 via-teal-200 to-green-200"
 	];
 
-	export default function MultiStepRegistration() {
-		const [stepIndex, setStepIndex] = useState<number>(0);
-		const [formData, setFormData] = useState<FormDataType>({});
+	// Define props for OAuth data
+interface MultiStepRegistrationProps {
+	googleOAuthData?: {
+		name?: string;
+		email?: string;
+		googleAuthenticated?: boolean;
+		token?: string;
+	};
+	searchParams?: URLSearchParams;
+	forceProfileCompletion?: boolean;
+}
+
+export default function MultiStepRegistration({ 
+	googleOAuthData, 
+	searchParams, 
+	forceProfileCompletion = false 
+}: MultiStepRegistrationProps = {}) {
+		const { t } = useI18n();
+		
+		// Extract token data if available
+const [tokenData, setTokenData] = useState<any>(null);
+		
+React.useEffect(() => {
+		// Try to parse token from props, URL, or localStorage
+		console.log('MultiStepRegistration: Checking for token data', {
+			hasGoogleOAuthData: !!googleOAuthData,
+			hasGoogleOAuthToken: !!(googleOAuthData?.token),
+			hasSearchParams: !!searchParams,
+			tokenFromParams: searchParams?.get('token')
+		});
+		
+		let token = googleOAuthData?.token || (searchParams ? searchParams.get('token') : null);
+		
+		// If no token in props or URL, try localStorage
+		if (!token) {
+			try {
+				const storedToken = localStorage.getItem('pendingUserToken');
+				if (storedToken) {
+					console.log('MultiStepRegistration: Found token in localStorage');
+					token = storedToken;
+				}
+			} catch (e) {
+				console.error('MultiStepRegistration: Failed to read localStorage:', e);
+			}
+		}
+		
+		if (token) {
+			try {
+				const parsed = JSON.parse(decodeURIComponent(token));
+				setTokenData(parsed);
+				console.log('MultiStepRegistration: Parsed token data:', parsed);
+				
+				// If we have token data, immediately set the step to 1 (first input form)
+				if (parsed && parsed.email) {
+					// If we're in an OAuth flow, skip to the minimal OAuth form by setting stepIndex=1
+					setStepIndex(0);
+				}
+			} catch (e) {
+				console.error('MultiStepRegistration: Failed to parse token:', e);
+			}
+		} else {
+			console.log('MultiStepRegistration: No token found in props or URL');
+		}
+	}, [googleOAuthData?.token, searchParams]);		// Log initialization for debugging
+		console.log("MultiStepRegistration initialized with OAuth data:", googleOAuthData ? {
+			name: googleOAuthData.name,
+			email: googleOAuthData.email,
+			googleAuthenticated: googleOAuthData.googleAuthenticated,
+			hasToken: !!googleOAuthData.token,
+			tokenData: tokenData ? 'present' : 'none'
+		} : 'No OAuth data');
+		
+		// For OAuth users, we start with the oauth_basic_info step
+		// For regular users, we start with the standard basic_info step
+		const startingStepIndex = 0; // Always start at first step
+		const [stepIndex, setStepIndex] = useState<number>(startingStepIndex);
+		
+	// Add a useEffect to handle forced profile completion and disable back button
+	React.useEffect(() => {
+		if (forceProfileCompletion) {
+			console.log('MultiStepRegistration: Force profile completion mode active');
+			
+			// Check if profile is already completed from localStorage
+			const isProfileCompleted = localStorage.getItem('profileCompleted') === 'true';
+			
+			// Only add restrictions if profile is not yet completed
+			if (!isProfileCompleted) {
+				// Add an event listener to prevent navigation away
+				const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+					// Check if we're navigating to the signout page
+					const navUrl = document?.activeElement?.getAttribute('href');
+					if (navUrl && navUrl.includes('/api/auth/signout')) {
+						// Allow navigation to signout without warning
+						return;
+					}
+					
+					e.preventDefault();
+					e.returnValue = 'You must complete your profile before leaving this page.';
+					return e.returnValue;
+				};
+				
+				// Disable the browser's back button
+				const handlePopState = () => {
+					window.history.pushState(null, document.title, window.location.href);
+					alert('You must complete your profile before navigating away.');
+				};
+				
+				window.history.pushState(null, document.title, window.location.href);
+				window.addEventListener('popstate', handlePopState);
+				window.addEventListener('beforeunload', handleBeforeUnload);
+				
+				return () => {
+					window.removeEventListener('popstate', handlePopState);
+					window.removeEventListener('beforeunload', handleBeforeUnload);
+				};
+			}
+		}
+	}, [forceProfileCompletion]);
+
+	// Create initial form data state based on OAuth status
+	const createInitialFormData = () => {
+		// First try to use explicit googleOAuthData from props
+		if (googleOAuthData && googleOAuthData.email) {
+			console.log('MultiStepRegistration: Using googleOAuthData to pre-fill form', {
+				name: googleOAuthData.name,
+				email: googleOAuthData.email
+			});
+			return {
+				full_name: googleOAuthData.name || '',
+				email: googleOAuthData.email || '',
+				googleAuthenticated: googleOAuthData.googleAuthenticated || false,
+				// We don't pre-fill country since it's required input from the user
+				country: '',
+				organization: ''
+			};
+		}
+		
+		// Then try to use token data if available
+		if (tokenData && tokenData.email) {
+			console.log('MultiStepRegistration: Using tokenData to pre-fill form', {
+				name: tokenData.name,
+				email: tokenData.email,
+				provider: tokenData.provider
+			});
+			return {
+				full_name: tokenData.name || '',
+				email: tokenData.email || '',
+				googleAuthenticated: tokenData.provider === 'google' || false,
+				country: '',
+				organization: ''
+			};
+		}
+		
+		// Default to empty form data
+		console.log('MultiStepRegistration: No OAuth data found, using empty form');
+		return {};
+	};		const [formData, setFormData] = useState<FormDataType>(createInitialFormData());
+		
+		// Update form data when token data changes
+		React.useEffect(() => {
+			if (tokenData && tokenData.email) {
+				console.log('MultiStepRegistration: Updating form data from token');
+				setFormData(prev => ({
+					...prev,
+					full_name: prev.full_name || tokenData.name || '',
+					email: prev.email || tokenData.email || '',
+					googleAuthenticated: prev.googleAuthenticated || tokenData.provider === 'google' || false,
+				}));
+			}
+		}, [tokenData]);
 		const [errors, setErrors] = useState<ErrorsType>({});
 		const [expanded, setExpanded] = useState<ExpandedType>({});
 		const [submitted, setSubmitted] = useState<boolean>(false);
@@ -176,8 +352,23 @@ const branchLogic: { [key: string]: string } = {
 		// Use useMemo to prevent rebuilding steps array on every render
 		const { steps, currentStep } = useMemo(() => {
 			console.log("Building steps array with selected roles:", formData["roles"]);
-			// Build the steps array dynamically by joining all selected role branches
-			const baseSteps = formJson.form.steps;
+			// For OAuth users, we use a modified steps array
+			const isOAuthUser = !!googleOAuthData;
+			
+			// Define base steps differently based on authentication method
+			const baseSteps = isOAuthUser 
+				? [formJson.form.steps.find(step => step.id === 'oauth_basic_info')] // Only use OAuth version for basic info
+				: [formJson.form.steps.find(step => step.id === 'basic_info')]; // Use standard version
+			
+			// Filter out any undefined steps (shouldn't happen, but just in case)
+			const filteredBaseSteps = baseSteps.filter(Boolean);
+			
+			// Add user type step which is common for both OAuth and regular users
+			const userTypeStep = formJson.form.steps.find(step => step.id === 'user_type');
+			if (userTypeStep) {
+				filteredBaseSteps.push(userTypeStep);
+			}
+			
 			const selectedRoles: string[] = Array.isArray(formData["roles"]) ? formData["roles"] : [];
 			const branches: Record<string, { title: string; questions: Question[] }> = formJson.branches;
 			// Get all matching branch keys in the order of selection
@@ -185,7 +376,7 @@ const branchLogic: { [key: string]: string } = {
 			
 			// Build steps: base, all selected branches, final
 			const calculatedSteps = [
-				...baseSteps,
+				...filteredBaseSteps,
 				...selectedBranchKeys.map(branchKey => {
 					const branch = branches[branchKey];
 					return branch ? { id: branchKey, title: branch.title, questions: branch.questions } : null;
@@ -215,6 +406,26 @@ const branchLogic: { [key: string]: string } = {
 						   isArray: Array.isArray(formData[q.id]),
 						   arrayLength: Array.isArray(formData[q.id]) ? (formData[q.id] as string[]).length : 'n/a'
 					   });
+					   
+					   // Special handling for OAuth users - skip password validation but ensure country is required
+					   const isOAuthUser = formData['googleAuthenticated'];
+					   
+					   // Skip required validation for password field if user is authenticated with OAuth
+					   if (q.id === 'password' && isOAuthUser) {
+						   // Password not required for OAuth users
+						   continue;
+					   }
+					   
+					   // Ensure country is always validated as required, regardless of authentication method
+					   if (q.id === 'country' && !formData[q.id]) {
+						   console.log(`Field "${q.id}" failed required validation`);
+						   // Use specific error message for OAuth users
+						   if (isOAuthUser) {
+							   stepErrors[q.id] = t("profile.country.required") || "Country is required even with Google sign-in";
+						   } else {
+							   stepErrors[q.id] = t("form.error.required");
+						   }
+					   }
 					   
 					   // @ts-expect-error: Some questions may not have required
 					   if (q.required && (!formData[q.id] || (Array.isArray(formData[q.id]) && formData[q.id].length === 0))) {
@@ -302,47 +513,241 @@ const branchLogic: { [key: string]: string } = {
 			setSubmitError(null);
 			
 			// Final validation of critical fields before submission
-			const requiredFields = {
-				'full_name': 'Full Name',
-				'email': 'Email',
-				'password': 'Password'
-			};
+			// For OAuth users, password is not required
+			const isOAuthUser = formData['googleAuthenticated'];
+			
+			console.log('MultiStepRegistration: Form submission attempt', { 
+				isOAuthUser,
+				fullName: formData['full_name'], 
+				email: formData['email'],
+				hasPassword: !!formData['password'],
+				country: formData['country'],
+				hasRoles: Array.isArray(formData['roles']) ? formData['roles'].length > 0 : false,
+				hasTokenData: !!tokenData,
+				forceProfileCompletion
+			});
+			
+			// If this is a forced profile completion from Google OAuth but we somehow lost the OAuth flag,
+			// try to recover it from the token data or the force flag
+			if (forceProfileCompletion && !formData['googleAuthenticated'] && (tokenData?.provider === 'google')) {
+				console.log('Recovering googleAuthenticated flag from token data');
+				formData['googleAuthenticated'] = true;
+			}
+			
+			// Double check if we should be in OAuth mode based on available data
+			const effectiveOAuthUser = isOAuthUser || (tokenData?.provider === 'google');
+			
+			// Expanded required fields to include country and roles
+			// For OAuth users, we still require country field explicitly
+			const requiredFields = effectiveOAuthUser 
+				? {
+					'full_name': 'Full Name',
+					'email': 'Email',
+					'country': 'Country', // Country is still required for OAuth users
+					'roles': 'Roles'
+				}
+				: {
+					'full_name': 'Full Name',
+					'email': 'Email',
+					'password': 'Password',
+					'country': 'Country',
+					'roles': 'Roles'
+				};
 			
 			const missingFields = Object.entries(requiredFields).filter(
-				([key]) => !formData[key]
-			).map(([/* key */, label]) => label);
+				([key]) => {
+					if (key === 'roles') {
+						// Special handling for roles which should be an array with at least one value
+						return !formData[key] || !Array.isArray(formData[key]) || formData[key].length === 0;
+					}
+					return !formData[key];
+				}
+			).map(([key, label]) => {
+				console.log(`Field check: ${key} - ${formData[key] ? 'present' : 'missing'}`);
+				return label;
+			});
 			
 			if (missingFields.length > 0) {
-				setSubmitError(`Missing required fields: ${missingFields.join(', ')}`);
+				console.error(`Form validation failed - missing fields: ${missingFields.join(', ')}`);
+				setSubmitError(t("form.error.missingFields") + `: ${missingFields.join(', ')}`);
 				return;
 			}
 			
 			if (validateStep()) {
 				try {
-					console.log('Submitting form data:', { ...formData, password: '[REDACTED]' });
-					const res = await fetch('/api/auth/register', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(formData),
+					console.log('Submitting form data:', { 
+						...formData, 
+						password: '[REDACTED]',
+						rolesCount: Array.isArray(formData.roles) ? formData.roles.length : 0
 					});
 					
+					// Use different endpoints for OAuth vs regular registration
+					const endpoint = formData['googleAuthenticated'] 
+					  ? '/api/auth/complete-profile'
+					  : '/api/auth/register';
+					
+					// Get token from localStorage if available - this helps with authentication
+					let tokenParam = '';
+					try {
+						const storedToken = localStorage.getItem('pendingUserToken');
+						if (storedToken) {
+							tokenParam = `?token=${encodeURIComponent(storedToken)}`;
+						}
+					} catch (e) {
+						console.error('Error accessing localStorage for token:', e);
+					}
+					
+					console.log(`Submitting form to endpoint: ${endpoint}${tokenParam}`);
+					const res = await fetch(`${endpoint}${tokenParam}`, {
+						method: 'POST',
+						headers: { 
+							'Content-Type': 'application/json',
+							'X-OAuth-Authentication': formData['googleAuthenticated'] ? 'true' : 'false',
+							// Include auth token in headers as well for redundancy
+							'X-Auth-Token': String(formData['token'] || localStorage.getItem('pendingUserToken') || ''),
+						},
+						body: JSON.stringify({
+							...formData,
+							// Include token data in the request body as well
+							_tokenData: localStorage.getItem('authTokenRaw') || null,
+						}),
+						// Include credentials to send cookies with the request
+						credentials: 'include',
+					});
+					
+					// Handle network errors
+					if (!res) {
+						console.error('Network error: No response received');
+						setSubmitError('Network error: Could not connect to server. Please try again.');
+						return;
+					}
+					
+					// Log response status
+					console.log(`Registration response status: ${res.status} ${res.statusText}`);
+					
 					const data = await res.json();
+					console.log('Registration response data:', data);
 					
 					if (!res.ok) {
 						console.error('Registration failed:', data);
+						
+						// Special handling for database connection errors (503 Service Unavailable)
+						if (res.status === 503 && (data.dbConnectionError || data.message?.includes('database'))) {
+							console.error('Database connection error during profile submission');
+							setSubmitError(t("errors.database.submitFailed") || 
+								"We're having trouble connecting to our database. Your profile will be saved when connectivity is restored. You can continue to the next step.");
+							
+							// Store the form data in localStorage as a fallback
+							try {
+								localStorage.setItem('pendingProfileData', JSON.stringify(formData));
+								localStorage.setItem('pendingProfileTimestamp', Date.now().toString());
+								console.log('Stored form data in localStorage as fallback');
+								
+								// Despite the error, we'll treat this as a successful submission
+								// This allows the user to proceed even when the DB is down
+								setSubmitted(true);
+								return;
+							} catch (e) {
+								console.error('Failed to store form data in localStorage:', e);
+							}
+						}
+						
+						// Handle standard validation errors
 						if (data.details && Array.isArray(data.details)) {
-							setSubmitError(`Registration failed: ${data.details.join(', ')}`);
+							setSubmitError(t("register.error.withDetails") + `: ${data.details.join(', ')}`);
 						} else {
-							setSubmitError(data.error || data.message || 'Registration failed.');
+							setSubmitError(data.error || data.message || t("register.error.generic"));
 						}
 						return;
 					}
 					
 					console.log('Registration successful:', data);
+					
+					// Verify that the role was updated to waiting_list
+					if (data.roleUpdated && data.currentRole === 'waiting_list') {
+						console.log(`Role successfully updated from ${data.previousRole} to ${data.currentRole}`);
+					} else {
+						console.warn('Role update status not confirmed in response');
+					}
+					
 					setSubmitted(true);
+					
+// For users who complete their profile, redirect to comingsoon page
+				// Make sure to force a session refresh first to get the new role
+				console.log('Registration complete, user now has waiting_list role');
+				
+					// Clear any stored pending user data
+					try {
+						localStorage.removeItem('pendingUserToken');
+						localStorage.removeItem('pendingUserCompletion');
+						localStorage.removeItem('pendingUserEmail');
+						localStorage.removeItem('pendingTimestamp');
+						
+						// Set the profileCompleted flag to prevent beforeunload warnings
+						localStorage.setItem('profileCompleted', 'true');
+						
+						// Remove any existing beforeunload handler
+						window.onbeforeunload = null;
+						
+						console.log('Cleared localStorage pending user data and disabled beforeunload warnings');
+					} catch (e) {
+						console.error('Failed to clear localStorage:', e);
+					}				// Force a full page reload to get a fresh session with the new role
+				setTimeout(() => {
+					// If the server indicated we should refresh the session (particularly for token-based auth)
+					const refreshRequired = data.refreshSession === true;
+					
+					if (refreshRequired) {
+						// Perform more thorough session refresh for token-based auth
+						console.log('Performing thorough session refresh...');
+						
+						// First clear any session cache
+						fetch('/api/auth/session?update=force', { 
+							method: 'GET',
+							headers: {
+								'Cache-Control': 'no-cache, no-store, must-revalidate',
+								'Pragma': 'no-cache',
+								'Expires': '0'
+							}
+						})
+						.then(() => {
+							// Short delay to allow backend session updates to propagate
+							setTimeout(() => {
+								// Try the signin endpoint to force a new session
+								fetch('/api/auth/signin?callbackUrl=' + encodeURIComponent(data.redirectTo || '/comingsoon'))
+								.then(() => {
+									console.log('Session thoroughly refreshed, redirecting to', data.redirectTo || '/comingsoon');
+									// Use replace instead of href to ensure we don't add to browser history
+									window.location.replace(data.redirectTo || '/comingsoon');
+								})
+								.catch(err => {
+									console.error('Failed during thorough session refresh:', err);
+									window.location.replace('/comingsoon');
+								});
+							}, 500);
+						})
+						.catch(err => {
+							console.error('Failed to clear session cache:', err);
+							window.location.replace('/comingsoon');
+						});
+					} else {
+						// Standard session refresh
+						console.log('Standard session refresh before redirecting...');
+						fetch('/api/auth/session', { method: 'GET' })
+							.then(() => {
+								console.log('Session refreshed, redirecting to', data.redirectTo || '/comingsoon');
+								// Use replace instead of href to ensure we don't add to browser history
+								window.location.replace(data.redirectTo || '/comingsoon');
+							})
+							.catch(err => {
+								console.error('Failed to refresh session before redirect:', err);
+								window.location.replace('/comingsoon');
+							});
+					}
+				}, 1500); // Slightly longer delay to show success state
 				} catch (err: unknown) {
 					console.error('Registration error:', err);
-					setSubmitError(err instanceof Error ? err.message : 'Registration failed.');
+					setSubmitError(err instanceof Error ? err.message : t("register.error.generic"));
 				}
 			}
 		}
@@ -512,14 +917,27 @@ const branchLogic: { [key: string]: string } = {
 								<span className="text-xl font-bold text-gray-900">FarmLab</span>
 							</div>
 							<h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">
-								Welcome to the Future of Agriculture!
+								{t("register.success.title")}
 							</h2>
 							<p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
-								Thank you for joining our community. We&apos;ve received your information and will be in touch soon with updates about our platform launch.
+								{t("register.success.message")}
 							</p>
+							<div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-6">
+								<div className="flex items-center">
+									<div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+										<svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+										</svg>
+									</div>
+									<div>
+										<p className="text-green-700 font-medium">You&apos;ve been added to the waiting list!</p>
+										<p className="text-green-600 text-sm">Your account has been updated and is ready to go.</p>
+									</div>
+								</div>
+							</div>
 							<div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-6">
 								<p className="text-sm text-green-800 font-medium">
-									🚀 You&apos;re now part of our exclusive community of agricultural innovators
+									🚀 {t("register.success.community")}
 								</p>
 							</div>
 							<Link 
@@ -527,7 +945,7 @@ const branchLogic: { [key: string]: string } = {
 								className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg"
 							>
 								<FiTarget className="w-5 h-5 mr-2" />
-								Return to Home
+								{t("register.success.returnHome")}
 							</Link>
 						</div>
 					</div>
@@ -555,13 +973,13 @@ const branchLogic: { [key: string]: string } = {
 								<span className="ml-3 text-xl sm:text-2xl font-bold text-gray-900">FarmLab</span>
 							</div>
 							<h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-2 sm:mb-4 tracking-tight">
-								Join the Agricultural
+								{t("register.heading")}
 								<span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 animate-gradient-x">
-									Revolution
+									{t("register.headingHighlight")}
 								</span>
 							</h1>
 							<p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-								Help us build the future of smart farming. Your insights will shape our platform.
+								{t("register.multistep.subtitle")}
 							</p>
 						</div>
 						
@@ -622,7 +1040,7 @@ const branchLogic: { [key: string]: string } = {
 										: 'bg-white border-2 border-gray-300 text-gray-700 hover:border-green-500 hover:text-green-600 shadow-sm hover:shadow-md'
 								}`}
 							>
-								<FiArrowLeft className="w-4 h-4" /> Back
+								<FiArrowLeft className="w-4 h-4" /> {t("form.button.back")}
 							</button>
 							{stepIndex < steps.length - 2 ? (
 								<button
@@ -635,7 +1053,7 @@ const branchLogic: { [key: string]: string } = {
 											: 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 hover:shadow-xl'
 									}`}
 								>
-									{validationInProgress ? 'Validating...' : 'Next'} <FiArrowRight className="w-4 h-4" />
+									{validationInProgress ? t("form.button.validating") : t("form.button.next")} <FiArrowRight className="w-4 h-4" />
 								</button>
 							) : (
 								<button
@@ -644,7 +1062,7 @@ const branchLogic: { [key: string]: string } = {
 									className="order-1 sm:order-2 px-4 sm:px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
 								>
 									<FiUsers className="w-4 h-4" />
-									Join FarmLab
+									{t("register.button.joinNow")}
 								</button>
 							)}
 						</div>
@@ -652,7 +1070,7 @@ const branchLogic: { [key: string]: string } = {
 						{/* Additional info footer */}
 						<div className="mt-4 sm:mt-6 text-center">
 							<p className="text-sm text-gray-500 px-4">
-								By joining, you agree to be part of our agricultural innovation community
+								{t("register.agreeTerms")}
 							</p>
 						</div>
 					</div>

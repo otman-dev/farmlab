@@ -5,10 +5,14 @@ import React from "react";
 import { FiTarget, FiActivity, FiTrendingUp, FiCheckCircle, FiUsers, FiGlobe, FiStar, FiArrowRight, FiMail } from "react-icons/fi";
 import LaunchCountdown from "@/components/LaunchCountdown";
 import Footer from "@/components/Footer";
+import AuthStatusBar from "@/components/AuthStatusBar";
 
 export default function ComingSoonPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 overflow-x-hidden">
+      {/* Auth status bar in top right corner */}
+      <AuthStatusBar />
+      
       {/* Enhanced background with pattern and animation - matching home page */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-gradient-to-r from-green-200 to-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>

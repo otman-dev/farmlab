@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FiUser } from 'react-icons/fi';
+import { signOut } from 'next-auth/react';
 
 type User = {
   name?: string | null;
@@ -19,9 +20,8 @@ export default function VisitorHeader({ user, onOpenSidebar }: VisitorHeaderProp
   // For visitor, use provided user or default to visitor
   const displayUser = user || { name: 'Visitor', email: null };
 
-  const handleSignOut = () => {
-    document.cookie = 'auth_token=; Max-Age=0; path=/';
-    window.location.href = '/auth/signin';
+  const handleSignOut = async () => {
+    await signOut({ redirect: true, callbackUrl: '/auth/signin' });
   };
 
   return (
@@ -53,9 +53,17 @@ export default function VisitorHeader({ user, onOpenSidebar }: VisitorHeaderProp
                   aria-haspopup="true"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
-                  <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white">
-                    {displayUser.name ? displayUser.name.charAt(0).toUpperCase() : <FiUser />}
-                  </div>
+                  {displayUser.image ? (
+                    <img 
+                      src={displayUser.image} 
+                      alt="Profile" 
+                      className="h-8 w-8 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                      {displayUser.name ? displayUser.name.charAt(0).toUpperCase() : <FiUser />}
+                    </div>
+                  )}
                   <span className="ml-2 text-sm font-medium text-gray-700 hidden sm:block">
                     {displayUser.name || displayUser.email || 'User'}
                   </span>
@@ -69,6 +77,15 @@ export default function VisitorHeader({ user, onOpenSidebar }: VisitorHeaderProp
                   aria-labelledby="user-menu"
                 >
                   <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+                    {displayUser.image && (
+                      <div className="flex justify-center mb-2">
+                        <img 
+                          src={displayUser.image} 
+                          alt="Profile" 
+                          className="h-16 w-16 rounded-full object-cover border border-gray-200"
+                        />
+                      </div>
+                    )}
                     <p className="font-medium">{displayUser.name}</p>
                     <p className="text-xs text-gray-500 truncate">{displayUser.email}</p>
                   </div>
