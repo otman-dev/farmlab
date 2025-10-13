@@ -80,9 +80,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if the path is a protected route
+  // Check if the path is a protected route (root path is now public)
   const isProtectedRoute =
-    pathname === '/' || // Root path should redirect based on role
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/managerDashboard') ||
     pathname.startsWith('/adminDashboard') ||

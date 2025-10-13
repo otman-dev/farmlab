@@ -419,87 +419,8 @@ function CompleteProfileContent() {
             </div>
           )}
           
-          {/* Debug info */}
-          <div className={`text-center mb-8 ${process.env.NODE_ENV !== 'production' ? '' : 'hidden'}`}>
-            <div className="flex items-center justify-center mb-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg">
-                <FiTarget className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-extrabold text-gray-900">{t("profile.title")}</h1>
-            <p className="mt-2 text-lg text-gray-600">
-              {t("profile.welcome").replace("{name}", session?.user?.name || "")}
-            </p>
-            
-            {/* Prominent warning for forced/pending users */}
-            {isForced && (
-              <div className="mb-4 bg-red-50 border-2 border-red-300 rounded-lg p-4 shadow-md">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="font-bold text-red-800 text-lg">Profile Completion Required</h3>
-                    <div className="mt-2 text-red-700">
-                      <p>
-                        <strong>You must complete this registration form to continue.</strong>
-                      </p>
-                      <p className="mt-1">
-                        Access to all other areas is blocked until your profile is complete.
-                      </p>
-                      <div className="mt-3 flex justify-between items-center">
-                        <p className="text-sm">
-                          Your only options are to complete this form or log out.
-                        </p>
-                        <LogoutButton variant="danger" className="text-sm py-1 px-3" confirmText="Are you sure you want to log out? Your profile will remain incomplete until you sign in again and complete this form." />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Large sticky footer logout button for pending users */}
-            {isForced && (
-              <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-red-50 to-transparent pb-4 pt-8 px-4">
-                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between">
-                  <div className="mb-3 sm:mb-0">
-                    <h4 className="font-bold text-red-800">Need to leave?</h4>
-                    <p className="text-sm text-red-700">You can log out now and complete your profile later.</p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <LogoutButton 
-                      variant="danger" 
-                      className="px-6 py-2 text-base"
-                      confirmText="Are you sure you want to log out? Your profile is incomplete."
-                      iconSize={20}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Conditional message based on authentication type */}
-            {session?.user?.image ? (
-              <div className="mt-2 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <h3 className="font-medium text-blue-800 mb-1">Complete Your Google Sign-in</h3>
-                <p className="text-sm text-blue-700">
-                  Since you signed in with Google, we already have your name and email.
-                  <strong className="block mt-1">Please complete the form to continue.</strong>
-                </p>
-              </div>
-            ) : (
-              <div className="mt-2 p-4 bg-green-50 rounded-lg border border-green-100">
-                <h3 className="font-medium text-green-800 mb-1">Complete Your Registration</h3>
-                <p className="text-sm text-green-700">
-                  We need some additional information to complete your registration.
-                  <strong className="block mt-1">Please fill out the entire form to continue.</strong>
-                </p>
-              </div>
-            )}
-          </div>
+      
+          
           
           {/* Multi-step registration form - conditionally pass OAuth data */}
           <MultiStepRegistration 
