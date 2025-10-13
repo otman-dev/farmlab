@@ -26,27 +26,35 @@ export default function LanguageSwitcher() {
     ar: "🇲🇦",
   };
 
+  // Dropdown design with flags, branding, and compact style
+  const languages = [
+    { code: "en", label: "English", flag: "🇬🇧" },
+    { code: "fr", label: "Français", flag: "🇫🇷" },
+    { code: "ar", label: "العربية", flag: "🇲🇦" }
+  ];
+
   return (
-    <div className="inline-flex items-center bg-white bg-opacity-80 backdrop-filter backdrop-blur-lg border border-gray-200 rounded-full px-3 py-1.5 shadow-lg hover:shadow-xl transition-all duration-300 group">
-      <span className="text-base mr-2" aria-hidden="true">
-        {flags[locale]}
-      </span>
+    <div className="inline-flex items-center bg-white border border-gray-200 rounded-full px-2 py-1 shadow-md">
+      <span className="text-lg mr-2" aria-hidden="true">{languages.find(l => l.code === locale)?.flag}</span>
       <select
         id="lang-select"
         value={locale}
         onChange={handleChange}
-        className="text-sm bg-transparent focus:outline-none text-gray-800 font-medium cursor-pointer appearance-none pr-6"
+        className="text-sm bg-transparent focus:outline-none text-black font-bold cursor-pointer appearance-none pr-6"
         aria-label="Select language"
-        style={{ 
-          backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
+        style={{
+          backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "right center",
-          backgroundSize: "1em"
+          backgroundSize: "1em",
+          minWidth: 80
         }}
       >
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-        <option value="ar">العربية</option>
+        {languages.map(lang => (
+          <option key={lang.code} value={lang.code}>
+            {lang.flag} {lang.label}
+          </option>
+        ))}
       </select>
     </div>
   );
