@@ -33,16 +33,19 @@ const formJson = {
 					   { "id": "full_name", "label": "Full Name", "type": "text", "required": true },
 					   { "id": "email", "label": "Email Address", "type": "email", "required": true },
 					   { "id": "password", "label": "Create Password", "type": "password", "required": true, "minLength": 8 },
-					   { "id": "country", "label": "Country / Region", "type": "text", "required": true }, // Always required, even with OAuth
-					   { "id": "organization", "label": "Organization / Farm / Company Name", "type": "text", "required": false }
+					   { "id": "regions_operate", "label": "Regions you operate in", "type": "multi-select", "options": ["North Africa", "Sub‑Saharan Africa", "Middle East", "Europe", "North America", "Latin America & Caribbean", "Asia‑Pacific", "Other"], "required": false },
+					   { "id": "organization_type", "label": "Organization / farm type", "type": "multi-select", "options": ["Smallholder / Family farm", "Commercial farm", "Cooperative", "Agribusiness (input/packaging)", "AgriTech startup", "Research / University", "NGO / nonprofit", "Government", "Investor / Fund", "Other"], "required": false },
+					   { "id": "primary_objectives", "label": "Main objectives", "type": "multi-select", "options": ["Increase yield", "Reduce costs", "Improve sustainability", "Access data & dashboards", "Run pilots", "Find partners / buyers", "Upskill staff", "Monetize data"], "required": false },
+					   { "id": "engagement_preference", "label": "How you'd like to engage", "type": "multi-select", "options": ["News & updates", "Webinars / events", "Pilot programs", "Data access / API", "Paid products", "Partnerships"], "required": false }
 				   ]
 			},
 			{
 				"id": "oauth_basic_info",
 				"title": "Complete Your Profile",
 				"questions": [
-					{ "id": "country", "label": "Country / Region", "type": "text", "required": true },
-					{ "id": "organization", "label": "Organization / Farm / Company Name", "type": "text", "required": false }
+					{ "id": "roles", "label": "Which of the following describe you? (You can select more than one)", "type": "multi-select", "options": ["Farmer / Grower","Technologist / Developer / Engineer","Researcher / Academic","Industry Professional (Agri-related, food, energy, logistics, etc.)","Investor / Business Developer","Student / Educator","Enthusiast / Curious Observer"], "required": true },
+					{ "id": "regions_operate", "label": "Which region best describes where you operate? (select one)", "type": "multi-select", "options": ["North Africa", "Sub‑Saharan Africa", "Middle East", "Europe", "North America", "Latin America & Caribbean", "Asia‑Pacific", "Other"], "required": true },
+					{ "id": "participation_mode", "label": "How would you like to participate in FarmLab?", "type": "multi-select", "options": ["Join the community / follow updates","Access data and dashboards","Join beta / pilot programs","Partner commercially","Contribute to research","Mentor / advise"], "required": false }
 				]
 			},
 			{
@@ -76,13 +79,13 @@ const formJson = {
 		]
 	},
 	"branches": {
-	       "branch_researcher": {
-		       "title": "Researcher / Academic Path",
-		       "questions": [
-			       { "id": "research_field", "label": "What is your research field or academic focus?", "type": "text", "required": true },
-			       { "id": "collab_interest", "label": "What type of collaboration interests you?", "type": "multi-select", "options": ["Data access", "Field trials", "Joint publications", "Student projects", "Other"] }
-		       ]
-	       },
+		   "branch_researcher": {
+				   "title": "Researcher / Academic Path",
+				   "questions": [
+					   { "id": "research_areas", "label": "Which research areas apply to you?", "type": "multi-select", "options": ["Agronomy", "Soil Science", "Plant Pathology", "Crop Physiology", "AgTech / IoT", "Data Science / AI", "Economics / Policy", "Sustainability / Soil Health", "Other"], "required": true },
+					   { "id": "collab_interest", "label": "What type of collaboration interests you?", "type": "multi-select", "options": ["Data access", "Field trials", "Joint publications", "Student projects", "Other"] }
+				   ]
+		   },
 	       "branch_investor": {
 		       "title": "Investor / Business Developer Path",
 		       "questions": [
@@ -97,13 +100,13 @@ const formJson = {
 			       { "id": "interest_area", "label": "What are you most interested in?", "type": "multi-select", "options": ["Internships", "Research projects", "Learning resources", "Hackathons", "Other"] }
 		       ]
 	       },
-	       "branch_enthusiast": {
-		       "title": "Enthusiast / Curious Observer Path",
-		       "questions": [
-			       { "id": "interest_reason", "label": "What brings you to FarmLab?", "type": "text", "required": false },
-			       { "id": "follow_topics", "label": "What topics would you like to follow?", "type": "multi-select", "options": ["Smart farming", "IoT", "Sustainability", "Market trends", "All of the above"] }
-		       ]
-	       },
+		   "branch_enthusiast": {
+				   "title": "Enthusiast / Curious Observer Path",
+				   "questions": [
+					   { "id": "interest_reason", "label": "What brings you to FarmLab?", "type": "single-select", "options": ["Curiosity / Learning", "Follow topics / community", "Professional interest", "Student / research", "Potential collaborator or partner", "Other"], "required": false },
+					   { "id": "follow_topics", "label": "What topics would you like to follow?", "type": "multi-select", "options": ["Smart farming", "IoT", "Sustainability", "Market trends", "All of the above"] }
+				   ]
+		   },
 		"branch_farmer": {
 			"title": "Farmer Path",
 			"questions": [
@@ -140,8 +143,9 @@ const formJson = {
 	"final_section": {
 		"title": "Engagement & Monetization (All Users)",
 		"questions": [
-			{ "id": "participation_mode", "label": "How would you like to participate in FarmLab?", "type": "multi-select", "options": ["Join the community / follow updates", "Access data and dashboards", "Join beta / pilot programs", "Partner commercially", "Contribute to research"] },
-			{ "id": "pricing_model", "label": "What pricing model would you find most appealing?", "type": "single-select", "options": ["Monthly subscription", "One-time purchase", "Pay-as-you-grow (based on farm size)", "Revenue-sharing model", "Not sure yet"] }
+			{ "id": "participation_mode", "label": "How would you like to participate in FarmLab?", "type": "multi-select", "options": ["Join the community / follow updates", "Access dashboards & analytics", "Join beta / pilot", "Partner commercially", "Contribute research", "Sponsor or invest"] },
+			{ "id": "preferred_pricing", "label": "Preferred pricing models", "type": "multi-select", "options": ["Monthly subscription", "One-time license", "Pay-as-you-grow", "Revenue share", "Grants / sponsor support", "Not sure" ] },
+			{ "id": "contact_pref", "label": "Preferred contact channels", "type": "multi-select", "options": ["Email", "WhatsApp", "SMS", "Phone", "Slack / Discord", "No contact"] }
 		]
 	}
 };
@@ -288,8 +292,7 @@ React.useEffect(() => {
 	}, [forceProfileCompletion]);
 
 	// Create initial form data state based on OAuth status
-	const createInitialFormData = () => {
-		// First try to use explicit googleOAuthData from props
+	const createInitialFormData = (): FormDataType => {
 		if (googleOAuthData && googleOAuthData.email) {
 			console.log('MultiStepRegistration: Using googleOAuthData to pre-fill form', {
 				name: googleOAuthData.name,
@@ -299,13 +302,11 @@ React.useEffect(() => {
 				full_name: googleOAuthData.name || '',
 				email: googleOAuthData.email || '',
 				googleAuthenticated: googleOAuthData.googleAuthenticated || false,
-				// We don't pre-fill country since it's required input from the user
-				country: '',
-				organization: ''
+				roles: [],
+				regions_operate: []
 			};
 		}
-		
-		// Then try to use token data if available
+
 		if (tokenData && tokenData.email) {
 			console.log('MultiStepRegistration: Using tokenData to pre-fill form', {
 				name: tokenData.name,
@@ -316,15 +317,17 @@ React.useEffect(() => {
 				full_name: tokenData.name || '',
 				email: tokenData.email || '',
 				googleAuthenticated: tokenData.provider === 'google' || false,
-				country: '',
-				organization: ''
+				roles: [],
+				regions_operate: []
 			};
 		}
-		
-		// Default to empty form data
+
+		// Default to empty form data (selection arrays initialized lazily)
 		console.log('MultiStepRegistration: No OAuth data found, using empty form');
-		return {};
-	};		const [formData, setFormData] = useState<FormDataType>(createInitialFormData());
+		return { roles: [], regions_operate: [] } as FormDataType;
+	};
+
+	const [formData, setFormData] = useState<FormDataType>(createInitialFormData());
 		
 		// Update form data when token data changes
 		React.useEffect(() => {
@@ -416,16 +419,7 @@ React.useEffect(() => {
 						   continue;
 					   }
 					   
-					   // Ensure country is always validated as required, regardless of authentication method
-					   if (q.id === 'country' && !formData[q.id]) {
-						   console.log(`Field "${q.id}" failed required validation`);
-						   // Use specific error message for OAuth users
-						   if (isOAuthUser) {
-							   stepErrors[q.id] = t("profile.country.required") || "Country is required even with Google sign-in";
-						   } else {
-							   stepErrors[q.id] = t("form.error.required");
-						   }
-					   }
+					   // No special-case country validation; all required multi-selects handled below
 					   
 					   // @ts-expect-error: Some questions may not have required
 					   if (q.required && (!formData[q.id] || (Array.isArray(formData[q.id]) && formData[q.id].length === 0))) {
@@ -451,8 +445,20 @@ React.useEffect(() => {
 			}
 
 		const handleChange = useCallback((id: string, value: string | string[] | number | boolean | undefined) => {
-			setFormData((prev: FormDataType) => ({ ...prev, [id]: value }));
-			setErrors((prev: ErrorsType) => ({ ...prev, [id]: undefined }));
+			setFormData((prev: FormDataType) => {
+				// Only update state if the value has actually changed
+				if (prev[id] !== value) {
+					return { ...prev, [id]: value };
+				}
+				return prev;
+			});
+			setErrors((prev: ErrorsType) => {
+				// Clear error only if it exists
+				if (prev[id]) {
+					return { ...prev, [id]: undefined };
+				}
+				return prev;
+			});
 		}, []);
 		
 		const handleMultiSelect = useCallback((id: string, option: string) => {
@@ -541,16 +547,16 @@ React.useEffect(() => {
 			// For OAuth users, we still require country field explicitly
 			const requiredFields = effectiveOAuthUser 
 				? {
-					'full_name': 'Full Name',
-					'email': 'Email',
-					'country': 'Country', // Country is still required for OAuth users
-					'roles': 'Roles'
+						'full_name': 'Full Name',
+						'email': 'Email',
+						'roles': 'Roles',
+						'regions_operate': 'Region'
 				}
 				: {
 					'full_name': 'Full Name',
 					'email': 'Email',
 					'password': 'Password',
-					'country': 'Country',
+						'regions_operate': 'Region',
 					'roles': 'Roles'
 				};
 			
@@ -575,10 +581,16 @@ React.useEffect(() => {
 			
 			if (validateStep()) {
 				try {
-					console.log('Submitting form data:', { 
-						...formData, 
+					// Build outgoing payload and map selection values into expected API fields
+					const outgoing: Record<string, any> = { ...formData };
+					// If backend expects a 'country' property, derive it from regions_operate (use the first selected region)
+					if (!outgoing.country && Array.isArray(outgoing.regions_operate) && outgoing.regions_operate.length > 0) {
+						outgoing.country = String(outgoing.regions_operate[0]);
+					}
+					console.log('Submitting form data (outgoing):', {
+						...outgoing,
 						password: '[REDACTED]',
-						rolesCount: Array.isArray(formData.roles) ? formData.roles.length : 0
+						rolesCount: Array.isArray(outgoing.roles) ? outgoing.roles.length : 0
 					});
 					
 					// Use different endpoints for OAuth vs regular registration
@@ -607,7 +619,7 @@ React.useEffect(() => {
 							'X-Auth-Token': String(formData['token'] || localStorage.getItem('pendingUserToken') || ''),
 						},
 						body: JSON.stringify({
-							...formData,
+							...outgoing,
 							// Include token data in the request body as well
 							_tokenData: localStorage.getItem('authTokenRaw') || null,
 						}),
