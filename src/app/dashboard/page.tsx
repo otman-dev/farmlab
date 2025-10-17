@@ -332,6 +332,42 @@ function AdminDashboard() {
   const offlineDevices = devices.filter(d => d.status === 'offline').length;
   const maintenanceDevices = devices.filter(d => d.status === 'maintenance').length;
 
+  // Helper functions for status UI (kept local to the dashboard)
+  const getStatusBadgeClasses = (status: string | undefined, deviceId?: string) => {
+    if (deviceId === 'greenhouse01') return 'bg-blue-100 text-blue-800';
+    switch (status) {
+      case 'online': return 'bg-green-100 text-green-800';
+      case 'offline': return 'bg-red-100 text-red-800';
+      case 'maintenance': return 'bg-purple-100 text-purple-800';
+      case 'coming_soon': return 'bg-blue-100 text-blue-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusDotClasses = (status: string | undefined, deviceId?: string) => {
+    if (deviceId === 'greenhouse01') return 'bg-blue-400';
+    switch (status) {
+      case 'online': return 'bg-green-400';
+      case 'offline': return 'bg-red-400';
+      case 'maintenance': return 'bg-purple-400';
+      case 'coming_soon': return 'bg-blue-400';
+      default: return 'bg-gray-400';
+    }
+  };
+
+  const formatStatusLabel = (status: string | undefined, deviceId?: string) => {
+    if (deviceId === 'greenhouse01') return 'Coming soon';
+    if (!status) return 'Unknown';
+    switch (status) {
+      case 'online': return 'Online';
+      case 'offline': return 'Offline';
+      case 'maintenance': return 'Maintenance';
+      case 'coming_soon': return 'Coming soon';
+      case 'unknown': return 'Unknown';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -470,21 +506,9 @@ function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          device.status === 'online'
-                            ? 'bg-green-100 text-green-800'
-                            : device.status === 'offline'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          <div className={`w-2 h-2 rounded-full mr-1.5 ${
-                            device.status === 'online'
-                              ? 'bg-green-400'
-                              : device.status === 'offline'
-                              ? 'bg-red-400'
-                              : 'bg-gray-400'
-                          }`}></div>
-                          {device.status || 'unknown'}
+                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClasses(device.status, device.device_id)}`}>
+                          <div className={`w-2 h-2 rounded-full mr-1.5 ${getStatusDotClasses(device.status, device.device_id)}`}></div>
+                          {formatStatusLabel(device.status, device.device_id)}
                         </div>
                       </div>
                     </td>

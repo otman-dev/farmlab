@@ -9,6 +9,7 @@ interface HeartbeatIndicatorProps {
   size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
   showPulse?: boolean;
+  device_id?: string;
 }
 
 export default function HeartbeatIndicator({
@@ -16,7 +17,8 @@ export default function HeartbeatIndicator({
   status = 'unknown',
   size = 'md',
   showLabel = true,
-  showPulse = true
+  showPulse = true,
+  device_id
 }: HeartbeatIndicatorProps) {
   const [timeAgo, setTimeAgo] = useState<string>('');
   const [mounted, setMounted] = useState<boolean>(false);
@@ -43,17 +45,23 @@ export default function HeartbeatIndicator({
   // Update the time ago text
   useEffect(() => {
     setMounted(true);
-    
+
     function updateTimeAgo() {
+      // If device is greenhouse01, always show Coming soon
+      if (device_id === 'greenhouse01' || status === 'coming_soon') {
+        setTimeAgo('Coming soon');
+        return;
+      }
+
       if (!lastHeartbeat) {
         setTimeAgo('Never');
         return;
       }
-      
+
       const lastBeatDate = new Date(lastHeartbeat);
       const now = new Date();
       const diffInSeconds = Math.floor((now.getTime() - lastBeatDate.getTime()) / 1000);
-      
+
       // More readable time ago format
       if (diffInSeconds < 5) {
         setTimeAgo('Just now');
@@ -76,9 +84,9 @@ export default function HeartbeatIndicator({
 
     updateTimeAgo();
     const intervalId = setInterval(updateTimeAgo, 1000);
-    
+
     return () => clearInterval(intervalId);
-  }, [lastHeartbeat]);
+  }, [lastHeartbeat, status, device_id]);
 
   // Don't render anything on the server to avoid hydration mismatch
   if (!mounted) {
@@ -98,6 +106,18 @@ export default function HeartbeatIndicator({
           dot: 'bg-red-500',
           text: 'text-red-600',
           pulse: 'bg-red-400'
+        };
+      case 'coming_soon':
+        return {
+          dot: 'bg-blue-500',
+          text: 'text-blue-600',
+          pulse: 'bg-blue-400'
+        };
+      case 'maintenance':
+        return {
+          dot: 'bg-purple-600',
+          text: 'text-purple-600',
+          pulse: 'bg-purple-400'
         };
       default:
         return {

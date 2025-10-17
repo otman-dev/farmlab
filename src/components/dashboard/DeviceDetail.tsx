@@ -15,7 +15,7 @@ interface Device {
   device_id: string;
   name: string;
   type: string;
-  status: 'online' | 'offline' | 'unknown';
+  status: 'online' | 'offline' | 'unknown' | 'maintenance' | 'coming_soon';
   last_heartbeat?: Date;
   last_seen?: Date;
   last_seen_formatted?: string;
@@ -134,8 +134,25 @@ export default function DeviceDetail({ deviceId }: { deviceId: string }) {
         return 'bg-green-100 text-green-800';
       case 'offline':
         return 'bg-red-100 text-red-800';
+      case 'coming_soon':
+        return 'bg-blue-100 text-blue-800';
+      case 'maintenance':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  const formatStatusLabel = (status: string | undefined, deviceId?: string) => {
+    if (deviceId === 'greenhouse01') return 'Coming soon';
+    if (!status) return 'Unknown';
+    switch (status) {
+      case 'online': return 'Online';
+      case 'offline': return 'Offline';
+      case 'maintenance': return 'Maintenance';
+      case 'coming_soon': return 'Coming soon';
+      case 'unknown': return 'Unknown';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -219,8 +236,8 @@ export default function DeviceDetail({ deviceId }: { deviceId: string }) {
         <div className="bg-gray-50 border-b px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-800">{device.name}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(device.status || 'unknown')}`}>
-              {device.status ? device.status.charAt(0).toUpperCase() + device.status.slice(1) : 'Unknown'}
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(device.device_id === 'greenhouse01' ? 'coming_soon' : device.status || 'unknown')}`}>
+              {formatStatusLabel(device.status, device.device_id)}
             </span>
           </div>
           <p className="text-gray-500 text-sm mt-1 flex items-center">
@@ -283,6 +300,7 @@ export default function DeviceDetail({ deviceId }: { deviceId: string }) {
                     status={device.status}
                     size="md"
                     showPulse={true}
+                    device_id={device.device_id}
                   />
                   <div className="text-xs text-gray-500 mt-1 ml-5">
                     {device.last_seen_formatted || formatTimestamp(device.last_heartbeat)}

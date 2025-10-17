@@ -15,7 +15,7 @@ interface Device {
   device_id: string;
   name: string;
   type: string;
-  status: 'online' | 'offline' | 'unknown';
+  status: 'online' | 'offline' | 'unknown' | 'maintenance' | 'coming_soon';
   last_heartbeat?: Date;
   last_seen?: Date;
   last_seen_formatted?: string;
@@ -100,6 +100,8 @@ export default function DevicesList() {
         return 'text-green-500';
       case 'offline':
         return 'text-red-500';
+      case 'coming_soon':
+        return 'text-blue-600';
       case 'maintenance':
         return 'text-purple-600';
       default:
@@ -118,8 +120,23 @@ export default function DevicesList() {
         return 'bg-red-100 text-red-800';
       case 'maintenance':
         return 'bg-purple-100 text-purple-800';
+      case 'coming_soon':
+        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  const formatStatusLabel = (status: string | undefined, deviceId?: string) => {
+    if (deviceId === 'greenhouse01') return 'Coming soon';
+    if (!status) return 'Unknown';
+    switch (status) {
+      case 'online': return 'Online';
+      case 'offline': return 'Offline';
+      case 'maintenance': return 'Maintenance';
+      case 'coming_soon': return 'Coming soon';
+      case 'unknown': return 'Unknown';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -178,8 +195,8 @@ export default function DevicesList() {
             >
               <div className="border-b bg-gray-50 px-4 py-3 flex justify-between items-center border-l-4 border-l-green-500">
                 <h3 className="font-semibold text-gray-800">{device.name}</h3>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(device.status)}`}>
-                  {device.status ? device.status.charAt(0).toUpperCase() + device.status.slice(1) : 'Unknown'}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(device.device_id === 'greenhouse01' ? 'coming_soon' : device.status)}`}>
+                  {formatStatusLabel(device.status, device.device_id)}
                 </span>
               </div>
               <div className="p-4">
@@ -199,6 +216,7 @@ export default function DevicesList() {
                         lastHeartbeat={device.last_heartbeat ?? device.last_seen ?? device.last_seen_formatted}
                         status={device.status}
                         size="sm"
+                        device_id={device.device_id}
                       />
                     </div>
                     

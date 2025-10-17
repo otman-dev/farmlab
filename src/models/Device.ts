@@ -38,6 +38,11 @@ const DeviceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // Alias used by some scripts and APIs — keep it optional
+  last_heartbeat: {
+    type: Date,
+    required: false,
+  },
   mac: {
     type: String,
     required: false,
@@ -72,7 +77,8 @@ const DeviceSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['online', 'offline', 'unknown'],
+    // Allow a couple of additional helper states used in the UI/scripts
+    enum: ['online', 'offline', 'unknown', 'maintenance', 'coming_soon'],
     default: 'unknown',
   },
 }, {
@@ -127,14 +133,20 @@ DeviceSchema.set('toJSON', {
       ret.type = ret.device_type;
     }
     
-    // Calculate status based on last_seen timestamp
-    if (ret.last_seen) {
-      const lastSeen = new Date(ret.last_seen);
-      const now = new Date();
-      const diffMinutes = (now.getTime() - lastSeen.getTime()) / (1000 * 60);
-      ret.status = diffMinutes < 5 ? 'online' : 'offline';
+    // Preserve explicit special statuses (e.g. maintenance, coming_soon) when present.
+    // Otherwise compute status from recent heartbeat / last_seen.
+    if (ret.status === 'maintenance' || ret.status === 'coming_soon') {
+      // keep the explicitly provided status as-is
     } else {
-      ret.status = 'unknown';
+      const lastSeenForStatus = ret.last_seen || ret.last_heartbeat;
+      if (lastSeenForStatus) {
+        const lastSeen = new Date(lastSeenForStatus);
+        const now = new Date();
+        const diffMinutes = (now.getTime() - lastSeen.getTime()) / (1000 * 60);
+        ret.status = diffMinutes < 5 ? 'online' : 'offline';
+      } else {
+        ret.status = 'unknown';
+      }
     }
     
     // Standardize firmware version field
@@ -143,8 +155,8 @@ DeviceSchema.set('toJSON', {
     // Standardize IP address field
     ret.ip_address = ret.ip || 'Unknown';
     
-    // Standardize last heartbeat field
-    ret.last_heartbeat = ret.last_seen;
+  // Standardize last heartbeat field (support documents that use either field)
+  ret.last_heartbeat = ret.last_heartbeat || ret.last_seen || null;
     
     // Add formatted timestamps
     if (ret.last_seen) {

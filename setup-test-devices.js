@@ -14,9 +14,10 @@ const deviceSchema = new mongoose.Schema({
   status: { 
     type: String, 
     required: true,
-    enum: ['online', 'offline', 'unknown'],
+    // Add maintenance and coming_soon so we can mark devices explicitly
+    enum: ['online', 'offline', 'unknown', 'maintenance', 'coming_soon'],
     default: 'unknown'
-  },
+  },      
   location: { type: String },
   ip_address: { type: String },
   firmware_version: { type: String },
@@ -122,13 +123,15 @@ const sampleDevices = [
   },
   {
     device_id: 'greenhouse01',
-    name: 'Greenhouse Controller',
+    // Explicitly mark this device as coming soon — it isn't deployed yet
+    name: 'Greenhouse Controller (Coming Soon)',
     type: 'climateControl',
-    status: getRandomStatus(),
+    status: 'coming_soon',
     location: 'Main Greenhouse',
-    ip_address: '192.168.1.105',
-    firmware_version: '1.4.2',
-    last_heartbeat: getRandomRecentDate()
+    // No live network or firmware for a coming-soon device
+    ip_address: null,
+    firmware_version: null,
+    last_heartbeat: null
   }
 ];
 
@@ -175,11 +178,13 @@ async function setupTestData() {
         console.log(`No existing logs collection to drop for: ${logCollectionName}`);
       }
       
-      // Generate and insert random logs
-      const logs = generateRandomLogs(device.device_id, 20);
+      // Generate and insert random logs — skip logs for devices that are coming soon
+      const logs = device.status === 'coming_soon' ? [] : generateRandomLogs(device.device_id, 20);
       if (logs.length > 0) {
         await db.collection(logCollectionName).insertMany(logs);
         console.log(`Created ${logs.length} logs for ${device.device_id}`);
+      } else if (device.status === 'coming_soon') {
+        console.log(`Skipping log generation for coming-soon device: ${device.device_id}`);
       }
     }
     
