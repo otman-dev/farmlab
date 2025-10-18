@@ -44,7 +44,7 @@ export default function SensorStationsComparisonChart() {
   const [refreshInterval, setRefreshInterval] = useState(0); // 0 means no auto-refresh
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [chartMode, setChartMode] = useState<'temperature' | 'humidity'>('temperature');
-  const [timeView, setTimeView] = useState<'current' | 'history'>('current');
+  const [timeView, setTimeView] = useState<'current' | 'history'>('history');
   
   // Function to fetch current data
   const fetchCurrentData = async () => {

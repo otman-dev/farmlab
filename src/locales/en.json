@@ -510,5 +510,23 @@
   "manager.nav.staffManagement": "Staff Management",
   "manager.nav.hydroponics": "Hydroponics",
   "manager.nav.hydroponicBarleyCycles": "Hydroponic Barley Cycles",
-  "manager.nav.signOut": "Sign out"
+  "manager.nav.signOut": "Sign out",
+
+  "manager.sensor.title": "Sensor Stations Comparison",
+  "manager.sensor.subtitle": "Compare temperature and humidity readings across all sensor stations",
+  "manager.sensor.activeStations": "Active Stations",
+  "manager.sensor.avgTemperature": "Avg Temperature",
+  "manager.sensor.avgHumidity": "Avg Humidity",
+  "manager.sensor.tempRange": "Temp Range",
+  "manager.sensor.temperatureComparison": "Temperature Comparison (°C)",
+  "manager.sensor.humidityComparison": "Humidity Comparison (%)",
+  "manager.sensor.detailedReadings": "Detailed Sensor Readings",
+  "manager.sensor.stationId": "Station ID",
+  "manager.sensor.airTemp": "Air Temp (°C)",
+  "manager.sensor.humidity": "Humidity (%)",
+  "manager.sensor.waterTemp": "Water Temp (°C)",
+  "manager.sensor.tds": "TDS (ppm)",
+  "manager.sensor.lastUpdate": "Last Update",
+  "manager.nav.sensors": "Sensors",
+  "manager.nav.sensorComparison": "Sensor Comparison"
 }

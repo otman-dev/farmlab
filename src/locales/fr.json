@@ -509,5 +509,23 @@
   "manager.nav.staffManagement": "Gestion du personnel",
   "manager.nav.hydroponics": "Hydroponique",
   "manager.nav.hydroponicBarleyCycles": "Cycles d'orge hydroponique",
-  "manager.nav.signOut": "Se déconnecter"
+  "manager.nav.signOut": "Se déconnecter",
+
+  "manager.sensor.title": "Comparaison des stations de capteurs",
+  "manager.sensor.subtitle": "Comparez les lectures de température et d'humidité sur toutes les stations de capteurs",
+  "manager.sensor.activeStations": "Stations actives",
+  "manager.sensor.avgTemperature": "Température moyenne",
+  "manager.sensor.avgHumidity": "Humidité moyenne",
+  "manager.sensor.tempRange": "Plage de température",
+  "manager.sensor.temperatureComparison": "Comparaison de température (°C)",
+  "manager.sensor.humidityComparison": "Comparaison d'humidité (%)",
+  "manager.sensor.detailedReadings": "Lectures détaillées des capteurs",
+  "manager.sensor.stationId": "ID de station",
+  "manager.sensor.airTemp": "Température air (°C)",
+  "manager.sensor.humidity": "Humidité (%)",
+  "manager.sensor.waterTemp": "Température eau (°C)",
+  "manager.sensor.tds": "TDS (ppm)",
+  "manager.sensor.lastUpdate": "Dernière mise à jour",
+  "manager.nav.sensors": "Capteurs",
+  "manager.nav.sensorComparison": "Comparaison des capteurs"
 }

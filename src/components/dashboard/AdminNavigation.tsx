@@ -58,6 +58,7 @@ export default function AdminNavigation({ mobileOpen, setMobileOpen }: AdminNavi
   // Admin-only sections
   const adminNavItems = [
     { path: '/adminDashboard', label: 'Admin Dashboard', icon: FiShield },
+    { path: '/adminDashboard/microclimate', label: 'Microclimate Metrics', icon: FiTrendingUp },
     { path: '/adminDashboard/debug', label: 'Debug Tools', icon: FiActivity },
     { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
     { path: '/dashboard/devices', label: 'Devices', icon: FiServer },

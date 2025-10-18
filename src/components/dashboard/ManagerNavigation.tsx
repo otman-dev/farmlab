@@ -19,7 +19,8 @@ export default function ManagerNavigation({ mobileOpen, setMobileOpen }: Manager
     stock: true,
     business: false,
     personnel: false,
-    hydroponics: false
+    hydroponics: false,
+    sensors: false
   });
 
   const managerNavItems = [
@@ -45,6 +46,10 @@ export default function ManagerNavigation({ mobileOpen, setMobileOpen }: Manager
 
   const hydroponicsItems = [
     { path: '/managerDashboard/hydroponic-barley', label: t('manager.nav.hydroponicBarleyCycles'), icon: FiActivity },
+  ];
+
+  const sensorItems = [
+    { path: '/managerDashboard/sensor-comparison', label: t('manager.nav.sensorComparison'), icon: FiActivity },
   ];
 
   const toggleSection = (section: string) => {
@@ -156,6 +161,7 @@ export default function ManagerNavigation({ mobileOpen, setMobileOpen }: Manager
         {renderNavSection(t('manager.nav.businessOperations'), 'business', businessOperationsItems, 'bg-purple-600')}
         {renderNavSection(t('manager.nav.personnel'), 'personnel', personnelItems, 'bg-orange-600')}
         {renderNavSection(t('manager.nav.hydroponics'), 'hydroponics', hydroponicsItems, 'bg-cyan-600')}
+        {renderNavSection(t('manager.nav.sensors'), 'sensors', sensorItems, 'bg-green-600')}
       </div>
 
       {/* Spacer to push sign out to bottom on tall screens */}

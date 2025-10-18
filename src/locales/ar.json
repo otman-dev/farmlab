@@ -512,5 +512,23 @@
   "manager.nav.staffManagement": "إدارة الموظفين",
   "manager.nav.hydroponics": "الزراعة المائية",
   "manager.nav.hydroponicBarleyCycles": "دورات الشعير المائي",
-  "manager.nav.signOut": "تسجيل الخروج"
+  "manager.nav.signOut": "تسجيل الخروج",
+
+  "manager.sensor.title": "مقارنة محطات الاستشعار",
+  "manager.sensor.subtitle": "قارن قراءات درجة الحرارة والرطوبة عبر جميع محطات الاستشعار",
+  "manager.sensor.activeStations": "المحطات النشطة",
+  "manager.sensor.avgTemperature": "متوسط درجة الحرارة",
+  "manager.sensor.avgHumidity": "متوسط الرطوبة",
+  "manager.sensor.tempRange": "نطاق درجة الحرارة",
+  "manager.sensor.temperatureComparison": "مقارنة درجة الحرارة (°C)",
+  "manager.sensor.humidityComparison": "مقارنة الرطوبة (%)",
+  "manager.sensor.detailedReadings": "قراءات الاستشعار التفصيلية",
+  "manager.sensor.stationId": "معرف المحطة",
+  "manager.sensor.airTemp": "درجة حرارة الهواء (°C)",
+  "manager.sensor.humidity": "الرطوبة (%)",
+  "manager.sensor.waterTemp": "درجة حرارة الماء (°C)",
+  "manager.sensor.tds": "TDS (ppm)",
+  "manager.sensor.lastUpdate": "آخر تحديث",
+  "manager.nav.sensors": "الاستشعارات",
+  "manager.nav.sensorComparison": "مقارنة الاستشعارات"
 }
