@@ -4,45 +4,48 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiActivity, FiServer, FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { useState } from 'react';
+import { useI18n } from '../LanguageProvider';
+
 
 interface ManagerSidebarProps {
   mobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
 }
 
-const managerNavItems = [
-  { path: '/managerDashboard', label: 'Dashboard', icon: FiServer },
-];
-
-// Grouped navigation items
-const stockManagementItems = [
-  { path: '/managerDashboard/medical-stock', label: 'Medical Stock', icon: FiActivity },
-  { path: '/managerDashboard/food-stock', label: 'Food Stock', icon: FiActivity },
-  { path: '/managerDashboard/plant-stock', label: 'Plant Stock', icon: FiActivity },
-];
-
-const businessOperationsItems = [
-  { path: '/managerDashboard/products', label: 'Products', icon: FiServer },
-  { path: '/managerDashboard/suppliers', label: 'Suppliers', icon: FiServer },
-  { path: '/managerDashboard/invoices', label: 'Invoices & Receipts', icon: FiServer },
-];
-
-const personnelItems = [
-  { path: '/managerDashboard/staff', label: 'Staff Management', icon: FiServer },
-];
-
-const hydroponicsItems = [
-  { path: '/managerDashboard/hydroponic-barley', label: 'Hydroponic Barley Cycles', icon: FiActivity },
-];
-
 export default function ManagerNavigation({ mobileOpen, setMobileOpen }: ManagerSidebarProps) {
   const pathname = usePathname();
+  const { t } = useI18n();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     stock: true,
     business: false,
     personnel: false,
     hydroponics: false
   });
+
+  const managerNavItems = [
+    { path: '/managerDashboard', label: t('manager.nav.dashboard'), icon: FiServer },
+  ];
+
+  // Grouped navigation items
+  const stockManagementItems = [
+    { path: '/managerDashboard/medical-stock', label: t('manager.nav.medicalStock'), icon: FiActivity },
+    { path: '/managerDashboard/food-stock', label: t('manager.nav.foodStock'), icon: FiActivity },
+    { path: '/managerDashboard/plant-stock', label: t('manager.nav.plantStock'), icon: FiActivity },
+  ];
+
+  const businessOperationsItems = [
+    { path: '/managerDashboard/products', label: t('manager.nav.products'), icon: FiServer },
+    { path: '/managerDashboard/suppliers', label: t('manager.nav.suppliers'), icon: FiServer },
+    { path: '/managerDashboard/invoices', label: t('manager.nav.invoices'), icon: FiServer },
+  ];
+
+  const personnelItems = [
+    { path: '/managerDashboard/staff', label: t('manager.nav.staffManagement'), icon: FiServer },
+  ];
+
+  const hydroponicsItems = [
+    { path: '/managerDashboard/hydroponic-barley', label: t('manager.nav.hydroponicBarleyCycles'), icon: FiActivity },
+  ];
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -149,10 +152,10 @@ export default function ManagerNavigation({ mobileOpen, setMobileOpen }: Manager
 
       {/* Grouped Navigation Sections */}
       <div className="space-y-2">
-        {renderNavSection('Stock Management', 'stock', stockManagementItems, 'bg-blue-600')}
-        {renderNavSection('Business Operations', 'business', businessOperationsItems, 'bg-purple-600')}
-        {renderNavSection('Personnel', 'personnel', personnelItems, 'bg-orange-600')}
-        {renderNavSection('Hydroponics', 'hydroponics', hydroponicsItems, 'bg-cyan-600')}
+        {renderNavSection(t('manager.nav.stockManagement'), 'stock', stockManagementItems, 'bg-blue-600')}
+        {renderNavSection(t('manager.nav.businessOperations'), 'business', businessOperationsItems, 'bg-purple-600')}
+        {renderNavSection(t('manager.nav.personnel'), 'personnel', personnelItems, 'bg-orange-600')}
+        {renderNavSection(t('manager.nav.hydroponics'), 'hydroponics', hydroponicsItems, 'bg-cyan-600')}
       </div>
 
       {/* Spacer to push sign out to bottom on tall screens */}
@@ -165,7 +168,7 @@ export default function ManagerNavigation({ mobileOpen, setMobileOpen }: Manager
           className="text-base text-red-500 hover:text-red-700 font-semibold px-4 py-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors duration-150 w-full text-left"
           onClick={() => setMobileOpen(false)}
         >
-          Sign out
+          {t('manager.nav.signOut')}
         </Link>
       </div>
     </div>

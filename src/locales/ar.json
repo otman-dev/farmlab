@@ -491,5 +491,26 @@
   "comingsoon.stats.farmers": "المزارعون على قائمة الانتظار",
   "comingsoon.stats.solutions": "الحلول المدعومة بالذكاء الاصطناعي",
   "comingsoon.stats.monitoring": "مراقبة المنصة",
-  "comingsoon.stats.innovation": "الابتكار المغربي"
+  "comingsoon.stats.innovation": "الابتكار المغربي",
+
+  "manager.dashboard.title": "لوحة تحكم المدير",
+  "manager.dashboard.welcome": "مرحباً بك في لوحة تحكم المدير. إدارة المخزون والموظفين وعمليات المزرعة هنا.",
+  "manager.dashboard.feature1": "إدارة المخزون الطبي والغذائي",
+  "manager.dashboard.feature2": "الفواتير والمنتجات",
+  "manager.dashboard.feature3": "الموظفين والموردين",
+
+  "manager.nav.dashboard": "لوحة التحكم",
+  "manager.nav.stockManagement": "إدارة المخزون",
+  "manager.nav.medicalStock": "المخزون الطبي",
+  "manager.nav.foodStock": "المخزون الغذائي",
+  "manager.nav.plantStock": "مخزون النباتات",
+  "manager.nav.businessOperations": "العمليات التجارية",
+  "manager.nav.products": "المنتجات",
+  "manager.nav.suppliers": "الموردون",
+  "manager.nav.invoices": "الفواتير",
+  "manager.nav.personnel": "الموظفين",
+  "manager.nav.staffManagement": "إدارة الموظفين",
+  "manager.nav.hydroponics": "الزراعة المائية",
+  "manager.nav.hydroponicBarleyCycles": "دورات الشعير المائي",
+  "manager.nav.signOut": "تسجيل الخروج"
 }

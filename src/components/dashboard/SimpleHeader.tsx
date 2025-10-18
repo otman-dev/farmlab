@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { FiUser } from 'react-icons/fi';
 import { signOut } from 'next-auth/react';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 type User = {
   name?: string | null;
@@ -41,7 +42,8 @@ export default function SimpleHeader({ user, onOpenSidebar }: HeaderProps) {
             </button>
             <span className="text-lg font-medium text-green-600">FarmLab Platform</span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             {/* Profile dropdown */}
             <div className="relative">
               <div>

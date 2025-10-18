@@ -489,5 +489,26 @@
   "comingsoon.stats.farmers": "Farmers on Waitlist",
   "comingsoon.stats.solutions": "AI-Powered Solutions",
   "comingsoon.stats.monitoring": "Platform Monitoring",
-  "comingsoon.stats.innovation": "Moroccan Innovation"
+  "comingsoon.stats.innovation": "Moroccan Innovation",
+
+  "manager.dashboard.title": "Manager Dashboard",
+  "manager.dashboard.welcome": "Welcome to the manager dashboard. Manage stock, staff, and farm operations here.",
+  "manager.dashboard.feature1": "Medical and food stock management",
+  "manager.dashboard.feature2": "Invoices and products",
+  "manager.dashboard.feature3": "Staff and suppliers",
+
+  "manager.nav.dashboard": "Dashboard",
+  "manager.nav.stockManagement": "Stock Management",
+  "manager.nav.medicalStock": "Medical Stock",
+  "manager.nav.foodStock": "Food Stock",
+  "manager.nav.plantStock": "Plant Stock",
+  "manager.nav.businessOperations": "Business Operations",
+  "manager.nav.products": "Products",
+  "manager.nav.suppliers": "Suppliers",
+  "manager.nav.invoices": "Invoices",
+  "manager.nav.personnel": "Personnel",
+  "manager.nav.staffManagement": "Staff Management",
+  "manager.nav.hydroponics": "Hydroponics",
+  "manager.nav.hydroponicBarleyCycles": "Hydroponic Barley Cycles",
+  "manager.nav.signOut": "Sign out"
 }

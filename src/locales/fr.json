@@ -488,5 +488,26 @@
   "comingsoon.stats.farmers": "Agriculteurs sur la liste d'attente",
   "comingsoon.stats.solutions": "Solutions alimentées par l'IA",
   "comingsoon.stats.monitoring": "Surveillance de la plateforme",
-  "comingsoon.stats.innovation": "Innovation marocaine"
+  "comingsoon.stats.innovation": "Innovation marocaine",
+
+  "manager.dashboard.title": "Tableau de bord du gestionnaire",
+  "manager.dashboard.welcome": "Bienvenue dans le tableau de bord du gestionnaire. Gérez le stock, le personnel et les opérations de la ferme ici.",
+  "manager.dashboard.feature1": "Gestion du stock médical et alimentaire",
+  "manager.dashboard.feature2": "Factures et produits",
+  "manager.dashboard.feature3": "Personnel et fournisseurs",
+
+  "manager.nav.dashboard": "Tableau de bord",
+  "manager.nav.stockManagement": "Gestion du stock",
+  "manager.nav.medicalStock": "Stock médical",
+  "manager.nav.foodStock": "Stock alimentaire",
+  "manager.nav.plantStock": "Stock végétal",
+  "manager.nav.businessOperations": "Opérations commerciales",
+  "manager.nav.products": "Produits",
+  "manager.nav.suppliers": "Fournisseurs",
+  "manager.nav.invoices": "Factures",
+  "manager.nav.personnel": "Personnel",
+  "manager.nav.staffManagement": "Gestion du personnel",
+  "manager.nav.hydroponics": "Hydroponique",
+  "manager.nav.hydroponicBarleyCycles": "Cycles d'orge hydroponique",
+  "manager.nav.signOut": "Se déconnecter"
 }
