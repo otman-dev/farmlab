@@ -22,54 +22,54 @@ type Question = {
 
 // Move formJson outside component to make it completely stable
 const formJson = {
-	"form": {
-		"title": "FarmLab Registration & Market Intelligence Form",
-		"description": "Adaptive multi-branch questionnaire to understand user profile, challenges, goals, and collaboration opportunities with FarmLab.",
-		"steps": [
+	form: {
+		title: "register.form.title",
+		description: "register.form.description",
+		steps: [
 			{
-				"id": "basic_info",
-				"title": "Basic Information",
-				   "questions": [
-					   { "id": "full_name", "label": "Full Name", "type": "text", "required": true },
-					   { "id": "email", "label": "Email Address", "type": "email", "required": true },
-					   { "id": "password", "label": "Create Password", "type": "password", "required": true, "minLength": 8 },
-					   { "id": "regions_operate", "label": "Regions you operate in", "type": "multi-select", "options": ["North Africa", "Sub‑Saharan Africa", "Middle East", "Europe", "North America", "Latin America & Caribbean", "Asia‑Pacific", "Other"], "required": false },
-					   { "id": "organization_type", "label": "Organization / farm type", "type": "multi-select", "options": ["Smallholder / Family farm", "Commercial farm", "Cooperative", "Agribusiness (input/packaging)", "AgriTech startup", "Research / University", "NGO / nonprofit", "Government", "Investor / Fund", "Other"], "required": false },
-					   { "id": "primary_objectives", "label": "Main objectives", "type": "multi-select", "options": ["Increase yield", "Reduce costs", "Improve sustainability", "Access data & dashboards", "Run pilots", "Find partners / buyers", "Upskill staff", "Monetize data"], "required": false },
-					   { "id": "engagement_preference", "label": "How you'd like to engage", "type": "multi-select", "options": ["News & updates", "Webinars / events", "Pilot programs", "Data access / API", "Paid products", "Partnerships"], "required": false }
-				   ]
-			},
-			{
-				"id": "oauth_basic_info",
-				"title": "Complete Your Profile",
-				"questions": [
-					{ "id": "roles", "label": "Which of the following describe you? (You can select more than one)", "type": "multi-select", "options": ["Farmer / Grower","Technologist / Developer / Engineer","Researcher / Academic","Industry Professional (Agri-related, food, energy, logistics, etc.)","Investor / Business Developer","Student / Educator","Enthusiast / Curious Observer"], "required": true },
-					{ "id": "regions_operate", "label": "Which region best describes where you operate? (select one)", "type": "multi-select", "options": ["North Africa", "Sub‑Saharan Africa", "Middle East", "Europe", "North America", "Latin America & Caribbean", "Asia‑Pacific", "Other"], "required": true },
-					{ "id": "participation_mode", "label": "How would you like to participate in FarmLab?", "type": "multi-select", "options": ["Join the community / follow updates","Access data and dashboards","Join beta / pilot programs","Partner commercially","Contribute to research","Mentor / advise"], "required": false }
+				id: "basic_info",
+				title: "register.form.basicInfo.title",
+				questions: [
+					{ id: "full_name", label: "register.form.fullName", type: "text", required: true },
+					{ id: "email", label: "register.form.email", type: "email", required: true },
+					{ id: "password", label: "register.form.password", type: "password", required: true, minLength: 8 },
+					{ id: "regions_operate", label: "register.form.regionsOperate", type: "multi-select", options: ["register.form.region.northAfrica", "register.form.region.subSaharanAfrica", "register.form.region.middleEast", "register.form.region.europe", "register.form.region.northAmerica", "register.form.region.latinAmerica", "register.form.region.asiaPacific", "register.form.region.other"], required: false },
+					{ id: "organization_type", label: "register.form.organizationType", type: "multi-select", options: ["register.form.organization.smallholder", "register.form.organization.commercial", "register.form.organization.cooperative", "register.form.organization.agribusiness", "register.form.organization.agritech", "register.form.organization.research", "register.form.organization.ngo", "register.form.organization.government", "register.form.organization.investor", "register.form.organization.other"], required: false },
+					{ id: "primary_objectives", label: "register.form.primaryObjectives", type: "multi-select", options: ["register.form.objective.increaseYield", "register.form.objective.reduceCosts", "register.form.objective.improveSustainability", "register.form.objective.accessData", "register.form.objective.runPilots", "register.form.objective.findPartners", "register.form.objective.upskillStaff", "register.form.objective.monetizeData"], required: false },
+					{ id: "engagement_preference", label: "register.form.engagementPreference", type: "multi-select", options: ["register.form.engagement.news", "register.form.engagement.webinars", "register.form.engagement.pilotPrograms", "register.form.engagement.dataApi", "register.form.engagement.paidProducts", "register.form.engagement.partnerships"], required: false }
 				]
 			},
 			{
-				"id": "user_type",
-				"title": "Your Role & Interest",
-				"description": "This determines which question paths you’ll see next.",
-				"questions": [
+				id: "oauth_basic_info",
+				title: "register.form.oauthBasicInfo.title",
+				questions: [
+					{ id: "roles", label: "register.form.roles", type: "multi-select", options: ["register.form.role.farmer", "register.form.role.technologist", "register.form.role.researcher", "register.form.role.industry", "register.form.role.investor", "register.form.role.student", "register.form.role.enthusiast"], required: true },
+					{ id: "regions_operate", label: "register.form.regionsOperateSingle", type: "multi-select", options: ["register.form.region.northAfrica", "register.form.region.subSaharanAfrica", "register.form.region.middleEast", "register.form.region.europe", "register.form.region.northAmerica", "register.form.region.latinAmerica", "register.form.region.asiaPacific", "register.form.region.other"], required: true },
+					{ id: "participation_mode", label: "register.form.participationMode", type: "multi-select", options: ["register.form.participation.community", "register.form.participation.data", "register.form.participation.beta", "register.form.participation.commercial", "register.form.participation.research", "register.form.participation.mentor"], required: false }
+				]
+			},
+			{
+				id: "user_type",
+				title: "register.form.userType.title",
+				description: "register.form.userType.description",
+				questions: [
 					{
-						"id": "roles",
-						"label": "Which of the following describe you? (You can select more than one)",
-						"type": "multi-select",
-						"options": [
-							"Farmer / Grower",
-							"Technologist / Developer / Engineer",
-							"Researcher / Academic",
-							"Industry Professional (Agri-related, food, energy, logistics, etc.)",
-							"Investor / Business Developer",
-							"Student / Educator",
-							"Enthusiast / Curious Observer"
+						id: "roles",
+						label: "register.form.roles",
+						type: "multi-select",
+						options: [
+							"register.form.role.farmer",
+							"register.form.role.technologist",
+							"register.form.role.researcher",
+							"register.form.role.industry",
+							"register.form.role.investor",
+							"register.form.role.student",
+							"register.form.role.enthusiast"
 						],
-						"required": true
+						required: true
 					}
 				],
-				"branch_logic": {
+				branch_logic: {
 					"Farmer / Grower": "branch_farmer",
 					"Technologist / Developer / Engineer": "branch_technologist",
 					"Farmer / Grower + Technologist / Developer / Engineer": "branch_hybrid",
@@ -78,88 +78,88 @@ const formJson = {
 			}
 		]
 	},
-	"branches": {
-		   "branch_researcher": {
-				   "title": "Researcher / Academic Path",
-				   "questions": [
-					   { "id": "research_areas", "label": "Which research areas apply to you?", "type": "multi-select", "options": ["Agronomy", "Soil Science", "Plant Pathology", "Crop Physiology", "AgTech / IoT", "Data Science / AI", "Economics / Policy", "Sustainability / Soil Health", "Other"], "required": true },
-					   { "id": "collab_interest", "label": "What type of collaboration interests you?", "type": "multi-select", "options": ["Data access", "Field trials", "Joint publications", "Student projects", "Other"] }
-				   ]
-		   },
-	       "branch_investor": {
-		       "title": "Investor / Business Developer Path",
-		       "questions": [
-			       { "id": "investment_focus", "label": "What is your main investment focus?", "type": "single-select", "options": ["AgriTech", "IoT / Hardware", "SaaS / Software", "Sustainability", "Other"] },
-			       { "id": "ticket_size", "label": "Typical ticket size?", "type": "single-select", "options": ["< $50k", "$50k–$250k", "$250k–$1M", "$1M+", "Not sure"] }
-		       ]
-	       },
-	       "branch_student": {
-		       "title": "Student / Educator Path",
-		       "questions": [
-			       { "id": "study_level", "label": "What is your level?", "type": "single-select", "options": ["High school", "Undergraduate", "Graduate", "Educator", "Other"] },
-			       { "id": "interest_area", "label": "What are you most interested in?", "type": "multi-select", "options": ["Internships", "Research projects", "Learning resources", "Hackathons", "Other"] }
-		       ]
-	       },
-		   "branch_enthusiast": {
-				   "title": "Enthusiast / Curious Observer Path",
-				   "questions": [
-					   { "id": "interest_reason", "label": "What brings you to FarmLab?", "type": "single-select", "options": ["Curiosity / Learning", "Follow topics / community", "Professional interest", "Student / research", "Potential collaborator or partner", "Other"], "required": false },
-					   { "id": "follow_topics", "label": "What topics would you like to follow?", "type": "multi-select", "options": ["Smart farming", "IoT", "Sustainability", "Market trends", "All of the above"] }
-				   ]
-		   },
-		"branch_farmer": {
-			"title": "Farmer Path",
-			"questions": [
-				{ "id": "farm_size", "label": "Farm size", "type": "single-select", "options": ["< 1 ha", "1–5 ha", "5–20 ha", "20+ ha"] },
-				{ "id": "production_type", "label": "Type of production (select all that apply)", "type": "multi-select", "options": ["Vegetables", "Grains / Cereals", "Fruits / Orchards", "Livestock / Dairy", "Greenhouse", "Hydroponics / Vertical Farming", "Mixed / Other"] },
-				{ "id": "current_tech_usage", "label": "What technologies do you already use?", "type": "multi-select", "options": ["None — mostly manual", "Drip or timed irrigation", "Basic sensors (e.g., soil moisture)", "Farm management apps or software", "IoT / automated control systems", "Drones / imaging / AI", "Renewable energy solutions"] },
-				{ "id": "challenges", "label": "What are your biggest challenges? (Select up to 3)", "type": "multi-select", "options": ["Water usage / irrigation optimization", "Pest / disease detection", "Labor shortages", "Climate unpredictability", "Low yield / inefficiency", "Feed / livestock cost", "Lack of technical support", "Sustainability / soil health"] },
-				{ "id": "priorities", "label": "What are your top priorities in the next 2 years?", "type": "multi-select", "options": ["Automate key operations", "Reduce costs", "Increase yield", "Transition to sustainable practices", "Adopt smart farming solutions", "Collaborate with tech partners"] }
-			]
-		},
-		"branch_technologist": {
-			"title": "Technologist Path",
-			"questions": [
-				{ "id": "expertise_area", "label": "What is your primary area of expertise?", "type": "single-select", "options": ["IoT / Embedded Systems", "Backend / API Development", "Data Science / AI / ML", "Automation / Robotics", "Hardware / Electronics Design", "Cloud / Infrastructure", "Full-stack Development", "Other"] },
-				{ "id": "collaboration_interest", "label": "What type of collaboration interests you?", "type": "multi-select", "options": ["Build and integrate IoT devices", "Develop APIs or dashboards", "Work with real-time sensor data", "Contribute to open-source software", "Pilot-test solutions on real farms", "Research and analytics projects"] },
-				{ "id": "data_interest", "label": "What kind of agricultural data would be most valuable to you?", "type": "multi-select", "options": ["Sensor telemetry (soil, climate, etc.)", "Plant growth / yield metrics", "Livestock data", "Automation / control logs", "Market and pricing trends", "Other"] }
-			]
-		},
-		"branch_hybrid": {
-			"title": "Farmer + Technologist (Hybrid) Path",
-			"questions": [
-				{ "id": "hybrid_focus", "label": "Are you more focused on:", "type": "single-select", "options": ["Applying my tech skills to my own farm", "Building solutions for others", "Both"] },
-				{ "id": "pilot_interest", "label": "Would you be interested in becoming an early pilot site for FarmLab technologies?", "type": "single-select", "options": ["Yes", "Maybe — need more info", "Not right now"] }
-			]
-		},
-		"branch_industry": {
-			"title": "Industry / Related Sector Path",
-			"questions": [
-				{ "id": "sector", "label": "What sector are you in?", "type": "single-select", "options": ["Agri-inputs (fertilizers, seeds, etc.)", "Logistics / cold chain", "Food processing / packaging", "Renewable energy", "Agritech / SaaS", "Government / policy", "Investment / VC", "Other"] },
-				{ "id": "industry_interest", "label": "What are you most interested in exploring with FarmLab?", "type": "multi-select", "options": ["Commercial partnerships", "Product integration", "Research collaboration", "Market intelligence", "Pilot deployment", "Sponsorship or investment"] }
-			]
-		}
-	},
-	"final_section": {
-		"title": "Engagement & Monetization (All Users)",
-		"questions": [
-			{ "id": "participation_mode", "label": "How would you like to participate in FarmLab?", "type": "multi-select", "options": ["Join the community / follow updates", "Access dashboards & analytics", "Join beta / pilot", "Partner commercially", "Contribute research", "Sponsor or invest"] },
-			{ "id": "preferred_pricing", "label": "Preferred pricing models", "type": "multi-select", "options": ["Monthly subscription", "One-time license", "Pay-as-you-grow", "Revenue share", "Grants / sponsor support", "Not sure" ] },
-			{ "id": "contact_pref", "label": "Preferred contact channels", "type": "multi-select", "options": ["Email", "WhatsApp", "SMS", "Phone", "Slack / Discord", "No contact"] }
-		]
-	}
+			branches: {
+				branch_researcher: {
+					title: "register.form.branch.researcher.title",
+					questions: [
+						{ id: "research_areas", label: "register.form.branch.researcher.researchAreas", type: "multi-select", options: ["register.form.branch.researcher.agronomy", "register.form.branch.researcher.soilScience", "register.form.branch.researcher.plantPathology", "register.form.branch.researcher.cropPhysiology", "register.form.branch.researcher.agtech", "register.form.branch.researcher.dataScience", "register.form.branch.researcher.economics", "register.form.branch.researcher.sustainability", "register.form.branch.researcher.other"], required: true },
+						{ id: "collab_interest", label: "register.form.branch.researcher.collabInterest", type: "multi-select", options: ["register.form.branch.researcher.dataAccess", "register.form.branch.researcher.fieldTrials", "register.form.branch.researcher.jointPublications", "register.form.branch.researcher.studentProjects", "register.form.branch.researcher.other"] }
+					]
+				},
+				branch_investor: {
+					title: "register.form.branch.investor.title",
+					questions: [
+						{ id: "investment_focus", label: "register.form.branch.investor.investmentFocus", type: "single-select", options: ["register.form.branch.investor.agritech", "register.form.branch.investor.iot", "register.form.branch.investor.saas", "register.form.branch.investor.sustainability", "register.form.branch.investor.other"] },
+						{ id: "ticket_size", label: "register.form.branch.investor.ticketSize", type: "single-select", options: ["register.form.branch.investor.lt50k", "register.form.branch.investor.50k_250k", "register.form.branch.investor.250k_1m", "register.form.branch.investor.1mplus", "register.form.branch.investor.notSure"] }
+					]
+				},
+				branch_student: {
+					title: "register.form.branch.student.title",
+					questions: [
+						{ id: "study_level", label: "register.form.branch.student.studyLevel", type: "single-select", options: ["register.form.branch.student.highSchool", "register.form.branch.student.undergraduate", "register.form.branch.student.graduate", "register.form.branch.student.educator", "register.form.branch.student.other"] },
+						{ id: "interest_area", label: "register.form.branch.student.interestArea", type: "multi-select", options: ["register.form.branch.student.internships", "register.form.branch.student.researchProjects", "register.form.branch.student.learningResources", "register.form.branch.student.hackathons", "register.form.branch.student.other"] }
+					]
+				},
+				branch_enthusiast: {
+					title: "register.form.branch.enthusiast.title",
+					questions: [
+						{ id: "interest_reason", label: "register.form.branch.enthusiast.interestReason", type: "single-select", options: ["register.form.branch.enthusiast.curiosity", "register.form.branch.enthusiast.followTopicsOption", "register.form.branch.enthusiast.professionalInterest", "register.form.branch.enthusiast.studentResearch", "register.form.branch.enthusiast.collaborator", "register.form.branch.enthusiast.other"] },
+						{ id: "follow_topics", label: "register.form.branch.enthusiast.followTopics", type: "multi-select", options: ["register.form.branch.enthusiast.smartFarming", "register.form.branch.enthusiast.iot", "register.form.branch.enthusiast.sustainability", "register.form.branch.enthusiast.marketTrends", "register.form.branch.enthusiast.all"] }
+					]
+				},
+				branch_farmer: {
+					title: "register.form.branch.farmer.title",
+					questions: [
+						{ id: "farm_size", label: "register.form.branch.farmer.farmSize", type: "single-select", options: ["register.form.branch.farmer.lt1ha", "register.form.branch.farmer.1_5ha", "register.form.branch.farmer.5_20ha", "register.form.branch.farmer.20plusHa"] },
+						{ id: "production_type", label: "register.form.branch.farmer.productionType", type: "multi-select", options: ["register.form.branch.farmer.vegetables", "register.form.branch.farmer.grains", "register.form.branch.farmer.fruits", "register.form.branch.farmer.livestock", "register.form.branch.farmer.greenhouse", "register.form.branch.farmer.hydroponics", "register.form.branch.farmer.mixed"] },
+						{ id: "current_tech_usage", label: "register.form.branch.farmer.currentTechUsage", type: "multi-select", options: ["register.form.branch.farmer.manual", "register.form.branch.farmer.irrigation", "register.form.branch.farmer.basicSensors", "register.form.branch.farmer.managementApps", "register.form.branch.farmer.iotSystems", "register.form.branch.farmer.drones", "register.form.branch.farmer.renewable"] },
+						{ id: "challenges", label: "register.form.branch.farmer.challenges", type: "multi-select", options: ["register.form.branch.farmer.waterUsage", "register.form.branch.farmer.pestDetection", "register.form.branch.farmer.laborShortages", "register.form.branch.farmer.climate", "register.form.branch.farmer.lowYield", "register.form.branch.farmer.feedCost", "register.form.branch.farmer.lackSupport", "register.form.branch.farmer.sustainability"] },
+						{ id: "priorities", label: "register.form.branch.farmer.priorities", type: "multi-select", options: ["register.form.branch.farmer.automate", "register.form.branch.farmer.reduceCosts", "register.form.branch.farmer.increaseYield", "register.form.branch.farmer.sustainable", "register.form.branch.farmer.smartFarming", "register.form.branch.farmer.collaborate"] }
+					]
+				},
+				branch_technologist: {
+					title: "register.form.branch.technologist.title",
+					questions: [
+						{ id: "expertise_area", label: "register.form.branch.technologist.expertiseArea", type: "single-select", options: ["register.form.branch.technologist.iot", "register.form.branch.technologist.backend", "register.form.branch.technologist.dataScience", "register.form.branch.technologist.automation", "register.form.branch.technologist.hardware", "register.form.branch.technologist.cloud", "register.form.branch.technologist.fullStack", "register.form.branch.technologist.other"] },
+						{ id: "collaboration_interest", label: "register.form.branch.technologist.collaborationInterest", type: "multi-select", options: ["register.form.branch.technologist.buildIoT", "register.form.branch.technologist.developAPIs", "register.form.branch.technologist.sensorData", "register.form.branch.technologist.openSource", "register.form.branch.technologist.pilotTest", "register.form.branch.technologist.research"] },
+						{ id: "data_interest", label: "register.form.branch.technologist.dataInterest", type: "multi-select", options: ["register.form.branch.technologist.sensorTelemetry", "register.form.branch.technologist.plantGrowth", "register.form.branch.technologist.livestockData", "register.form.branch.technologist.automationLogs", "register.form.branch.technologist.marketTrends", "register.form.branch.technologist.other"] }
+					]
+				},
+				branch_hybrid: {
+					title: "register.form.branch.hybrid.title",
+					questions: [
+						{ id: "hybrid_focus", label: "register.form.branch.hybrid.hybridFocus", type: "single-select", options: ["register.form.branch.hybrid.applySkills", "register.form.branch.hybrid.buildForOthers", "register.form.branch.hybrid.both"] },
+						{ id: "pilot_interest", label: "register.form.branch.hybrid.pilotInterest", type: "single-select", options: ["register.form.branch.hybrid.yes", "register.form.branch.hybrid.maybe", "register.form.branch.hybrid.notNow"] }
+					]
+				},
+				branch_industry: {
+					title: "register.form.branch.industry.title",
+					questions: [
+						{ id: "sector", label: "register.form.branch.industry.sector", type: "single-select", options: ["register.form.branch.industry.agriInputs", "register.form.branch.industry.logistics", "register.form.branch.industry.foodProcessing", "register.form.branch.industry.renewable", "register.form.branch.industry.agritech", "register.form.branch.industry.government", "register.form.branch.industry.investment", "register.form.branch.industry.other"] },
+						{ id: "industry_interest", label: "register.form.branch.industry.industryInterest", type: "multi-select", options: ["register.form.branch.industry.commercial", "register.form.branch.industry.integration", "register.form.branch.industry.research", "register.form.branch.industry.marketIntelligence", "register.form.branch.industry.pilot", "register.form.branch.industry.sponsorship"] }
+					]
+				}
+			},
+			final_section: {
+				title: "register.form.finalSection.title",
+				questions: [
+					{ id: "participation_mode", label: "register.form.finalSection.participationMode", type: "multi-select", options: ["register.form.finalSection.community", "register.form.finalSection.analytics", "register.form.finalSection.beta", "register.form.finalSection.commercial", "register.form.finalSection.research", "register.form.finalSection.sponsor"] },
+					{ id: "preferred_pricing", label: "register.form.finalSection.preferredPricing", type: "multi-select", options: ["register.form.finalSection.monthly", "register.form.finalSection.oneTime", "register.form.finalSection.payAsYouGrow", "register.form.finalSection.revenueShare", "register.form.finalSection.grants", "register.form.finalSection.notSure"] },
+					{ id: "contact_pref", label: "register.form.finalSection.contactPref", type: "multi-select", options: ["register.form.finalSection.email", "register.form.finalSection.whatsapp", "register.form.finalSection.sms", "register.form.finalSection.phone", "register.form.finalSection.slack", "register.form.finalSection.noContact"] }
+				]
+			}
 };
 
 
 // Role to branch mapping (no hybrid)
 const branchLogic: { [key: string]: string } = {
-	"Farmer / Grower": "branch_farmer",
-	"Technologist / Developer / Engineer": "branch_technologist",
-	"Industry Professional (Agri-related, food, energy, logistics, etc.)": "branch_industry",
-	"Researcher / Academic": "branch_researcher",
-	"Investor / Business Developer": "branch_investor",
-	"Student / Educator": "branch_student",
-	"Enthusiast / Curious Observer": "branch_enthusiast"
+	"register.form.role.farmer": "branch_farmer",
+	"register.form.role.technologist": "branch_technologist",
+	"register.form.role.industry": "branch_industry",
+	"register.form.role.researcher": "branch_researcher",
+	"register.form.role.investor": "branch_investor",
+	"register.form.role.student": "branch_student",
+	"register.form.role.enthusiast": "branch_enthusiast"
 };
 
 	// FarmLab brand color palette for progress bubbles
@@ -385,13 +385,20 @@ React.useEffect(() => {
 					return branch ? { id: branchKey, title: branch.title, questions: branch.questions } : null;
 				}).filter(Boolean),
 				{ id: "final_section", title: formJson.final_section.title, questions: formJson.final_section.questions }
-			];
+			].map(step => step ? {
+				...step,
+				title: t(step.title),
+				questions: step.questions.map(q => ({
+					...q,
+					label: t(q.label)
+				}))
+			} : null);
 			
 			return {
 				steps: calculatedSteps,
 				currentStep: calculatedSteps[stepIndex] ?? null
 			};
-		}, [formData["roles"], stepIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+		}, [formData["roles"], stepIndex, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
 		// Validation
 		function validateStep(): boolean {
@@ -811,7 +818,7 @@ React.useEffect(() => {
 										}`}>
 											{isSelected && <FiCheckCircle className="text-white w-3 h-3" />}
 										</div>
-										<span className="flex-1 font-medium">{option}</span>
+										<span className="flex-1 font-medium">{t(option)}</span>
 									</button>
 								);
 							})}
@@ -857,7 +864,7 @@ React.useEffect(() => {
 												<div className="w-2.5 h-2.5 bg-white rounded-full"></div>
 											)}
 										</div>
-										<span className="flex-1 font-medium">{option}</span>
+										<span className="flex-1 font-medium">{t(option)}</span>
 									</button>
 								);
 							})}
