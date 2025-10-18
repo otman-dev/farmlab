@@ -6,8 +6,10 @@ import { FiTarget, FiActivity, FiTrendingUp, FiCheckCircle, FiUsers, FiGlobe, Fi
 import LaunchCountdown from "@/components/LaunchCountdown";
 import Footer from "@/components/Footer";
 import AuthStatusBar from "@/components/AuthStatusBar";
+import { useI18n } from "@/components/LanguageProvider";
 
 export default function ComingSoonPage() {
+  const { t } = useI18n();
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 overflow-x-hidden">
       {/* Auth status bar in top right corner */}
@@ -33,18 +35,17 @@ export default function ComingSoonPage() {
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6 tracking-tight">
-              The Future of
+              {t("comingsoon.hero.title1")}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 animate-gradient-x">
-                Smart Farming
+                {t("comingsoon.hero.title2")}
               </span>
               <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-2">
-                is Almost Here
+                {t("comingsoon.hero.title3")}
               </span>
             </h1>
             
             <p className="text-xl sm:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
-              Join thousands of forward-thinking farmers already on our waitlist. Be among the first to experience 
-              the revolutionary platform that will transform agriculture forever.
+              {t("comingsoon.hero.subtitle")}
             </p>
             
             {/* Feature highlights with enhanced styling */}
@@ -53,22 +54,22 @@ export default function ComingSoonPage() {
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
                   <FiActivity className="w-6 h-6 text-green-600" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Real-Time Monitoring</h3>
-                <p className="text-gray-600 text-sm">24/7 IoT sensors tracking every aspect of your farm</p>
+                <h3 className="font-bold text-gray-900 mb-2">{t("comingsoon.features.realtime.title")}</h3>
+                <p className="text-gray-600 text-sm">{t("comingsoon.features.realtime.desc")}</p>
               </div>
               <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
                 <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
                   <FiTrendingUp className="w-6 h-6 text-emerald-600" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">AI-Powered Analytics</h3>
-                <p className="text-gray-600 text-sm">Intelligent insights to optimize your operations</p>
+                <h3 className="font-bold text-gray-900 mb-2">{t("comingsoon.features.analytics.title")}</h3>
+                <p className="text-gray-600 text-sm">{t("comingsoon.features.analytics.desc")}</p>
               </div>
               <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
                 <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300">
                   <FiCheckCircle className="w-6 h-6 text-teal-600" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Automated Control</h3>
-                <p className="text-gray-600 text-sm">Smart automation that works while you sleep</p>
+                <h3 className="font-bold text-gray-900 mb-2">{t("comingsoon.features.automated.title")}</h3>
+                <p className="text-gray-600 text-sm">{t("comingsoon.features.automated.desc")}</p>
               </div>
             </div>
           </div>
@@ -79,17 +80,17 @@ export default function ComingSoonPage() {
       <div className="relative py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full mb-4">LAUNCHING SOON</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Platform Launch Countdown</h2>
+            <span className="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full mb-4">{t("comingsoon.countdown.badge")}</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{t("comingsoon.countdown.title")}</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              The wait is almost over. Our revolutionary smart farming platform launches soon.
+              {t("comingsoon.countdown.subtitle")}
             </p>
           </div>
           
           <LaunchCountdown 
             targetDate="2025-10-28T12:00:00" 
-            title="Official Launch" 
-            subtitle="Be ready to transform your farming operations"
+            title={t("comingsoon.countdown.launchTitle")} 
+            subtitle={t("comingsoon.countdown.launchSubtitle")}
             className="transform hover:scale-105 transition-all duration-300"
           />
         </div>
@@ -99,10 +100,10 @@ export default function ComingSoonPage() {
       <div className="relative py-16 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-emerald-800 bg-emerald-100 rounded-full mb-4">WHAT&apos;S COMING</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Revolutionary Features</h2>
+            <span className="inline-block px-3 py-1 text-xs font-semibold text-emerald-800 bg-emerald-100 rounded-full mb-4">{t("comingsoon.whatscoming.badge")}</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{t("comingsoon.whatscoming.title")}</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Experience the future of agriculture with cutting-edge technology designed for modern farmers.
+              {t("comingsoon.whatscoming.subtitle")}
             </p>
           </div>
           
@@ -112,9 +113,9 @@ export default function ComingSoonPage() {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                 <FiGlobe className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Global Farm Network</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t("comingsoon.features.global.title")}</h3>
               <p className="text-gray-600 leading-relaxed">
-                Connect with farmers worldwide, share insights, and learn from the global agricultural community.
+                {t("comingsoon.features.global.desc")}
               </p>
             </div>
             
@@ -123,9 +124,9 @@ export default function ComingSoonPage() {
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                 <FiStar className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Premium Analytics</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t("comingsoon.features.premium.title")}</h3>
               <p className="text-gray-600 leading-relaxed">
-                Advanced AI-driven insights that predict optimal planting times, irrigation schedules, and harvest windows.
+                {t("comingsoon.features.premium.desc")}
               </p>
             </div>
             
@@ -134,9 +135,9 @@ export default function ComingSoonPage() {
               <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                 <FiUsers className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Expert Support</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t("comingsoon.features.expert.title")}</h3>
               <p className="text-gray-600 leading-relaxed">
-                24/7 access to agricultural experts, technical support, and a thriving community of innovators.
+                {t("comingsoon.features.expert.desc")}
               </p>
             </div>
           </div>
@@ -152,12 +153,11 @@ export default function ComingSoonPage() {
             </div>
             
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              🎉 You&apos;re on the Waitlist!
+              {t("comingsoon.waitlist.title")}
             </h2>
             
             <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-              Congratulations! You&apos;re now part of an exclusive group of forward-thinking farmers who will be 
-              the first to experience the future of agriculture. We&apos;ll notify you the moment we launch.
+              {t("comingsoon.waitlist.subtitle")}
             </p>
             
             {/* Status indicators */}
@@ -166,19 +166,19 @@ export default function ComingSoonPage() {
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <FiCheckCircle className="w-4 h-4 text-green-600" />
                 </div>
-                <p className="text-sm font-medium text-green-800">Waitlist Confirmed</p>
+                <p className="text-sm font-medium text-green-800">{t("comingsoon.waitlist.confirmed")}</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <FiMail className="w-4 h-4 text-blue-600" />
                 </div>
-                <p className="text-sm font-medium text-blue-800">Updates Enabled</p>
+                <p className="text-sm font-medium text-blue-800">{t("comingsoon.waitlist.updates")}</p>
               </div>
               <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
                 <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <FiStar className="w-4 h-4 text-purple-600" />
                 </div>
-                <p className="text-sm font-medium text-purple-800">Early Access Ready</p>
+                <p className="text-sm font-medium text-purple-800">{t("comingsoon.waitlist.earlyaccess")}</p>
               </div>
             </div>
             
@@ -188,7 +188,7 @@ export default function ComingSoonPage() {
                 className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 <FiTarget className="w-5 h-5 mr-2" />
-                Back to Home
+                {t("comingsoon.waitlist.backhome")}
                 <FiArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <Link
@@ -196,7 +196,7 @@ export default function ComingSoonPage() {
                 className="inline-flex items-center justify-center px-8 py-4 bg-white border-2 border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <FiMail className="w-5 h-5 mr-2" />
-                Contact Us
+                {t("comingsoon.waitlist.contact")}
               </Link>
             </div>
           </div>
@@ -207,28 +207,28 @@ export default function ComingSoonPage() {
       <div className="relative py-16 bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Join the Growing Community</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{t("comingsoon.community.title")}</h2>
             <p className="text-xl text-green-100 max-w-2xl mx-auto">
-              Thousands of farmers worldwide are already preparing for the agricultural revolution.
+              {t("comingsoon.community.subtitle")}
             </p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="text-4xl sm:text-5xl font-bold text-white mb-2">2000+</div>
-              <div className="text-green-100 font-medium">Farmers on Waitlist</div>
+              <div className="text-green-100 font-medium">{t("comingsoon.stats.farmers")}</div>
             </div>
             <div className="text-center">
               <div className="text-4xl sm:text-5xl font-bold text-white mb-2">10+</div>
-              <div className="text-green-100 font-medium">AI-Powered Solutions</div>
+              <div className="text-green-100 font-medium">{t("comingsoon.stats.solutions")}</div>
             </div>
             <div className="text-center">
               <div className="text-4xl sm:text-5xl font-bold text-white mb-2">24/7</div>
-              <div className="text-green-100 font-medium">Platform Monitoring</div>
+              <div className="text-green-100 font-medium">{t("comingsoon.stats.monitoring")}</div>
             </div>
             <div className="text-center">
               <div className="text-4xl sm:text-5xl font-bold text-white mb-2">100%</div>
-              <div className="text-green-100 font-medium">Moroccan Innovation</div>
+              <div className="text-green-100 font-medium">{t("comingsoon.stats.innovation")}</div>
             </div>
           </div>
         </div>
