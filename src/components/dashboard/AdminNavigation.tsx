@@ -22,7 +22,8 @@ import {
   FiTrendingUp,
   FiUserCheck,
   FiEye,
-  FiCheck
+  FiCheck,
+  FiPower
 } from 'react-icons/fi';
 
 interface AdminNavigationProps {
@@ -63,6 +64,7 @@ export default function AdminNavigation({ mobileOpen, setMobileOpen }: AdminNavi
     { path: '/dashboard/todolist', label: 'Todo List', icon: FiActivity },
     { path: '/dashboard/devices', label: 'Devices', icon: FiServer },
     { path: '/dashboard/sensorstations', label: 'Sensor Stations', icon: FiActivity },
+    { path: '/adminDashboard/pumpstations', label: 'Pump Stations', icon: FiPower },
     { path: '/dashboard/securitysystem', label: 'Security System', icon: FiLock },
     { path: '/dashboard/services', label: 'Services Status', icon: FiServer },
     { path: '/dashboard/users', label: 'User Management', icon: FiUsers },

@@ -10,7 +10,8 @@ import {
   FiServer,
   FiActivity,
   FiBarChart,
-  FiThermometer
+  FiThermometer,
+  FiPower
 } from "react-icons/fi";
 import SensorStationsComparisonChart from "@/components/dashboard/SensorStationsComparisonChart";
 
@@ -195,7 +196,7 @@ export default function AdminDashboardPage() {
       {/* Quick Actions */}
       <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Admin Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Link 
             href="/dashboard/users"
             className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
@@ -216,6 +217,13 @@ export default function AdminDashboardPage() {
           >
             <FiActivity className="text-purple-600" size={20} />
             <span className="font-medium text-gray-900">Device Management</span>
+          </Link>
+          <Link 
+            href="/adminDashboard/pumpstations"
+            className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+          >
+            <FiPower className="text-orange-600" size={20} />
+            <span className="font-medium text-gray-900">Pump Stations</span>
           </Link>
         </div>
       </div>
